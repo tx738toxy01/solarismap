@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Solaris Map</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌞</text></svg>">
+    
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+        
+        html, body { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            overscroll-behavior: none; 
+            touch-action: none; 
+        }
+        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05050a; color: #e2e8f0; display: flex; flex-direction: column; }
+        
+        header { background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.8) 100%); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(51, 65, 85, 0.5); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.05em; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+        
+        .date-picker-btn { background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; font-weight: bold; font-family: monospace; display: block; text-align: center; cursor: pointer; transition: background 0.2s; line-height: 1.2; white-space: nowrap; }
+        .date-picker-btn:hover { background: #334155; }
+        
+        .lang-picker { background: #1e293b; color: #38bdf8; border: 1px solid #475569; border-radius: 6px; padding: 4px 10px; font-size: 0.85rem; font-weight: bold; outline: none; cursor: pointer; transition: background 0.2s; text-align: center; }
+        .lang-picker:hover { background: #334155; }
+
+        .app-container { flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden; }
+        
+        #canvas-container { flex: 1; position: relative; cursor: grab; touch-action: none; }
+        #canvas-container:active { cursor: grabbing; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* OVLÁDACÍ PANEL - NASA STYLE */
+        .controls-panel { position: absolute; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 24px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 5; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); width: 90px; }
+        .btn-teraz { background: #0284c7; color: white; font-weight: bold; font-size: 0.85rem; padding: 8px 12px; border-radius: 16px; border: none; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4); }
+        .btn-teraz:active { transform: scale(0.95); }
+        .btn-pause { background: transparent; color: #e2e8f0; font-size: 1.6rem; line-height: 1; border: none; cursor: pointer; transition: color 0.2s; }
+        .btn-pause.active { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
+        .divider { width: 80%; height: 1px; background-color: rgba(51, 65, 85, 0.6); margin: 2px 0; }
+        
+        .speed-row { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; color: #94a3b8; margin: 2px 0; }
+        .speed-btn { background: transparent; border: none; color: #475569; font-size: 0.9rem; cursor: pointer; padding: 4px 0; width: 22px; display: flex; justify-content: center; transition: all 0.2s; letter-spacing: -1px; }
+        .speed-btn:hover { color: #94a3b8; }
+        .speed-btn.active-fwd { color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
+        .speed-btn.active-bwd { color: #ef4444; text-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+        .speed-label { width: 34px; text-align: center; font-weight: normal; font-size: 0.75rem; }
+
+        .zoom-controls { position: absolute; right: 20px; top: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 5; }
+        .btn-zoom { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #e2e8f0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        
+        .info-drawer { background: linear-gradient(0deg, rgba(10, 15, 30, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%); backdrop-filter: blur(15px); border-top: 1px solid rgba(51, 65, 85, 0.6); padding: 20px; height: 150px; position: relative; z-index: 10; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px; }
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; }
+        .planet-title { font-size: 1.3rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .planet-color-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+        
+        .planet-selector { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; outline: none; cursor: pointer; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 5px; }
+        .stat-card { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(51, 65, 85, 0.3); border-radius: 10px; padding: 10px; text-align: center; }
+        .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .stat-value { font-size: 0.95rem; font-weight: 600; color: #f8fafc; font-family: monospace; }
+        
+        .tab-menu { position: absolute; left: 20px; top: 20px; display: flex; gap: 8px; z-index: 5; }
+        .tab-btn { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .tab-btn.active { background: #0284c7 !important; border-color: #0284c7 !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .tab-btn-location-mode { padding: 8px 12px; display: flex; align-items: center; gap: 6px; }
+        
+        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 240px; z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .radar-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
+        .radar-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+        .radar-row span:last-child { font-family: monospace; font-weight: bold; color: #fff; }
+
+        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(2, 132, 199, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; }
+
+        /* ČISTÝ ZADÁVAČ DÁTUMU (Bez rolovania) */
+        .picker-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .picker-modal { background: #0f172a; border: 1px solid #334155; border-radius: 16px; width: 95%; max-width: 380px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 15px; }
+        .picker-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .picker-title { color: #38bdf8; font-weight: bold; font-size: 1.1rem; }
+        .picker-close { background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; padding: 0; border-radius: 50%; }
+        .picker-close:hover { color: #ef4444; }
+        
+        .era-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 5px; }
+        .era-btn { background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 6px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; letter-spacing: 1px; }
+        .era-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.5); }
+
+        .input-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .input-group { flex: 0 0 calc(33.333% - 7px); display: flex; flex-direction: column; gap: 4px; }
+        .input-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; text-align: center;}
+        .num-input { background: #1e293b; border: 1px solid #475569; color: #fff; padding: 10px; border-radius: 8px; font-size: 1.1rem; text-align: center; outline: none; font-family: monospace; width: 100%;}
+        .num-input:focus { border-color: #38bdf8; }
+
+        .picker-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+        .picker-btn { padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem; }
+        .picker-btn-cancel { background: transparent; color: #94a3b8; border: 1px solid #475569; }
+        .picker-btn-confirm { background: #0284c7; color: #fff; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4); }
+
+        /* LOKÁCIA PICKER MODAL (NOVÝ AUTOKOMPLET DIZAJN) */
+        #loc-picker-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .loc-modal { background: #0f172a; border: 1px solid #334155; border-radius: 16px; width: 95%; max-width: 400px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 15px; max-height: 85vh; }
+        .loc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .loc-title { color: #38bdf8; font-weight: bold; font-size: 1.1rem; }
+        
+        .search-box { position: relative; display: flex; width: 100%; }
+        .search-input { flex: 1; background: #1e293b; border: 1px solid #475569; color: #fff; padding: 12px 40px 12px 14px; border-radius: 8px; font-size: 0.95rem; outline: none; }
+        .search-input:focus { border-color: #38bdf8; }
+        .btn-gps-inline { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 5px; transition: transform 0.2s; color: #38bdf8; }
+        .btn-gps-inline:hover { transform: translateY(-50%) scale(1.15); }
+        
+        .search-results { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; padding-right: 5px; }
+        .res-item { background: #1e293b; border: 1px solid #334155; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .res-item:hover { background: #334155; border-color: #475569; }
+        .res-item-title { font-weight: bold; color: #fff; font-size: 1rem; margin-bottom: 2px; }
+        .res-item-sub { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .preset-section { margin-top: 5px; border-top: 1px solid #334155; padding-top: 15px; }
+        .preset-title { font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .preset-list { display: flex; flex-direction: column; gap: 4px; }
+        .preset-item { background: transparent; border: none; color: #cbd5e1; padding: 8px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .preset-item:hover { background: rgba(51, 65, 85, 0.5); color: #fff; }
+        .loading-text { text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 5px; display: none; }
+
+        canvas { touch-action: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><span>🌌</span> Solaris Map</h1>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="position: relative; z-index: 100;">
+                <div class="lang-picker" id="lang-select-btn" onclick="let d = document.getElementById('lang-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">Slovenčina</div>
+                <div id="lang-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #1e293b; border: 1px solid #475569; border-radius: 8px; margin-bottom: 5px; padding: 5px 0; min-width: 140px; box-shadow: 0 5px 20px rgba(0,0,0,0.6);"></div>
+            </div>
+
+            <div title="Zmeniť dátum a čas">
+                <div class="date-picker-btn" id="live-date" onclick="openPicker()">--.--.---- --:--:--</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <div class="toast-tip" id="swipe-tip">Potiahnutím posúvaš čas (← Minulosť | Budúcnosť →)</div>
+
+        <div class="tab-menu">
+            <button class="tab-btn active" id="tab-btn-system" onclick="switchView('system')">Solárna mapa</button>
+            <div style="position: relative;">
+                <button class="tab-btn" id="tab-btn-horizon" onclick="onHorizonTabClick(event)">Lokálny Horizont</button>
+            </div>
+        </div>
+
+        <div id="jupiter-radar-panel">
+            <div class="radar-title" id="radar-planet-title">📡 Sledovanie: Zem</div>
+            <div class="radar-row"><span id="lbl-az">Azimut (Smer):</span><span id="jup-az">---.-°</span></div>
+            <div class="radar-row"><span id="lbl-alt">Výška nad obzorom:</span><span id="jup-alt">---.-°</span></div>
+            
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; flex-direction: column; gap: 4px;">
+                <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
+                <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold;">---</span>
+            </div>
+        </div>
+
+        <div class="zoom-controls" id="zoom-ctrl-wrapper">
+            <button class="btn-zoom" onclick="buttonZoomIn()">+</button>
+            <button class="btn-zoom" onclick="buttonZoomOut()">-</button>
+        </div>
+
+        <div id="canvas-container">
+            <canvas id="solarCanvas"></canvas>
+        </div>
+
+        <div class="controls-panel">
+            <button class="btn-teraz" id="btn-today" onclick="resetToToday()">Teraz</button>
+            <button class="btn-pause active" id="speed-pause" onclick="togglePlayPause()">⏸</button>
+            <div class="divider"></div>
+            
+            <div class="speed-row">
+                <button class="speed-btn" id="btn-bwd-2" onclick="setModeDir('acc', 2, -1)">◄◄</button>
+                <span class="speed-label">2x</span>
+                <button class="speed-btn" id="btn-fwd-2" onclick="setModeDir('acc', 2, 1)">►►</button>
+            </div>
+            
+            <div class="speed-row">
+                <button class="speed-btn" id="btn-bwd-10" onclick="setModeDir('acc', 10, -1)">◄◄</button>
+                <span class="speed-label">10x</span>
+                <button class="speed-btn" id="btn-fwd-10" onclick="setModeDir('acc', 10, 1)">►►</button>
+            </div>
+            
+            <div class="speed-row">
+                <button class="speed-btn" id="btn-bwd-100" onclick="setModeDir('acc', 100, -1)">◄◄</button>
+                <span class="speed-label">100x</span>
+                <button class="speed-btn" id="btn-fwd-100" onclick="setModeDir('acc', 100, 1)">►►</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-drawer">
+        <div class="drawer-header">
+            <div class="planet-title">
+                <span class="planet-color-dot" id="title-dot" style="background-color: #38bdf8;"></span>
+                <span id="selected-planet-name">Zem</span>
+            </div>
+            
+            <div style="position: relative;">
+                <div class="planet-selector" id="planet-select-btn" onclick="let d = document.getElementById('planet-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">Zem</div>
+                <div id="planet-dropdown" style="display: none; position: absolute; bottom: 100%; right: 0; background: #1e293b; border: 1px solid #475569; border-radius: 8px; margin-bottom: 5px; padding: 5px 0; min-width: 140px; box-shadow: 0 -5px 20px rgba(0,0,0,0.6); z-index: 100; max-height: 65vh; overflow-y: auto;"></div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label" id="lbl-stat-dist">Vzdialenosť</div>
+                <div class="stat-value" id="stat-dist">1.00 AU</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" id="lbl-stat-speed">Rýchlosť</div>
+                <div class="stat-value" id="stat-speed">29.8 km/s</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label" id="lbl-stat-period">Doba obehu</div>
+                <div class="stat-value" id="stat-period">365.2 d</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DÁTUM PICKER -->
+    <div class="picker-overlay" id="custom-picker">
+        <div class="picker-modal">
+            <div class="picker-header">
+                <div class="picker-title" id="lbl-picker-title">Dátum a Čas</div>
+                <button class="picker-close" onclick="closePicker()">×</button>
+            </div>
+            
+            <div class="era-container">
+                <button id="btn-era-bc" class="era-btn" onclick="setEra('BC')">BC</button>
+                <button id="btn-era-ad" class="era-btn active" onclick="setEra('AD')">AD</button>
+            </div>
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <span class="input-label" id="lbl-day">Deň</span>
+                    <input type="number" id="inp-day" class="num-input" min="1" max="31" placeholder="DD">
+                </div>
+                <div class="input-group">
+                    <span class="input-label" id="lbl-month">Mesiac</span>
+                    <input type="number" id="inp-month" class="num-input" min="1" max="12" placeholder="MM">
+                </div>
+                <div class="input-group">
+                    <span class="input-label" id="lbl-year">Rok</span>
+                    <input type="number" id="inp-year" class="num-input" min="1" max="9999" placeholder="YYYY">
+                </div>
+                
+                <div class="input-group">
+                    <span class="input-label" id="lbl-hour">Hodina</span>
+                    <input type="number" id="inp-hour" class="num-input" min="0" max="23" placeholder="HH">
+                </div>
+                <div class="input-group">
+                    <span class="input-label" id="lbl-minute">Minúta</span>
+                    <input type="number" id="inp-minute" class="num-input" min="0" max="59" placeholder="MM">
+                </div>
+                
+            </div>
+            
+            <div class="picker-buttons">
+                <button class="picker-btn picker-btn-cancel" id="lbl-picker-cancel" onclick="closePicker()">Zrušiť</button>
+                <button class="picker-btn picker-btn-confirm" id="lbl-picker-confirm" onclick="confirmPicker()">Potvrdiť</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOKÁCIA PICKER MODAL -->
+    <div id="loc-picker-overlay">
+        <div class="loc-modal">
+            <div class="loc-header">
+                <div class="loc-title">📍 Lokálny Horizont</div>
+                <button class="picker-close" onclick="closeLocPicker()">×</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="loc-search-inp" class="search-input" placeholder="Hľadať miesto..." oninput="onSearchInput()">
+                <button class="btn-gps-inline" onclick="requestGPS()" title="Zistiť moju presnú polohu">📍</button>
+            </div>
+            
+            <div class="loading-text" id="loc-loading">Načítavam...</div>
+            <div class="search-results" id="loc-results"></div>
+
+            <div class="preset-section">
+                <div class="preset-title">⭐ Rýchly výber</div>
+                <div class="preset-list" id="loc-presets-grid">
+                    <!-- Generované cez JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('click', () => {
+            let dp = document.getElementById('planet-dropdown');
+            if (dp && dp.style.display === 'block') dp.style.display = 'none';
+            let dl = document.getElementById('lang-dropdown');
+            if (dl && dl.style.display === 'block') dl.style.display = 'none';
+        });
+
+        const langNames = { en: "English", de: "Deutsch", fr: "Français", es: "Español", sk: "Slovenčina", cs: "Čeština", zh: "中文", hi: "हिन्दी" };
+
+        const translations = {
+            sk: {
+                tabSystem: "Solárna mapa", tabHorizon: "Lokálny Horizont",
+                radarTracking: "📡 Sledovanie: ", radarAz: "Azimut (Smer):", radarAlt: "Výška nad obzorom:", radarVis: "Viditeľnosť voľným okom:",
+                visNoHor: "Nie (Pod obzorom)", visNoSun: "Nie (Silné slnečné svetlo)", visNoFar: "Nie (Príliš ďaleko)", visNoMoonPhase: "Nie (Fáza novu)", visNoHubble: "Nie (Vyžaduje Hubblov ďalekohľad)",
+                visYesBright: "Áno (Žiari na oblohe)", visYesNormal: "Áno (Dobre viditeľné)", visYesFaint: "Áno (Na hranici viditeľnosti)", visYesDayMoon: "Áno (Viditeľný aj cez deň)",
+                statDist: "Vzdialenosť", statSpeed: "Rýchlosť", statPeriod: "Doba obehu",
+                btnToday: "Teraz", swipeTip: "Potiahnutím posúvaš čas (← Minulosť | Budúcnosť →)",
+                periodY: " r", periodD: " d", pickerTitle: "Dátum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušiť", pickerConfirm: "Potvrdiť",
+                pickerDay: "Deň", pickerMonth: "Mesiac", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
+                toastMaxZoom: "Blahoželám, Orol pristál!", toastMinZoom: "Blahoželám, toto je Boží pohľad!",
+                cardinals: ["S (0°)", "V (90°)", "J (180°)", "Z (270°)", "S (360°)"],
+                planets: { Sun: "Slnko", Moon: "Mesiac", Mercury: "Merkúr", Venus: "Venuša", Earth: "Zem", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Urán", Neptune: "Neptún", Pluto: "Pluto", Halley: "Halleyho kométa" },
+                zodiac: { Aries: "Baran", Taurus: "Býk", Gemini: "Blíženci", Cancer: "Rak", Leo: "Lev", Virgo: "Panna", Libra: "Váhy", Scorpio: "Škorpión", Sagittarius: "Strelec", Capricorn: "Kozorožec", Aquarius: "Vodnár", Pisces: "Ryby" }
+            },
+            cs: {
+                tabSystem: "Solární mapa", tabHorizon: "Lokální Horizont",
+                radarTracking: "📡 Sledování: ", radarAz: "Azimut (Směr):", radarAlt: "Výška nad obzorem:", radarVis: "Viditelnost pouhým okem:",
+                visNoHor: "Ne (Pod obzorem)", visNoSun: "Ne (Silné sluneční světlo)", visNoFar: "Ne (Příliš daleko)", visNoMoonPhase: "Ne (Fáze novu)", visNoHubble: "Ne (Vyžaduje Hubbleův dalekohled)",
+                visYesBright: "Ano (Září na obloze)", visYesNormal: "Ano (Dobře viditelné)", visYesFaint: "Ano (Na hranici viditelnosti)", visYesDayMoon: "Ano (Viditelný i ve dne)",
+                statDist: "Vzdálenost", statSpeed: "Rychlost", statPeriod: "Doba oběhu",
+                btnToday: "Nyní", swipeTip: "Tažením posouváš čas (← Minulost | Budoucnost →)",
+                periodY: " r", periodD: " d", pickerTitle: "Datum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušit", pickerConfirm: "Potvrdit",
+                pickerDay: "Den", pickerMonth: "Měsíc", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
+                toastMaxZoom: "Gratuluji, Orel přistál!", toastMinZoom: "Gratuluji, to je Boží pohled!",
+                cardinals: ["S (0°)", "V (90°)", "J (180°)", "Z (270°)", "S (360°)"],
+                planets: { Sun: "Slunce", Moon: "Měsíc", Mercury: "Merkur", Venus: "Venuše", Earth: "Země", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Uran", Neptune: "Neptun", Pluto: "Pluto", Halley: "Halleyova kometa" },
+                zodiac: { Aries: "Beran", Taurus: "Býk", Gemini: "Blíženci", Cancer: "Rak", Leo: "Lev", Virgo: "Panna", Libra: "Váhy", Scorpio: "Štír", Sagittarius: "Střelec", Capricorn: "Kozoroh", Aquarius: "Vodnář", Pisces: "Ryby" }
+            },
+            en: {
+                tabSystem: "System Map", tabHorizon: "Local Horizon",
+                radarTracking: "📡 Tracking: ", radarAz: "Azimuth (Dir):", radarAlt: "Altitude:", radarVis: "Naked-eye visibility:",
+                visNoHor: "No (Below Horizon)", visNoSun: "No (Strong Sunlight)", visNoFar: "No (Too far)", visNoMoonPhase: "No (New Moon phase)", visNoHubble: "No (Requires Hubble telescope)",
+                visYesBright: "Yes (Shining bright)", visYesNormal: "Yes (Clearly visible)", visYesFaint: "Yes (Barely visible)", visYesDayMoon: "Yes (Visible in daylight)",
+                statDist: "Distance", statSpeed: "Speed", statPeriod: "Orbital Period",
+                btnToday: "Now", swipeTip: "Swipe to change time (← Past | Future →)",
+                periodY: " y", periodD: " d", pickerTitle: "Date & Time <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(year -9999 to +9999)</small>", pickerCancel: "Cancel", pickerConfirm: "Confirm",
+                pickerDay: "Day", pickerMonth: "Month", pickerYear: "Year", pickerHour: "Hr", pickerMinute: "Min",
+                toastMaxZoom: "Congratulations, the Eagle has landed!", toastMinZoom: "Congratulations, this is God's view!",
+                cardinals: ["N (0°)", "E (90°)", "S (180°)", "W (270°)", "N (360°)"],
+                planets: { Sun: "Sun", Moon: "Moon", Mercury: "Mercury", Venus: "Venus", Earth: "Earth", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Uranus", Neptune: "Neptune", Pluto: "Pluto", Halley: "Halley's Comet" },
+                zodiac: { Aries: "Aries", Taurus: "Taurus", Gemini: "Gemini", Cancer: "Cancer", Leo: "Leo", Virgo: "Virgo", Libra: "Libra", Scorpio: "Scorpio", Sagittarius: "Sagittarius", Capricorn: "Capricorn", Aquarius: "Aquarius", Pisces: "Pisces" }
+            },
+            de: {
+                tabSystem: "Systemkarte", tabHorizon: "Lokaler Horizont",
+                radarTracking: "📡 Verfolgung: ", radarAz: "Azimut (Richtung):", radarAlt: "Höhe:", radarVis: "Sichtbarkeit mit bloßem Auge:",
+                visNoHor: "Nein (Unter dem Horizont)", visNoSun: "Nein (Starkes Sonnenlicht)", visNoFar: "Nein (Zu weit entfernt)", visNoMoonPhase: "Nein (Neumondphase)", visNoHubble: "Nein (Erfordert Hubble-Teleskop)",
+                visYesBright: "Ja (Leuchtet hell)", visYesNormal: "Ja (Gut sichtbar)", visYesFaint: "Ja (Kaum sichtbar)", visYesDayMoon: "Ja (Tagsüber sichtbar)",
+                statDist: "Entfernung", statSpeed: "Geschwindigkeit", statPeriod: "Umlaufzeit",
+                btnToday: "Jetzt", swipeTip: "Wischen, um Zeit zu ändern (← Verg. | Zukunft →)",
+                periodY: " J", periodD: " T", pickerTitle: "Datum & Uhrzeit <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(Jahr -9999 bis +9999)</small>", pickerCancel: "Abbrechen", pickerConfirm: "Bestätigen",
+                pickerDay: "Tag", pickerMonth: "Monat", pickerYear: "Jahr", pickerHour: "Std", pickerMinute: "Min",
+                toastMaxZoom: "Glückwunsch, der Adler ist gelandet!", toastMinZoom: "Glückwunsch, das ist der Blick Gottes!",
+                cardinals: ["N (0°)", "O (90°)", "S (180°)", "W (270°)", "N (360°)"],
+                planets: { Sun: "Sonne", Moon: "Mond", Mercury: "Merkur", Venus: "Venus", Earth: "Erde", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Uranus", Neptune: "Neptun", Pluto: "Pluto", Halley: "Halleyscher Komet" },
+                zodiac: { Aries: "Widder", Taurus: "Stier", Gemini: "Zwillinge", Cancer: "Krebs", Leo: "Löwe", Virgo: "Jungfrau", Libra: "Waage", Scorpio: "Skorpion", Sagittarius: "Schütze", Capricorn: "Steinbock", Aquarius: "Wassermann", Pisces: "Fische" }
+            },
+            fr: {
+                tabSystem: "Carte du Système", tabHorizon: "Horizon Local",
+                radarTracking: "📡 Suivi : ", radarAz: "Azimut (Dir) :", radarAlt: "Altitude :", radarVis: "Visibilité à l'œil nu :",
+                visNoHor: "Non (Sous l'horizon)", visNoSun: "Non (Forte lumière)", visNoFar: "Non (Trop loin)", visNoMoonPhase: "Non (Phase de nouvelle lune)", visNoHubble: "Non (Nécessite le télescope Hubble)",
+                visYesBright: "Oui (Brille dans le ciel)", visYesNormal: "Oui (Bien visible)", visYesFaint: "Oui (À peine visible)", visYesDayMoon: "Oui (Visible de jour)",
+                statDist: "Distance", statSpeed: "Vitesse", statPeriod: "Période Orbitale",
+                btnToday: "Mnt", swipeTip: "Glisser pour changer l'heure (← Passé | Futur →)",
+                periodY: " a", periodD: " j", pickerTitle: "Date et Heure <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(an -9999 à +9999)</small>", pickerCancel: "Annuler", pickerConfirm: "Valider",
+                pickerDay: "Jour", pickerMonth: "Mois", pickerYear: "An", pickerHour: "H", pickerMinute: "Min",
+                toastMaxZoom: "Félicitations, l'Aigle s'est posé !", toastMinZoom: "Félicitations, c'est la vue de Dieu !",
+                cardinals: ["N (0°)", "E (90°)", "S (180°)", "O (270°)", "N (360°)"],
+                planets: { Sun: "Soleil", Moon: "Lune", Mercury: "Mercure", Venus: "Vénus", Earth: "Terre", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturne", Uranus: "Uranus", Neptune: "Neptune", Pluto: "Pluton", Halley: "Comète de Halley" },
+                zodiac: { Aries: "Bélier", Taurus: "Taureau", Gemini: "Gémeaux", Cancer: "Cancer", Leo: "Lion", Virgo: "Vierge", Libra: "Balance", Scorpio: "Scorpion", Sagittarius: "Sagittaire", Capricorn: "Capricorne", Aquarius: "Verseau", Pisces: "Poissons" }
+            },
+            es: {
+                tabSystem: "Mapa del Sistema", tabHorizon: "Horizonte Local",
+                radarTracking: "📡 Rastreo: ", radarAz: "Azimut (Dir):", radarAlt: "Altitud:", radarVis: "Visibilidad a simple vista:",
+                visNoHor: "No (Bajo el horizonte)", visNoSun: "No (Luz solar fuerte)", visNoFar: "No (Demasiado lejos)", visNoMoonPhase: "No (Fase de luna nueva)", visNoHubble: "No (Requiere telescopio Hubble)",
+                visYesBright: "Sí (Brilla en el cielo)", visYesNormal: "Sí (Bien visible)", visYesFaint: "Sí (Apenas visible)", visYesDayMoon: "Sí (Visible de día)",
+                statDist: "Distancia", statSpeed: "Velocidad", statPeriod: "Período Orbital",
+                btnToday: "Ahora", swipeTip: "Desliza para cambiar la hora (← Pasado | Futuro →)",
+                periodY: " a", periodD: " d", pickerTitle: "Fecha y Hora <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(año -9999 a +9999)</small>", pickerCancel: "Cancelar", pickerConfirm: "Aceptar",
+                pickerDay: "Día", pickerMonth: "Mes", pickerYear: "Año", pickerHour: "H", pickerMinute: "Min",
+                toastMaxZoom: "¡Felicidades, el Águila ha aterrizado!", toastMinZoom: "¡Felicidades, esta es la vista de Dios!",
+                cardinals: ["N (0°)", "E (90°)", "S (180°)", "O (270°)", "N (360°)"],
+                planets: { Sun: "Sol", Moon: "Luna", Mercury: "Mercurio", Venus: "Venus", Earth: "Tierra", Mars: "Marte", Jupiter: "Júpiter", Saturn: "Saturno", Uranus: "Urano", Neptune: "Neptuno", Pluto: "Plutón", Halley: "Cometa Halley" },
+                zodiac: { Aries: "Aries", Taurus: "Tauro", Gemini: "Géminis", Cancer: "Cáncer", Leo: "Leo", Virgo: "Virgo", Libra: "Libra", Scorpio: "Escorpio", Sagittarius: "Sagitario", Capricorn: "Capricornio", Aquarius: "Acuario", Pisces: "Piscis" }
+            },
+            zh: {
+                tabSystem: "星系地图", tabHorizon: "本地地平线",
+                radarTracking: "📡 追踪：", radarAz: "方位角 (方向)：", radarAlt: "高度角：", radarVis: "肉眼可见度：",
+                visNoHor: "否 (在地平线以下)", visNoSun: "否 (强烈的阳光)", visNoFar: "否 (太远)", visNoMoonPhase: "否 (新月阶段)", visNoHubble: "否 (需要哈勃望远镜)",
+                visYesBright: "是 (在天空中闪耀)", visYesNormal: "是 (清晰可见)", visYesFaint: "是 (勉强可见)", visYesDayMoon: "是 (白天可见)",
+                statDist: "距离", statSpeed: "速度", statPeriod: "公转周期",
+                btnToday: "现在", swipeTip: "滑动以更改时间 (← 过去 | 未来 →)",
+                periodY: " 年", periodD: " 天", pickerTitle: "日期和时间 <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(年份 -9999 至 +9999)</small>", pickerCancel: "取消", pickerConfirm: "确认",
+                pickerDay: "日", pickerMonth: "月", pickerYear: "年", pickerHour: "时", pickerMinute: "分",
+                toastMaxZoom: "祝贺，老鹰已着陆！", toastMinZoom: "祝贺，这是上帝的视角！",
+                cardinals: ["北 (0°)", "东 (90°)", "南 (180°)", "西 (270°)", "北 (360°)"],
+                planets: { Sun: "太阳", Moon: "月球", Mercury: "水星", Venus: "金星", Earth: "地球", Mars: "火星", Jupiter: "木星", Saturn: "土星", Uranus: "天王星", Neptune: "海王星", Pluto: "冥王星", Halley: "哈雷彗星" },
+                zodiac: { Aries: "白羊座", Taurus: "金牛座", Gemini: "双子座", Cancer: "巨蟹座", Leo: "狮子座", Virgo: "处女座", Libra: "天秤座", Scorpio: "天蝎座", Sagittarius: "射手座", Capricorn: "摩羯座", Aquarius: "水瓶座", Pisces: "双鱼座" }
+            },
+            hi: {
+                tabSystem: "सौर मानचित्र", tabHorizon: "स्थानीय क्षितिज",
+                radarTracking: "📡 ट्रैकिंग: ", radarAz: "दिगंश (दिशा):", radarAlt: "ऊंचाई:", radarVis: "नंगी आँखों से दृश्यता:",
+                visNoHor: "नहीं (क्षितिज के नीचे)", visNoSun: "नहीं (तेज धूप)", visNoFar: "नहीं (बहुत दूर)", visNoMoonPhase: "नहीं (अमावस्या का चरण)", visNoHubble: "नहीं (हबल टेलीस्कोप की आवश्यकता है)",
+                visYesBright: "हाँ (आसमान में चमक रहा है)", visYesNormal: "हाँ (स्पष्ट रूप से दिखाई दे रहा है)", visYesFaint: "हाँ (मुश्किल से दिखाई दे रहा है)", visYesDayMoon: "हाँ (दिन के उजाले में दिखाई दे रहा है)",
+                statDist: "दूरी", statSpeed: "गति", statPeriod: "कक्षीय अवधि",
+                btnToday: "अभी", swipeTip: "समय बदलने के लिए स्वाइप करें (← अतीत | भविष्य →)",
+                periodY: " वर्ष", periodD: " दिन", pickerTitle: "दिनांक और समय <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(वर्ष -9999 से +9999)</small>", pickerCancel: "रद्द करें", pickerConfirm: "पुष्टि करें",
+                pickerDay: "दिन", pickerMonth: "माह", pickerYear: "वर्ष", pickerHour: "घंटे", pickerMinute: "मिनट",
+                toastMaxZoom: "बधाई हो, ईगल उतर चुका है!", toastMinZoom: "बधाई हो, यह भगवान का दृश्य है!",
+                cardinals: ["उ (0°)", "पू (90°)", "द (180°)", "प (270°)", "उ (360°)"],
+                planets: { Sun: "सूर्य", Moon: "चंद्रमा", Mercury: "बुध", Venus: "शुक्र", Earth: "पृथ्वी", Mars: "मंगल", Jupiter: "बृहस्पति", Saturn: "शनि", Uranus: "अरुण", Neptune: "वरुण", Pluto: "यम", Halley: "हैली धूमकेतु" },
+                zodiac: { Aries: "मेष", Taurus: "वृषभ", Gemini: "मिथुन", Cancer: "कर्क", Leo: "सिंह", Virgo: "कन्या", Libra: "तुला", Scorpio: "वृश्चिक", Sagittarius: "धनु", Capricorn: "मकर", Aquarius: "कुंभ", Pisces: "मीन" }
+            }
+        };
+
+        const zodiacSigns = [
+            { id: "Aries", sym: "♈", angle: 0 }, { id: "Taurus", sym: "♉", angle: 30 },
+            { id: "Gemini", sym: "♊", angle: 60 }, { id: "Cancer", sym: "♋", angle: 90 },
+            { id: "Leo", sym: "♌", angle: 120 }, { id: "Virgo", sym: "♍", angle: 150 },
+            { id: "Libra", sym: "♎", angle: 180 }, { id: "Scorpio", sym: "♏", angle: 210 },
+            { id: "Sagittarius", sym: "♐", angle: 240 }, { id: "Capricorn", sym: "♑", angle: 270 },
+            { id: "Aquarius", sym: "♒", angle: 300 }, { id: "Pisces", sym: "♓", angle: 330 }
+        ];
+
+        let currentLang = localStorage.getItem('solaris_lang') || 'sk';
+        let currentEra = 'AD'; 
+        let currentPlanetKey = "Halley";
+        let activeTab = "system";
+
+        // ---- GLOBÁLNE PREMENNÉ PRE LOKÁCIU ---- //
+        const presetCitiesData = [
+            { lat: 48.1486, lon: 17.1077, tz: "Europe/Bratislava", title: "Bratislava", sub: "Slovensko", isShort: "Bratislava" },
+            { lat: -33.8688, lon: 151.2093, tz: "Australia/Sydney", title: "Sydney", sub: "Austrália (Zima v júni)", isShort: "Sydney" },
+            { lat: 40.7128, lon: -74.0060, tz: "America/New_York", title: "New York", sub: "USA", isShort: "New York" },
+            { lat: 35.6762, lon: 139.6503, tz: "Asia/Tokyo", title: "Tokio", sub: "Japonsko", isShort: "Tokio" },
+            { lat: 69.6492, lon: 18.9553, tz: "Europe/Oslo", title: "Tromsø", sub: "Nórsko (Polárny deň)", isShort: "Tromsø" },
+            { lat: -0.1807, lon: -78.4678, tz: "America/Guayaquil", title: "Quito", sub: "Ekvádor (Rovník)", isShort: "Quito" }
+        ];
+
+        let myLat = presetCitiesData[0].lat;
+        let myLon = presetCitiesData[0].lon;
+        let myLocName = presetCitiesData[0].isShort;
+        let myTimezone = presetCitiesData[0].tz;
+
+        function setCity(lat, lon, tz, shortName) {
+            myLat = parseFloat(lat);
+            myLon = parseFloat(lon);
+            myTimezone = tz;
+            myLocName = shortName;
+            updateHorizonTabButton();
+            closeLocPicker();
+        }
+
+        function updateHorizonTabButton() {
+            let btn = document.getElementById('tab-btn-horizon');
+            if (activeTab === 'horizon') {
+                btn.innerHTML = `📍 ${myLocName}`;
+                btn.classList.add('tab-btn-location-mode');
+            } else {
+                btn.innerHTML = translations[currentLang].tabHorizon;
+                btn.classList.remove('tab-btn-location-mode');
+            }
+        }
+
+        // --- VYHĽADÁVACÍ LOKÁCIA MODAL LOGIKA ---
+        function onHorizonTabClick(event) {
+            if (activeTab === 'system') {
+                switchView('horizon');
+            } else {
+                openLocPicker();
+                event.stopPropagation();
+            }
+        }
+
+        function openLocPicker() {
+            document.getElementById('loc-picker-overlay').style.display = 'flex';
+            document.getElementById('loc-search-inp').value = '';
+            document.getElementById('loc-results').innerHTML = '';
+            document.getElementById('loc-loading').style.display = 'none';
+            
+            let grid = document.getElementById('loc-presets-grid');
+            grid.innerHTML = '';
+            presetCitiesData.forEach(c => {
+                let btn = document.createElement('button');
+                btn.className = 'preset-item';
+                btn.innerHTML = `<span><strong>${c.title}</strong></span> <span style="font-size:0.75rem; opacity:0.6">${c.sub}</span>`;
+                btn.onclick = () => setCity(c.lat, c.lon, c.tz, c.isShort);
+                grid.appendChild(btn);
+            });
+        }
+
+        function closeLocPicker() {
+            document.getElementById('loc-picker-overlay').style.display = 'none';
+        }
+
+        document.getElementById('loc-picker-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeLocPicker();
+        });
+
+        function requestGPS() {
+            if (navigator.geolocation) {
+                document.getElementById('loc-loading').style.display = 'block';
+                document.getElementById('loc-loading').innerText = "Hľadám satelity...";
+                
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        let lat = pos.coords.latitude;
+                        let lon = pos.coords.longitude;
+                        let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        setCity(lat, lon, tz, "Moja poloha");
+                    },
+                    (err) => {
+                        alert("Nepodarilo sa získať polohu (Skontrolujte práva v prehliadači).");
+                        document.getElementById('loc-loading').style.display = 'none';
+                    }
+                );
+            }
+        }
+
+        let searchTimeout = null;
+        function onSearchInput() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(searchLocation, 500); 
+        }
+
+        async function searchLocation() {
+            let q = document.getElementById('loc-search-inp').value.trim();
+            let resDiv = document.getElementById('loc-results');
+            let loadDiv = document.getElementById('loc-loading');
+            
+            resDiv.innerHTML = '';
+            
+            if (q.length < 2) {
+                loadDiv.style.display = 'none';
+                return;
+            }
+            
+            loadDiv.style.display = 'block';
+            loadDiv.innerText = "Vyhľadávam...";
+
+            try {
+                let response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=5`, {
+                    headers: { 'Accept-Language': 'sk,en' }
+                });
+                let data = await response.json();
+                
+                loadDiv.style.display = 'none';
+                
+                if (data.length === 0) {
+                    resDiv.innerHTML = '<div class="loading-text" style="display:block">Nič sme nenašli.</div>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    let addr = item.address || {};
+                    let city = addr.city || addr.town || addr.village || addr.name || "Neznáme miesto";
+                    
+                    let county = addr.county || addr.state || "";
+                    if (county) county = county.replace(/okres\s/i, "okr. ");
+                    
+                    let countryCode = addr.country_code ? addr.country_code.toUpperCase() : "";
+                    
+                    let subText = [];
+                    if (county && county !== city) subText.push(county);
+                    if (countryCode) subText.push(countryCode);
+                    
+                    let shortName = city;
+                    if (countryCode) shortName += ", " + countryCode;
+
+                    let div = document.createElement('div');
+                    div.className = 'res-item';
+                    div.innerHTML = `<div class="res-item-title">${city}</div><div class="res-item-sub">${subText.join(', ')}</div>`;
+                    
+                    div.onclick = () => fetchTimezoneAndSet(item.lat, item.lon, shortName);
+                    resDiv.appendChild(div);
+                });
+
+            } catch (error) {
+                loadDiv.innerText = "Chyba pripojenia.";
+            }
+        }
+
+        // 2. Krok: Zistenie Timezone pre kliknuté mesto
+        async function fetchTimezoneAndSet(lat, lon, shortName) {
+            let loadDiv = document.getElementById('loc-loading');
+            let resDiv = document.getElementById('loc-results');
+            resDiv.innerHTML = '';
+            loadDiv.style.display = 'block';
+            loadDiv.innerText = "Zisťujem lokálny čas mesta...";
+
+            try {
+                // Bezplatné API pre Timezone
+                let tzResponse = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`);
+                if (!tzResponse.ok) throw new Error("TZ fail");
+                let tzData = await tzResponse.json();
+                
+                let timeZoneStr = tzData.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+                setCity(lat, lon, timeZoneStr, shortName);
+            } catch (error) {
+                // Fallback (ak by API spadlo, použijeme odhad z prehliadača)
+                setCity(lat, lon, Intl.DateTimeFormat().resolvedOptions().timeZone, shortName);
+            }
+        }
+
+        function getSkyPos(date, lat, lon, eclipticOffsetDeg = 0) {
+            const rad = Math.PI / 180;
+            let d = (date.getTime() - 946728000000) / 86400000;
+            
+            let M = (356.0470 + 0.9856002585 * d) % 360;
+            let L = (280.460 + 0.9856474 * d) % 360;
+            let lambda = L + 1.915 * Math.sin(M * rad) + 0.020 * Math.sin(2 * M * rad) + eclipticOffsetDeg;
+            
+            let obliq = 23.439 - 0.0000004 * d;
+            let alpha = Math.atan2(Math.cos(obliq * rad) * Math.sin(lambda * rad), Math.cos(lambda * rad));
+            let delta = Math.asin(Math.sin(obliq * rad) * Math.sin(lambda * rad));
+            
+            let GMST = (18.697374558 + 24.06570982441908 * d) % 24;
+            if (GMST < 0) GMST += 24;
+            let LST = (GMST + lon / 15) % 24;
+            let HA = (LST * 15 * rad) - alpha;
+            let lat_rad = lat * rad;
+            
+            let sin_alt = Math.sin(delta) * Math.sin(lat_rad) + Math.cos(delta) * Math.cos(lat_rad) * Math.cos(HA);
+            let alt = Math.asin(sin_alt);
+            let cos_az = (Math.sin(delta) - Math.sin(lat_rad) * sin_alt) / (Math.cos(lat_rad) * Math.cos(alt));
+            let az = Math.acos(Math.max(-1, Math.min(1, cos_az)));
+            if (Math.sin(HA) > 0) az = 2 * Math.PI - az;
+            
+            return { az: az / rad, alt: alt / rad };
+        }
+
+        const EPOCH_J2000 = 946728000000; 
+
+        let timeDirection = 1;
+        let lastFrameTime = Date.now();
+        const planetVisuals = {};
+
+        function lerpAngleDeg(current, target, factor) {
+            let diff = target - current;
+            diff = ((diff % 360) + 360) % 360; 
+            if (diff > 180) diff -= 360;       
+            return current + diff * factor;
+        }
+        
+        function lerpAngleRad(current, target, factor) {
+            let diff = target - current;
+            let PI2 = Math.PI * 2;
+            diff = ((diff % PI2) + PI2) % PI2;
+            if (diff > Math.PI) diff -= PI2;
+            return current + diff * factor;
+        }
+
+        const jplData = {
+            Mercury: { a: 0.387099, e: 0.205630, e_r: 0.000025, L: 252.250324, L_r: 149472.67411, w: 77.457796, w_r: 0.160476 },
+            Venus: { a: 0.723336, e: 0.006777, e_r: -0.000041, L: 181.979099, L_r: 58517.81538, w: 131.602467, w_r: 0.002683 },
+            Earth: { a: 1.000003, e: 0.016711, e_r: -0.000044, L: 100.464572, L_r: 35999.37245, w: 102.937682, w_r: 0.323274 },
+            Mars: { a: 1.523710, e: 0.093394, e_r: 0.000078, L: -4.553432, L_r: 19140.30268, w: -23.943629, w_r: 0.444411 },
+            Jupiter: { a: 5.202887, e: 0.048386, e_r: -0.000133, L: 34.396440, L_r: 3034.74613, w: 14.728480, w_r: 0.212527 },
+            Saturn: { a: 9.536676, e: 0.053862, e_r: -0.000509, L: 49.954244, L_r: 1222.49362, w: 92.598878, w_r: -0.418972 },
+            Uranus: { a: 19.189165, e: 0.047257, e_r: -0.000044, L: 313.238104, L_r: 428.48203, w: 170.954276, w_r: 0.408053 },
+            Neptune: { a: 30.069923, e: 0.008590, e_r: 0.000051, L: -55.120029, L_r: 218.45945, w: 44.964762, w_r: -0.322415 },
+            Pluto: { a: 39.481687, e: 0.248827, e_r: 0.000051, L: 238.929038, L_r: 145.20781, w: 224.066764, w_r: -0.040629 }
+        };
+
+        const planetData = {
+            Sun:     { color: "#facc15", size: 18, radius: 0,   period: 365.25, speed: "0.0",  dist: "0.00 AU",  baseAngle: 0,   altOffset: 0,  H: -26.7, isVisibleNakedEye: true },
+            Moon:    { color: "#e2e8f0", size: 4,  radius: 18,  period: 27.32,  speed: "1.0",  dist: "0.002 AU", baseAngle: 0,   altOffset: 5,  H: -12.7, isVisibleNakedEye: true },
+            Mercury: { color: "#9ca3af", size: 4,  radius: 45,  period: 87.97,  speed: "47.4", dist: "0.39 AU",  baseAngle: 1.2, altOffset: 2,  H: -0.6,  isVisibleNakedEye: true },
+            Venus:   { color: "#fbbf24", size: 7,  radius: 65,  period: 224.7,  speed: "35.0", dist: "0.72 AU",  baseAngle: 2.5, altOffset: 8,  H: -4.4,  isVisibleNakedEye: true },
+            Earth:   { color: "#3b82f6", size: 8,  radius: 90,  period: 365.26, speed: "29.8", dist: "1.00 AU",  baseAngle: 0,   altOffset: 0,  H: -3.8,  isVisibleNakedEye: false },
+            Mars:    { color: "#ef4444", size: 6,  radius: 120, period: 686.98, speed: "24.1", dist: "1.52 AU",  baseAngle: 4.1, altOffset: 4,  H: -1.5,  isVisibleNakedEye: true },
+            Jupiter: { color: "#f59e0b", size: 16, radius: 170, period: 4332.59, speed: "13.1", dist: "5.20 AU",  baseAngle: 0.8, altOffset: 6,  H: -9.4,  isVisibleNakedEye: true },
+            Saturn:  { color: "#eab308", size: 13, radius: 220, period: 10759.22, speed: "9.7",  dist: "9.58 AU",  baseAngle: 5.3, altOffset: 2,  H: -8.9,  isVisibleNakedEye: true, hasRings: true },
+            Uranus:  { color: "#22d3ee", size: 10, radius: 260, period: 30685.4,  speed: "6.8",  dist: "19.22 AU", baseAngle: 1.9, altOffset: 1,  H: -7.2,  isVisibleNakedEye: false },
+            Neptune: { color: "#6366f1", size: 10, radius: 300, period: 60189.0,  speed: "5.4",  dist: "30.05 AU", baseAngle: 3.7, altOffset: 0,  H: -7.0,  isVisibleNakedEye: false },
+            Pluto:   { color: "#a1a1aa", size: 3,  radius: 360, period: 90560.0,  speed: "4.7",  dist: "39.48 AU", baseAngle: 2.1, altOffset: -2, H: -1.0,  isVisibleNakedEye: false },
+            Halley:  { color: "#ffffff", size: 4,  a: 182.5, e: 0.643, omega: 2.1, period: 27504, speed: "0.9 - 54", dist: "0.6 - 35 AU", baseAngle: 3.33, isComet: true, altOffset: 0, H: 4.0, isVisibleNakedEye: false }
+        };
+
+        const halleyPerihelions = [
+            new Date("1986-02-09T00:00:00Z").getTime(), new Date("1910-04-20T00:00:00Z").getTime(),
+            new Date("1835-11-16T00:00:00Z").getTime(), new Date("1759-11-16T00:00:00Z").getTime(),
+            new Date("1682-09-15T00:00:00Z").getTime(), new Date("1607-09-27T00:00:00Z").getTime(),
+            new Date("1531-08-26T00:00:00Z").getTime(), new Date("1456-08-26T00:00:00Z").getTime(),
+            new Date("1378-11-09T00:00:00Z").getTime(), new Date("1301-10-25T00:00:00Z").getTime(),
+            new Date("1222-09-28T00:00:00Z").getTime(), new Date("1145-04-18T00:00:00Z").getTime(),
+            new Date("1066-03-20T00:00:00Z").getTime(), new Date("0989-09-05T00:00:00Z").getTime(),
+            new Date("0912-07-18T00:00:00Z").getTime(), new Date("0837-02-28T00:00:00Z").getTime(),
+            new Date("0760-05-20T00:00:00Z").getTime(), new Date("0684-10-02T00:00:00Z").getTime(),
+            new Date("0607-03-15T00:00:00Z").getTime(), new Date("0530-09-27T00:00:00Z").getTime(),
+            new Date("0451-06-28T00:00:00Z").getTime(), new Date("0374-02-16T00:00:00Z").getTime(),
+            new Date("0295-04-20T00:00:00Z").getTime(), new Date("0218-05-17T00:00:00Z").getTime(),
+            new Date("0141-03-22T00:00:00Z").getTime(), new Date("0066-01-26T00:00:00Z").getTime(),
+            new Date(-11, 9, 10).getTime(), new Date(-86, 7, 6).getTime(), 
+            new Date(-163, 10, 12).getTime(), new Date(-239, 4, 25).getTime()
+        ];
+        const halleyNext = new Date("2061-07-28T00:00:00Z").getTime();
+
+        function getHalleyMeanAnomaly(currentDate) {
+            let t = currentDate.getTime();
+            let pPrev = 0, pNext = 0;
+
+            if (t >= halleyPerihelions[0]) {
+                pPrev = halleyPerihelions[0];
+                pNext = halleyNext;
+                if (t > pNext) {
+                    let periodMs = 27504 * 86400000;
+                    let remainder = (t - pNext) % periodMs;
+                    return (remainder / periodMs) * 2 * Math.PI;
+                }
+            } else if (t <= halleyPerihelions[halleyPerihelions.length - 1]) {
+                let pPrev = halleyPerihelions[halleyPerihelions.length - 1];
+                let periodMs = 27504 * 86400000;
+                let remainder = (pPrev - t) % periodMs;
+                return (1 - (remainder / periodMs)) * 2 * Math.PI;
+            } else {
+                for (let i = 0; i < halleyPerihelions.length - 1; i++) {
+                    if (t <= halleyPerihelions[i] && t >= halleyPerihelions[i+1]) {
+                        pNext = halleyPerihelions[i];    
+                        pPrev = halleyPerihelions[i+1];  
+                        break;
+                    }
+                }
+            }
+            let periodMs = pNext - pPrev;
+            let progress = (t - pPrev) / periodMs;
+            return progress * 2 * Math.PI;
+        }
+
+        function populateLangDropdown() {
+            const dropdown = document.getElementById('lang-dropdown');
+            dropdown.innerHTML = '';
+            for (let key in langNames) {
+                let div = document.createElement('div');
+                div.innerText = langNames[key];
+                div.style.padding = '8px 15px';
+                div.style.color = '#e2e8f0';
+                div.style.cursor = 'pointer';
+                div.style.fontSize = '0.9rem';
+                div.onmouseover = () => div.style.background = '#334155';
+                div.onmouseout = () => div.style.background = 'transparent';
+                div.onclick = (e) => { 
+                    changeLanguage(key); 
+                    e.stopPropagation(); 
+                    dropdown.style.display = 'none';
+                };
+                dropdown.appendChild(div);
+            }
+            document.getElementById('lang-select-btn').innerText = currentLang.toUpperCase();
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('solaris_lang', lang);
+            document.getElementById('lang-select-btn').innerText = lang.toUpperCase();
+            applyTranslations();
+        }
+
+        function applyTranslations() {
+            const t = translations[currentLang];
+            document.getElementById('tab-btn-system').innerText = t.tabSystem;
+            updateHorizonTabButton(); 
+            
+            document.getElementById('lbl-az').innerText = t.radarAz;
+            document.getElementById('lbl-alt').innerText = t.radarAlt;
+            document.getElementById('lbl-vis').innerText = t.radarVis;
+            document.getElementById('lbl-stat-dist').innerText = t.statDist;
+            document.getElementById('lbl-stat-speed').innerText = t.statSpeed;
+            document.getElementById('lbl-stat-period').innerText = t.statPeriod;
+            document.getElementById('btn-today').innerText = t.btnToday;
+            document.getElementById('swipe-tip').innerText = t.swipeTip;
+            
+            document.getElementById('lbl-picker-title').innerHTML = t.pickerTitle;
+            document.getElementById('lbl-picker-cancel').innerText = t.pickerCancel;
+            document.getElementById('lbl-picker-confirm').innerText = t.pickerConfirm;
+            
+            document.getElementById('lbl-day').innerText = t.pickerDay;
+            document.getElementById('lbl-month').innerText = t.pickerMonth;
+            document.getElementById('lbl-year').innerText = t.pickerYear;
+            document.getElementById('lbl-hour').innerText = t.pickerHour;
+            document.getElementById('lbl-minute').innerText = t.pickerMinute;
+
+            const dropdown = document.getElementById('planet-dropdown');
+            dropdown.innerHTML = '';
+            
+            const planetKeys = ["Sun", "Moon", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Halley"];
+            planetKeys.forEach(key => {
+                let div = document.createElement('div');
+                div.innerText = t.planets[key];
+                div.style.padding = '5px 12px';
+                div.style.color = '#e2e8f0';
+                div.style.cursor = 'pointer';
+                div.style.fontSize = '0.85rem';
+                div.onmouseover = () => div.style.background = '#334155';
+                div.onmouseout = () => div.style.background = 'transparent';
+                div.onclick = (e) => { 
+                    selectPlanet(key); 
+                    e.stopPropagation(); 
+                };
+                dropdown.appendChild(div);
+            });
+            
+            document.getElementById('planet-select-btn').innerText = t.planets[currentPlanetKey];
+            document.getElementById('selected-planet-name').innerText = t.planets[currentPlanetKey];
+            document.getElementById('radar-planet-title').innerText = t.radarTracking + t.planets[currentPlanetKey];
+            
+            let p = planetData[currentPlanetKey].period;
+            let pText = p > 365 ? (p/365.25).toFixed(1) + t.periodY : p.toFixed(0) + t.periodD;
+            document.getElementById('stat-period').innerText = pText;
+        }
+
+        const canvas = document.getElementById('solarCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+
+        let simDate = new Date(); 
+        let timeMode = 'real'; 
+        let timeSpeed = 1;
+        let lastRunningMode = 'real';
+        let lastRunningSpeed = 1;
+
+        function setEra(era) {
+            currentEra = era;
+            if(era === 'BC') {
+                document.getElementById('btn-era-bc').classList.add('active');
+                document.getElementById('btn-era-ad').classList.remove('active');
+            } else {
+                document.getElementById('btn-era-ad').classList.add('active');
+                document.getElementById('btn-era-bc').classList.remove('active');
+            }
+        }
+
+        function openPicker() {
+            document.getElementById('custom-picker').style.display = 'flex';
+            
+            let y = simDate.getFullYear();
+            if (y <= 0) {
+                setEra('BC');
+                document.getElementById('inp-year').value = Math.abs(y) + 1;
+            } else {
+                setEra('AD');
+                document.getElementById('inp-year').value = y;
+            }
+
+            document.getElementById('inp-day').value = simDate.getDate();
+            document.getElementById('inp-month').value = simDate.getMonth() + 1;
+            document.getElementById('inp-hour').value = simDate.getHours();
+            document.getElementById('inp-minute').value = simDate.getMinutes();
+        }
+
+        function closePicker() {
+            document.getElementById('custom-picker').style.display = 'none';
+        }
+
+        function confirmPicker() {
+            let d = parseInt(document.getElementById('inp-day').value) || 1;
+            let m = (parseInt(document.getElementById('inp-month').value) || 1) - 1;
+            let y = parseInt(document.getElementById('inp-year').value) || 2026;
+            let h = parseInt(document.getElementById('inp-hour').value) || 0;
+            let min = parseInt(document.getElementById('inp-minute').value) || 0;
+
+            d = Math.max(1, Math.min(d, 31));
+            m = Math.max(0, Math.min(m, 11));
+            y = Math.max(1, Math.min(y, 9999));
+            h = Math.max(0, Math.min(h, 23));
+            min = Math.max(0, Math.min(min, 59));
+
+            let actualYear = currentEra === 'BC' ? -(y - 1) : y;
+            
+            let newDate = new Date();
+            newDate.setHours(h, min, 0, 0);
+            newDate.setFullYear(actualYear, m, d);
+            
+            if (newDate.getMonth() !== m) {
+                newDate.setFullYear(actualYear, m + 1, 0);
+            }
+            
+            simDate = newDate;
+            setMode('paused');
+            closePicker();
+        }
+
+        document.getElementById('custom-picker').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePicker();
+            }
+        });
+
+        function resizeCanvas() {
+            let dpr = window.devicePixelRatio || 1;
+            canvas.style.width = container.clientWidth + 'px';
+            canvas.style.height = container.clientHeight + 'px';
+            canvas.width = container.clientWidth * dpr;
+            canvas.height = container.clientHeight * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let zoom = 1.0, targetZoom = 1.0;
+        let zoomStack = []; 
+        let offsetX = 0, targetOffsetX = 0;
+        let offsetY = 0, targetOffsetY = 0;
+        
+        let isTrackingPlanet = false; 
+        let trackingWeight = 0, targetTrackingWeight = 0;
+        let camWorldX = 0, camWorldY = 0;
+        let panOffsetWorldX = 0, panOffsetWorldY = 0;
+        
+        let isDragging = false;
+        let startX, startY;
+        let lastX = 0; 
+        let initialPinchDistance = null;
+        let horizonPositions = {}; 
+        let toastTimeout;
+
+        function showToast(msg) {
+            const tip = document.getElementById('swipe-tip');
+            tip.innerText = msg;
+            tip.style.opacity = '1';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { tip.style.opacity = '0'; }, 3500);
+        }
+
+        function hideTooltip() {
+            const tip = document.getElementById('swipe-tip');
+            tip.style.opacity = '0';
+            if (toastTimeout) clearTimeout(toastTimeout);
+        }
+
+        container.addEventListener('mousedown', (e) => {
+            hideTooltip();
+            isDragging = true; 
+            startX = e.clientX - offsetX; 
+            startY = e.clientY - offsetY; 
+            lastX = e.clientX;
+            isTrackingPlanet = false; 
+            targetOffsetX = offsetX; targetOffsetY = offsetY; targetZoom = zoom;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) {
+                let rect = canvas.getBoundingClientRect();
+                let hoverX = e.clientX - rect.left; let hoverY = e.clientY - rect.top;
+                let isHovering = false;
+                
+                for (let k in horizonPositions) {
+                    let hp = horizonPositions[k];
+                    let inCircle = Math.hypot(hoverX - hp.cx, hoverY - hp.cy) <= hp.cr;
+                    let inRect = hoverX >= hp.rx1 && hoverX <= hp.rx2 && hoverY >= hp.ry1 && hoverY <= hp.ry2;
+                    if (inCircle || inRect) { isHovering = true; break; }
+                }
+                container.style.cursor = isHovering ? 'pointer' : 'default';
+            } else {
+                container.style.cursor = 'grabbing';
+                if (activeTab === "horizon") {
+                    let deltaX = e.clientX - lastX; lastX = e.clientX;
+                    simDate = new Date(simDate.getTime() + deltaX * 2.5 * 60 * 1000); setMode('paused');
+                } else {
+                    offsetX = e.clientX - startX; offsetY = e.clientY - startY;
+                    targetOffsetX = offsetX; targetOffsetY = offsetY; 
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            container.style.cursor = 'default';
+        });
+
+        container.addEventListener('touchstart', (e) => {
+            hideTooltip();
+            if (e.touches.length === 1) {
+                isDragging = true; 
+                startX = e.touches[0].clientX - offsetX; 
+                startY = e.touches[0].clientY - offsetY; 
+                lastX = e.touches[0].clientX;
+                isTrackingPlanet = false;
+                targetOffsetX = offsetX; targetOffsetY = offsetY; targetZoom = zoom;
+            } else if (e.touches.length === 2 && activeTab === "system") {
+                isDragging = false; 
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1 && isDragging) {
+                if (activeTab === "horizon") {
+                    let deltaX = e.touches[0].clientX - lastX; lastX = e.touches[0].clientX;
+                    simDate = new Date(simDate.getTime() + deltaX * 2.5 * 60 * 1000); setMode('paused');
+                } else {
+                    offsetX = e.touches[0].clientX - startX; offsetY = e.touches[0].clientY - startY;
+                    targetOffsetX = offsetX; targetOffsetY = offsetY;
+                }
+            } else if (e.touches.length === 2 && activeTab === "system") {
+                let currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                
+                if (initialPinchDistance) {
+                    let zoomFactor = currentDistance / initialPinchDistance;
+                    adjustZoom(zoomFactor);
+                }
+                
+                initialPinchDistance = currentDistance;
+            }
+        });
+
+        container.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) { initialPinchDistance = null; }
+            if (e.touches.length === 0) { isDragging = false; }
+        });
+
+        function getOrbitCenterPos(key, days, zoomLevel) {
+            if (key === "Sun") return { x: 0, y: 0 };
+            let p = planetData[key];
+            if (!p) return { x: 0, y: 0 };
+
+            if (jplData[key]) {
+                const T = (simDate.getTime() - EPOCH_J2000) / 3155760000000;
+                let j = jplData[key];
+                let e = j.e + j.e_r * T;
+                let w = (j.w + j.w_r * T) * Math.PI / 180;
+                let vis_a = p.radius * zoomLevel;
+                return {
+                    x: -vis_a * e * Math.cos(w),
+                    y: -vis_a * e * Math.sin(w)
+                };
+            }
+
+            if (key === "Moon") {
+                return getPlanetPos("Earth", days, zoomLevel); 
+            }
+
+            if (p.isComet) {
+                let cx = -p.a * zoomLevel * p.e;
+                let omega = p.omega || 0;
+                return { x: cx * Math.cos(omega), y: cx * Math.sin(omega) };
+            }
+
+            return { x: 0, y: 0 };
+        }
+
+        function getPlanetPos(key, days, zoomLevel) {
+            if (key === "Sun") return { x: 0, y: 0 };
+
+            let p = planetData[key];
+            if (!p || !planetVisuals[key]) return { x: 0, y: 0 }; 
+
+            if (jplData[key]) {
+                const T = (simDate.getTime() - EPOCH_J2000) / 3155760000000; 
+                let j = jplData[key];
+                let e = j.e + j.e_r * T;
+                let w = (j.w + j.w_r * T) % 360;
+                
+                let L_rad = planetVisuals[key].angle * Math.PI / 180;
+                let w_rad = w * Math.PI / 180;
+                let M = L_rad - w_rad;
+                
+                M = M % (2 * Math.PI);
+                if (M < 0) M += 2 * Math.PI;
+
+                let E = M;
+                for(let k = 0; k < 5; k++) {
+                    E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+                }
+
+                let x_orb = j.a * (Math.cos(E) - e);
+                let y_orb = j.a * Math.sqrt(1 - e*e) * Math.sin(E);
+
+                let r_true = Math.hypot(x_orb, y_orb);
+                let theta_true = Math.atan2(y_orb, x_orb) + w_rad; 
+
+                let r_ratio = r_true / j.a;
+                let visual_radius = p.radius * zoomLevel * r_ratio;
+
+                return {
+                    x: visual_radius * Math.cos(theta_true),
+                    y: visual_radius * Math.sin(theta_true)
+                };
+            }
+
+            if (key === "Moon") {
+                let ePos = getPlanetPos("Earth", days, zoomLevel);
+                let mAngle = planetVisuals[key].angle * Math.PI / 180;
+                return {
+                    x: ePos.x + 18 * zoomLevel * Math.cos(mAngle),
+                    y: ePos.y + 18 * zoomLevel * Math.sin(mAngle)
+                };
+            }
+
+            if (p.isComet) {
+                let E = planetVisuals[key].angle;
+                for(let k = 0; k < 5; k++) {
+                    E = E - (E - p.e * Math.sin(E) - planetVisuals[key].angle) / (1 - p.e * Math.cos(E));
+                }
+                let ox = p.a * zoomLevel * (Math.cos(E) - p.e);
+                let oy = p.a * zoomLevel * Math.sqrt(1 - p.e*p.e) * Math.sin(E);
+                let omega = p.omega || 0;
+                return {
+                    x: ox * Math.cos(omega) - oy * Math.sin(omega),
+                    y: ox * Math.sin(omega) + oy * Math.cos(omega)
+                };
+            }
+
+            return { x: 0, y: 0 };
+        }
+
+        function getMaxZoom() {
+            let minDim = Math.min(canvas.clientWidth, canvas.clientHeight);
+            let currentSize = planetData[currentPlanetKey].size;
+            let baseMaxZoom = (minDim - 10) / (currentSize * 2);
+            return baseMaxZoom * Math.pow(1.4, 5);
+        }
+
+        function buttonZoomIn() {
+            let maxZoom = getMaxZoom();
+            if (targetZoom >= maxZoom * 0.99) {
+                showToast(translations[currentLang].toastMaxZoom);
+                return;
+            }
+
+            if (!isTrackingPlanet && activeTab === "system") {
+                isTrackingPlanet = true;
+                let msSinceEpoch = simDate.getTime() - new Date(2026, 0, 1).getTime();
+                let days = msSinceEpoch / (1000 * 60 * 60 * 24);
+                let pPosRaw = getPlanetPos(currentPlanetKey, days, 1);
+                let oPosRaw = getOrbitCenterPos(currentPlanetKey, days, 1);
+                
+                let targetX = oPosRaw.x + (pPosRaw.x - oPosRaw.x) * trackingWeight;
+                let targetY = oPosRaw.y + (pPosRaw.y - oPosRaw.y) * trackingWeight;
+                
+                panOffsetWorldX = (-offsetX / zoom) - targetX;
+                panOffsetWorldY = (-offsetY / zoom) - targetY;
+            }
+
+            zoomStack.push({ zoom: targetZoom, weight: targetTrackingWeight });
+
+            targetZoom = Math.min(targetZoom * 1.4, maxZoom);
+            targetTrackingWeight = targetTrackingWeight + (1.0 - targetTrackingWeight) * 0.4;
+            if (targetZoom >= maxZoom * 0.95) targetTrackingWeight = 1.0;
+        }
+
+        function buttonZoomOut() {
+            if (!isTrackingPlanet && activeTab === "system") {
+                isTrackingPlanet = true;
+                let msSinceEpoch = simDate.getTime() - new Date(2026, 0, 1).getTime();
+                let days = msSinceEpoch / (1000 * 60 * 60 * 24);
+                let pPosRaw = getPlanetPos(currentPlanetKey, days, 1);
+                let oPosRaw = getOrbitCenterPos(currentPlanetKey, days, 1);
+                
+                let targetX = oPosRaw.x + (pPosRaw.x - oPosRaw.x) * trackingWeight;
+                let targetY = oPosRaw.y + (pPosRaw.y - oPosRaw.y) * trackingWeight;
+                
+                panOffsetWorldX = (-offsetX / zoom) - targetX;
+                panOffsetWorldY = (-offsetY / zoom) - targetY;
+            }
+
+            if (zoomStack.length > 0) {
+                let lastState = zoomStack.pop();
+                targetZoom = lastState.zoom;
+                targetTrackingWeight = lastState.weight;
+            } else {
+                if (targetZoom <= 0.15 * 1.01) {
+                    showToast(translations[currentLang].toastMinZoom);
+                    return;
+                }
+                targetZoom = Math.max(0.15, targetZoom / 1.4);
+                targetTrackingWeight = 0; 
+            }
+        }
+
+        function adjustZoom(factor) { 
+            let maxZoom = getMaxZoom();
+            let oldZoom = targetZoom;
+
+            if (factor > 1 && targetZoom >= maxZoom * 0.99) showToast(translations[currentLang].toastMaxZoom);
+            if (factor < 1 && targetZoom <= 0.15 * 1.01) showToast(translations[currentLang].toastMinZoom);
+
+            targetZoom = Math.max(0.15, Math.min(targetZoom * factor, maxZoom)); 
+            
+            if (isTrackingPlanet) {
+                let minDim = Math.min(canvas.clientWidth, canvas.clientHeight);
+                let targetRadius = planetData[currentPlanetKey].radius || 60;
+                if (currentPlanetKey === "Sun") targetRadius = 60;
+                if (currentPlanetKey === "Moon") targetRadius = planetData["Moon"].radius * 1.2;
+                if (planetData[currentPlanetKey].isComet) targetRadius = planetData[currentPlanetKey].a * 1.2;
+                let orbitZoom = (minDim - 40) / (targetRadius * 2);
+                let minZ = Math.max(0.15, Math.min(orbitZoom, maxZoom * 0.9));
+                
+                if (maxZoom > minZ) {
+                    let ratio = Math.max(0, Math.min(1, (targetZoom - minZ) / (maxZoom - minZ)));
+                    targetTrackingWeight = Math.pow(ratio, 0.7);
+                } else {
+                    targetTrackingWeight = 1;
+                }
+            } else if (activeTab === "system") {
+                let actualFactor = targetZoom / oldZoom;
+                targetOffsetX *= actualFactor;
+                targetOffsetY *= actualFactor;
+            }
+        }
+
+        function setModeDir(mode, speed, dir) {
+            timeDirection = dir;
+            setMode(mode, speed);
+        }
+
+        function setMode(mode, speed = 1) {
+            document.getElementById('speed-pause').classList.remove('active');
+            document.querySelectorAll('.speed-btn').forEach(b => {
+                b.classList.remove('active-fwd');
+                b.classList.remove('active-bwd');
+            });
+            
+            if (mode !== 'paused') {
+                timeMode = mode;
+                if (mode === 'acc') timeSpeed = speed;
+                lastRunningMode = timeMode; lastRunningSpeed = timeSpeed;
+                document.getElementById('speed-pause').innerText = '⏸';
+                
+                if (mode === 'acc') {
+                    let btnId = (timeDirection === 1) ? `btn-fwd-${speed}` : `btn-bwd-${speed}`;
+                    let cls = (timeDirection === 1) ? 'active-fwd' : 'active-bwd';
+                    let b = document.getElementById(btnId);
+                    if (b) b.classList.add(cls);
+                }
+            } else {
+                timeMode = 'paused'; 
+                document.getElementById('speed-pause').innerText = '▶'; 
+                document.getElementById('speed-pause').classList.add('active');
+            }
+        }
+
+        function togglePlayPause() {
+            if (timeMode === 'paused') { 
+                setMode(lastRunningMode, lastRunningSpeed); 
+            } else { 
+                setMode('paused'); 
+            }
+        }
+
+        function resetToToday() { 
+            timeDirection = 1; 
+            setMode('real'); 
+            simDate = new Date(); 
+        }
+
+        function selectPlanet(key, noAnimation = false) {
+            const t = translations[currentLang];
+            
+            if (!noAnimation && activeTab === "system") {
+                let msSinceEpoch = simDate.getTime() - new Date(2026, 0, 1).getTime();
+                let days = msSinceEpoch / (1000 * 60 * 60 * 24);
+                let new_oPosRaw = getOrbitCenterPos(key, days, 1);
+                
+                panOffsetWorldX = (-offsetX / zoom) - new_oPosRaw.x;
+                panOffsetWorldY = (-offsetY / zoom) - new_oPosRaw.y;
+            } else {
+                panOffsetWorldX = 0;
+                panOffsetWorldY = 0;
+            }
+
+            currentPlanetKey = key;
+            let dp = document.getElementById('planet-dropdown');
+            if (dp) dp.style.display = 'none';
+            document.getElementById('planet-select-btn').innerText = t.planets[key];
+
+            document.getElementById('selected-planet-name').innerText = t.planets[key];
+            document.getElementById('title-dot').style.backgroundColor = planetData[key].color;
+            document.getElementById('stat-dist').innerText = planetData[key].dist;
+            document.getElementById('stat-speed').innerText = planetData[key].speed + " km/s";
+            
+            let p = planetData[key].period;
+            let pText = p > 365 ? (p/365.25).toFixed(1) + t.periodY : p.toFixed(0) + t.periodD;
+            document.getElementById('stat-period').innerText = pText;
+            document.getElementById('radar-planet-title').innerText = t.radarTracking + t.planets[key];
+
+            if (activeTab === "system") {
+                let targetRadius = planetData[key].radius;
+                if (key === "Sun") targetRadius = 60; 
+                if (key === "Moon") targetRadius = planetData["Moon"].radius * 1.2; 
+                if (planetData[key].isComet) targetRadius = planetData[key].a * 1.2; 
+                
+                let minDimension = Math.min(canvas.clientWidth, canvas.clientHeight);
+                let padding = 40; 
+                let orbitZoom = (minDimension - padding) / (targetRadius * 2);
+                let maxZ = getMaxZoom();
+                
+                isTrackingPlanet = true;
+                zoomStack = []; 
+                targetTrackingWeight = 0; 
+                trackingWeight = 0; 
+                targetZoom = Math.max(0.15, Math.min(orbitZoom, maxZ));
+                
+                if (noAnimation) {
+                    zoom = targetZoom; 
+                    let msSinceEpoch = simDate.getTime() - new Date(2026, 0, 1).getTime();
+                    let days = msSinceEpoch / (1000 * 60 * 60 * 24);
+                    let oPosRaw = getOrbitCenterPos(currentPlanetKey, days, 1);
+                    
+                    camWorldX = oPosRaw.x;
+                    camWorldY = oPosRaw.y;
+                    
+                    offsetX = -camWorldX * zoom; 
+                    offsetY = -camWorldY * zoom;
+                    targetOffsetX = offsetX;
+                    targetOffsetY = offsetY;
+                }
+            }
+        }
+
+        function switchView(view) {
+            activeTab = view;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            hideTooltip();
+            
+            if (view === 'system') {
+                document.getElementById('tab-btn-system').classList.add('active');
+                document.getElementById('jupiter-radar-panel').style.display = 'none';
+                document.getElementById('zoom-ctrl-wrapper').style.display = 'flex';
+                updateHorizonTabButton(); 
+                
+                selectPlanet(currentPlanetKey, true);
+            } else {
+                document.getElementById('tab-btn-horizon').classList.add('active');
+                document.getElementById('jupiter-radar-panel').style.display = 'block';
+                document.getElementById('zoom-ctrl-wrapper').style.display = 'none';
+                updateHorizonTabButton(); 
+                
+                selectPlanet(currentPlanetKey, true);
+                showToast(translations[currentLang].swipeTip);
+            }
+        }
+
+        function drawMoonPhase(ctx, x, y, radius, phase, darkColor = '#1e293b') {
+            phase = ((phase % 1) + 1) % 1; 
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.fillStyle = darkColor;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f8fafc';
+            let isWaxing = phase <= 0.5;
+            
+            ctx.beginPath();
+            if (isWaxing) {
+                ctx.arc(0, 0, radius, -Math.PI / 2, Math.PI / 2);
+            } else {
+                ctx.arc(0, 0, radius, Math.PI / 2, -Math.PI / 2);
+            }
+            ctx.fill();
+
+            let cosPhase = Math.cos(phase * Math.PI * 2);
+            let ellipseRadius = radius * Math.abs(cosPhase);
+
+            if (cosPhase > 0) {
+                ctx.fillStyle = darkColor; 
+            } else {
+                ctx.fillStyle = '#f8fafc'; 
+            }
+
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ellipseRadius, radius, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function updateAndRender() {
+            let now = Date.now();
+            let realDelta = now - lastFrameTime;
+            lastFrameTime = now;
+
+            if (timeMode === 'real') {
+                simDate = new Date(simDate.getTime() + realDelta * timeDirection); 
+            } else if (timeMode === 'acc') {
+                let dt = 16 * timeSpeed * 60 * 1000 * timeDirection; 
+                simDate = new Date(simDate.getTime() + dt);
+            }
+
+            const T = (simDate.getTime() - EPOCH_J2000) / 3155760000000;
+            const dJ2000 = (simDate.getTime() - EPOCH_J2000) / 86400000;
+            let msSinceEpoch = simDate.getTime() - new Date(2026, 0, 1).getTime();
+            let days = msSinceEpoch / (1000 * 60 * 60 * 24);
+
+            for (let key in planetData) {
+                if (key === "Sun") continue;
+                
+                let targetL = 0;
+                let isRad = false;
+                
+                if (jplData[key]) {
+                    targetL = (jplData[key].L + jplData[key].L_r * T) % 360;
+                } else if (key === "Moon") {
+                    targetL = (218.316 + 13.176396 * dJ2000) % 360;
+                } else if (planetData[key].isComet) {
+                    targetL = getHalleyMeanAnomaly(simDate);
+                    isRad = true;
+                }
+                
+                if (!planetVisuals[key]) {
+                    planetVisuals[key] = { angle: targetL }; 
+                } else {
+                    if (timeMode === 'acc' && timeSpeed >= 2) {
+                        planetVisuals[key].angle = targetL;
+                    } else {
+                        if (isRad) {
+                            planetVisuals[key].angle = lerpAngleRad(planetVisuals[key].angle, targetL, 0.06);
+                        } else {
+                            planetVisuals[key].angle = lerpAngleDeg(planetVisuals[key].angle, targetL, 0.06);
+                        }
+                    }
+                }
+            }
+
+            zoom += (targetZoom - zoom) * 0.08;
+            trackingWeight += (targetTrackingWeight - trackingWeight) * 0.08;
+
+            if (isTrackingPlanet && activeTab === "system") {
+                let pPosRaw = getPlanetPos(currentPlanetKey, days, 1);
+                let oPosRaw = getOrbitCenterPos(currentPlanetKey, days, 1);
+
+                let exactTargetWorldX = oPosRaw.x + (pPosRaw.x - oPosRaw.x) * trackingWeight;
+                let exactTargetWorldY = oPosRaw.y + (pPosRaw.y - oPosRaw.y) * trackingWeight;
+
+                panOffsetWorldX += (0 - panOffsetWorldX) * 0.05;
+                panOffsetWorldY += (0 - panOffsetWorldY) * 0.05;
+
+                camWorldX = exactTargetWorldX + panOffsetWorldX;
+                camWorldY = exactTargetWorldY + panOffsetWorldY;
+
+                offsetX = -camWorldX * zoom;
+                offsetY = -camWorldY * zoom;
+                
+                targetOffsetX = offsetX;
+                targetOffsetY = offsetY;
+            } else if (activeTab === "system") {
+                offsetX += (targetOffsetX - offsetX) * 0.08;
+                offsetY += (targetOffsetY - offsetY) * 0.08;
+                camWorldX = -offsetX / zoom;
+                camWorldY = -offsetY / zoom;
+            }
+
+            // --- VÝPOČET ZOBRAZOVANÉHO ČASU ---
+            let pad = (n) => n.toString().padStart(2, '0');
+            let displayDate = simDate; 
+            
+            if (activeTab === 'horizon' && myTimezone) {
+                try {
+                    let tzDateStr = displayDate.toLocaleString('en-US', { timeZone: myTimezone });
+                    displayDate = new Date(tzDateStr);
+                } catch(e) {
+                }
+            }
+
+            let dYear = displayDate.getFullYear();
+            let displayYear = dYear <= 0 ? Math.abs(dYear) + 1 : dYear;
+            let eraStr = dYear <= 0 ? "BC" : "AD";
+            
+            document.getElementById('live-date').innerHTML = 
+                `${pad(displayDate.getDate())}.${pad(displayDate.getMonth()+1)}.${displayYear.toString().padStart(4, '0')}&nbsp;${eraStr}<br>${pad(displayDate.getHours())}:${pad(displayDate.getMinutes())}:${pad(displayDate.getSeconds())}`;
+
+            ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+            horizonPositions = {}; 
+            const t = translations[currentLang];
+
+            if (activeTab === "system") {
+                let cx = canvas.clientWidth / 2 + offsetX;
+                let cy = canvas.clientHeight / 2 + offsetY;
+
+                ctx.fillStyle = "rgba(255,255,255,0.15)";
+                for (let i = 0; i < 50; i++) {
+                    let hx = (Math.sin(i * 3323) * 0.5 + 0.5) * canvas.clientWidth;
+                    let hy = (Math.cos(i * 9482) * 0.5 + 0.5) * canvas.clientHeight;
+                    ctx.fillRect(hx, hy, 1, 1);
+                }
+
+                let plutoCenter = getOrbitCenterPos("Pluto", days, zoom);
+                let zx = cx + plutoCenter.x * 0.65; 
+                let zy = cy + plutoCenter.y * 0.65;
+                let ringRad = 425 * zoom; 
+                
+                ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(zx, zy, ringRad, 0, Math.PI*2); ctx.stroke();
+                
+                zodiacSigns.forEach(z => {
+                    let r = z.angle * Math.PI / 180;
+                    let cosR = Math.cos(r);
+                    let sinR = Math.sin(r);
+                    
+                    ctx.textAlign = 'center'; 
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
+                    ctx.font = '18px sans-serif'; 
+                    ctx.fillText(z.sym, zx + ringRad * cosR, zy + ringRad * sinR);
+                    
+                    if (cosR > 0.1) ctx.textAlign = 'left';
+                    else if (cosR < -0.1) ctx.textAlign = 'right';
+                    else ctx.textAlign = 'center';
+                    
+                    if (sinR > 0.1) ctx.textBaseline = 'top';
+                    else if (sinR < -0.1) ctx.textBaseline = 'bottom';
+                    else ctx.textBaseline = 'middle';
+
+                    ctx.fillStyle = 'rgba(148, 163, 184, 0.85)';
+                    ctx.font = '15px sans-serif'; 
+                    ctx.fillText(t.zodiac[z.id], zx + (ringRad + 16) * cosR, zy + (ringRad + 16) * sinR);
+                });
+                
+                ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+
+                ctx.beginPath();
+                let sunGlow = ctx.createRadialGradient(cx, cy, 2, cx, cy, 18 * zoom);
+                sunGlow.addColorStop(0, '#fffdf0'); sunGlow.addColorStop(0.2, '#facc15'); sunGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = sunGlow; ctx.arc(cx, cy, 20 * zoom, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = '#facc15'; 
+                ctx.font = currentPlanetKey === "Sun" ? 'bold 14px sans-serif' : '14px sans-serif'; 
+                let textWidth = ctx.measureText(t.planets["Sun"]).width;
+                ctx.fillText(t.planets["Sun"], cx - textWidth/2, cy - 20 * zoom - 5);
+                horizonPositions["Sun"] = { 
+                    cx: cx, cy: cy, cr: Math.max(20, 25 * zoom), 
+                    rx1: cx - textWidth/2 - 5, rx2: cx + textWidth/2 + 5, 
+                    ry1: cy - 20 * zoom - 15, ry2: cy - 20 * zoom + 2
+                };
+
+                for (let key in planetData) {
+                    if (key === "Sun") continue; 
+                    drawSystemPlanet(key, cx, cy, days, t);
+                }
+            } else {
+                let horizonY = canvas.clientHeight * 0.70;
+
+                let ePosRaw = getPlanetPos("Earth", days, 1);
+                let earthX = ePosRaw.x;
+                let earthY = ePosRaw.y;
+                let sunGeoAngle = Math.atan2(-earthY, -earthX);
+                let sunDeg = (sunGeoAngle * 180 / Math.PI + 360) % 360;
+
+                let realSun = getSkyPos(simDate, myLat, myLon, 0);
+                let sunAz = realSun.az;
+                let sunAlt = realSun.alt;
+
+                let skyColor;
+                if (sunAlt > 10) skyColor = '#38bdf8'; 
+                else if (sunAlt > -5) skyColor = '#fbbf24'; 
+                else skyColor = '#020617'; 
+
+                ctx.fillStyle = skyColor; ctx.fillRect(0, 0, canvas.clientWidth, horizonY);
+                ctx.fillStyle = '#090d16'; ctx.fillRect(0, horizonY, canvas.clientWidth, canvas.clientHeight - horizonY);
+                ctx.beginPath(); ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2; ctx.moveTo(0, horizonY); ctx.lineTo(canvas.clientWidth, horizonY); ctx.stroke();
+
+                const cardinalAngles = [0, 90, 180, 270, 360];
+                ctx.font = '13px monospace';
+                cardinalAngles.forEach((angle, index) => {
+                    let x = (angle / 360) * canvas.clientWidth;
+                    ctx.beginPath(); ctx.strokeStyle = 'rgba(51, 65, 85, 0.2)'; ctx.setLineDash([4, 4]); ctx.moveTo(x, 0); ctx.lineTo(x, horizonY); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.fillStyle = '#94a3b8'; ctx.fillText(t.cardinals[index], x - 18, horizonY + 20);
+                });
+
+                let zodiacAltOffset = 18; 
+                
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+                ctx.lineWidth = 1.5;
+                let eclipPoints = [];
+                for (let i = 0; i < 360; i += 4) { eclipPoints.push(getSkyPos(simDate, myLat, myLon, i)); }
+                eclipPoints.sort((a,b) => a.az - b.az);
+                eclipPoints.forEach((pt, i) => {
+                    let screenX = (pt.az / 360) * canvas.clientWidth;
+                    let screenY = horizonY - ((pt.alt + zodiacAltOffset) / 90) * horizonY;
+                    if (i === 0 || Math.abs(screenX - ((eclipPoints[i-1].az / 360) * canvas.clientWidth)) > canvas.clientWidth / 2) { ctx.moveTo(screenX, screenY); } 
+                    else { ctx.lineTo(screenX, screenY); }
+                });
+                ctx.stroke();
+
+                zodiacSigns.forEach(z => {
+                    let elongation = z.angle - sunDeg;
+                    let pos = getSkyPos(simDate, myLat, myLon, elongation);
+                    let screenX = (pos.az / 360) * canvas.clientWidth;
+                    let screenY = horizonY - ((pos.alt + zodiacAltOffset) / 90) * horizonY;
+                    
+                    if (pos.alt > -15) { 
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; ctx.font = '18px sans-serif'; 
+                        ctx.fillText(z.sym, screenX, screenY - 8);
+                        ctx.fillStyle = 'rgba(148, 163, 184, 0.9)'; ctx.font = '12px sans-serif'; 
+                        ctx.fillText(t.zodiac[z.id], screenX, screenY + 10);
+                    }
+                });
+                ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+
+                let renderKeys = Object.keys(planetData).filter(k => k !== "Earth");
+                renderKeys.sort((a, b) => a === currentPlanetKey ? 1 : (b === currentPlanetKey ? -1 : 0));
+
+                for (let key of renderKeys) {
+                    let p = planetData[key];
+                    let pPosRaw = getPlanetPos(key, days, 1);
+                    let dx = pPosRaw.x - earthX;
+                    let dy = pPosRaw.y - earthY;
+
+                    let geoAngle = Math.atan2(dy, dx);
+                    let elongation = geoAngle - sunGeoAngle;
+                    
+                    let pos = getSkyPos(simDate, myLat, myLon, elongation * 180 / Math.PI);
+                    let az = pos.az;
+                    let alt = pos.alt + (p.altOffset || 0);
+                    
+                    let screenX = (az / 360) * canvas.clientWidth;
+                    let screenY = horizonY - (alt / 90) * horizonY;
+                    let isVisible = alt > 0;
+                    
+                    let drawRadius = Math.max(4, p.size * 0.7);
+                    if (key === "Sun") drawRadius = 16;
+                    if (key === "Moon") drawRadius = 10;
+                    
+                    ctx.font = '14px sans-serif';
+                    let textWidth = ctx.measureText(t.planets[key]).width;
+                    horizonPositions[key] = { 
+                        cx: screenX, cy: screenY, cr: Math.max(15, drawRadius + 5),
+                        rx1: screenX + 12, rx2: screenX + 16 + textWidth + 5, 
+                        ry1: screenY - 10, ry2: screenY + 10 
+                    };
+
+                    if (isVisible) { ctx.fillStyle = p.color; ctx.globalAlpha = 1.0; } 
+                    else { ctx.fillStyle = 'rgba(100, 116, 139, 0.25)'; ctx.globalAlpha = 0.3; }
+
+                    if (key === "Sun" && isVisible) {
+                        ctx.beginPath(); 
+                        let sg = ctx.createRadialGradient(screenX, screenY, drawRadius * 0.5, screenX, screenY, drawRadius * 3);
+                        sg.addColorStop(0, 'rgba(255, 253, 240, 1)'); 
+                        sg.addColorStop(0.4, 'rgba(250, 204, 21, 0.5)'); 
+                        sg.addColorStop(1, 'rgba(250, 204, 21, 0)');
+                        ctx.fillStyle = sg; 
+                        ctx.arc(screenX, screenY, drawRadius * 3, 0, Math.PI * 2); 
+                        ctx.fill();
+
+                        ctx.beginPath(); 
+                        ctx.fillStyle = '#fffdf0';
+                        ctx.arc(screenX, screenY, drawRadius, 0, Math.PI * 2); 
+                        ctx.fill();
+                    } else if (key === "Moon") {
+                        let phase = (geoAngle - sunGeoAngle) / (Math.PI * 2);
+                        
+                        let moonDark = '#020617'; 
+                        if (isVisible && skyColor === '#38bdf8') moonDark = '#64748b';
+                        else if (isVisible && skyColor === '#fbbf24') moonDark = '#334155';
+                        
+                        drawMoonPhase(ctx, screenX, screenY, drawRadius, phase, moonDark);
+                    } else if (p.isComet) {
+                        let tailLen = drawRadius * 8; 
+                        let dirX = 0.4;  
+                        let dirY = -0.9;
+                        
+                        let tailGrad = ctx.createLinearGradient(screenX, screenY, screenX + dirX * tailLen, screenY + dirY * tailLen);
+                        tailGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                        tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(screenX + dirY * drawRadius * 0.8, screenY - dirX * drawRadius * 0.8);
+                        ctx.lineTo(screenX + dirX * tailLen, screenY + dirY * tailLen);
+                        ctx.lineTo(screenX - dirY * drawRadius * 0.8, screenY + dirX * drawRadius * 0.8);
+                        ctx.fillStyle = tailGrad;
+                        ctx.fill();
+                        
+                        let cometGrad = ctx.createRadialGradient(screenX, screenY, drawRadius * 0.2, screenX, screenY, drawRadius);
+                        cometGrad.addColorStop(0, '#ffffff');
+                        cometGrad.addColorStop(1, '#94a3b8');
+                        ctx.fillStyle = cometGrad; 
+                        ctx.beginPath(); ctx.arc(screenX, screenY, drawRadius, 0, Math.PI * 2); ctx.fill();
+                    } else {
+                        let isSaturn = p.hasRings;
+                        let ringRot = Math.PI / 8; 
+                        let ringGrad;
+
+                        if (isSaturn) {
+                            ringGrad = ctx.createLinearGradient(screenX - drawRadius * 2.2, screenY - drawRadius, screenX + drawRadius * 2.2, screenY + drawRadius);
+                            ringGrad.addColorStop(0, 'rgba(253, 224, 71, 0.1)');   
+                            ringGrad.addColorStop(0.2, 'rgba(253, 224, 71, 0.9)'); 
+                            ringGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.9)');
+                            ringGrad.addColorStop(0.8, 'rgba(180, 83, 9, 0.9)');   
+                            ringGrad.addColorStop(1, 'rgba(180, 83, 9, 0.1)');     
+
+                            ctx.beginPath(); 
+                            ctx.strokeStyle = 'rgba(69, 26, 3, 0.6)'; 
+                            ctx.lineWidth = Math.max(2, drawRadius * 0.5); 
+                            ctx.ellipse(screenX, screenY + 1, drawRadius * 2.2, drawRadius * 0.6, ringRot, Math.PI, Math.PI * 2); 
+                            ctx.stroke(); 
+
+                            ctx.beginPath(); 
+                            ctx.strokeStyle = ringGrad; 
+                            ctx.lineWidth = Math.max(1, drawRadius * 0.3); 
+                            ctx.ellipse(screenX, screenY, drawRadius * 2.2, drawRadius * 0.6, ringRot, Math.PI, Math.PI * 2); 
+                            ctx.stroke(); 
+                        }
+
+                        ctx.beginPath(); 
+                        ctx.fillStyle = p.color; 
+                        ctx.arc(screenX, screenY, drawRadius, 0, Math.PI * 2); 
+                        ctx.fill();
+                        
+                        let shadeGrad = ctx.createRadialGradient(screenX - drawRadius * 0.3, screenY - drawRadius * 0.3, drawRadius * 0.1, screenX, screenY, drawRadius * 1.1);
+                        shadeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)'); 
+                        shadeGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0)'); 
+                        shadeGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.3)');     
+                        shadeGrad.addColorStop(1, 'rgba(0, 0, 0, 0.65)');      
+                        
+                        ctx.beginPath(); 
+                        ctx.fillStyle = shadeGrad; 
+                        ctx.arc(screenX, screenY, drawRadius, 0, Math.PI * 2); 
+                        ctx.fill();
+
+                        if (isSaturn) {
+                            ctx.beginPath(); 
+                            ctx.strokeStyle = 'rgba(69, 26, 3, 0.6)'; 
+                            ctx.lineWidth = Math.max(2, drawRadius * 0.5); 
+                            ctx.ellipse(screenX, screenY + 1, drawRadius * 2.2, drawRadius * 0.6, ringRot, 0, Math.PI); 
+                            ctx.stroke(); 
+
+                            ctx.beginPath(); 
+                            ctx.strokeStyle = ringGrad; 
+                            ctx.lineWidth = Math.max(1, drawRadius * 0.3); 
+                            ctx.ellipse(screenX, screenY, drawRadius * 2.2, drawRadius * 0.6, ringRot, 0, Math.PI); 
+                            ctx.stroke(); 
+                        }
+                    }
+                    ctx.globalAlpha = 1.0;
+
+                    ctx.fillStyle = 'black'; 
+                    ctx.font = currentPlanetKey === key ? 'bold 15px sans-serif' : '14px sans-serif'; 
+                    ctx.fillText(t.planets[key], screenX + 16, screenY + 5);
+                    
+                    if (key === "Sun") {
+                        ctx.fillStyle = '#facc15';
+                    } else {
+                        ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#f8fafc';
+                    }
+                    
+                    ctx.strokeStyle = 'black'; 
+                    ctx.lineWidth = 3; 
+                    ctx.lineJoin = 'round';
+
+                    ctx.strokeText(t.planets[key], screenX + 16, screenY + 5);
+                    ctx.fillText(t.planets[key], screenX + 16, screenY + 5);
+
+                    if (currentPlanetKey === key) {
+                        // --- DVOJITÝ OREO ZVÝRAZŇOVAČ ---
+                        ctx.beginPath(); 
+                        ctx.strokeStyle = 'rgba(0,0,0,0.5)'; 
+                        ctx.lineWidth = 3.5; 
+                        ctx.arc(screenX, screenY, drawRadius + 8, 0, Math.PI * 2); 
+                        ctx.stroke();
+                        
+                        ctx.beginPath(); 
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; 
+                        ctx.lineWidth = 1.5; 
+                        ctx.arc(screenX, screenY, drawRadius + 8, 0, Math.PI * 2); 
+                        ctx.stroke();
+                        
+                        if (isVisible) { 
+                            ctx.beginPath(); 
+                            ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)'; 
+                            ctx.lineWidth = 2.5; 
+                            ctx.moveTo(screenX, screenY + drawRadius + 8); 
+                            ctx.lineTo(screenX, horizonY); 
+                            ctx.stroke();
+                            
+                            ctx.beginPath(); 
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; 
+                            ctx.lineWidth = 1; 
+                            ctx.moveTo(screenX, screenY + drawRadius + 8); 
+                            ctx.lineTo(screenX, horizonY); 
+                            ctx.stroke(); 
+                        }
+                        // --- KONIEC OREO ZVÝRAZŇOVAČA ---
+                        
+                        let r_au = Math.hypot(pPosRaw.x, pPosRaw.y) / 90; 
+                        let d_au = Math.hypot(dx, dy) / 90;
+                        let mag = p.H;
+                        
+                        if (key !== "Sun" && key !== "Moon") {
+                            mag = p.H + 5 * Math.log10(r_au * d_au);
+                        }
+                        
+                        if (alt > 0 && alt < 10) mag += (10 - alt) * 0.3;
+
+                        let elDeg = (elongation * 180 / Math.PI) % 360;
+                        if (elDeg > 180) elDeg -= 360;
+                        if (elDeg < -180) elDeg += 360;
+                        let absElongation = Math.abs(elDeg);
+
+                        let visText = "";
+                        let visColor = "#ef4444"; 
+
+                        if (alt <= 0) {
+                            visText = t.visNoHor;
+                        } else if (key === "Sun") {
+                            visText = t.visYesBright;
+                            visColor = "#22c55e"; 
+                        } else if (key === "Moon") {
+                            if (absElongation < 25) {
+                                visText = t.visNoMoonPhase;
+                                visColor = "#ef4444";
+                            } else {
+                                visText = (sunAlt > -2) ? t.visYesDayMoon : t.visYesBright;
+                                visColor = "#22c55e"; 
+                            }
+                        } else if (!p.isVisibleNakedEye) {
+                            visText = t.visNoHubble;
+                            visColor = "#ef4444";
+                        } else if (mag > 6.0) {
+                            visText = t.visNoFar;
+                        } else if (sunAlt > 0) {
+                            visText = t.visNoSun;
+                        } else if (sunAlt > -6 && mag > 1.0) {
+                            visText = t.visNoSun;
+                        } else if (sunAlt > -12 && mag > 3.0) {
+                            visText = t.visNoSun; 
+                        } else if (mag < 0) {
+                            visText = t.visYesBright;
+                            visColor = "#22c55e";
+                        } else if (mag <= 3.5) {
+                            visText = t.visYesNormal;
+                            visColor = "#22c55e"; 
+                        } else if (mag <= 6.0) {
+                            visText = t.visYesFaint;
+                            visColor = "#eab308"; 
+                        } else {
+                            visText = t.visNoFar;
+                        }
+
+                        document.getElementById('jup-az').innerText = az.toFixed(1) + "°";
+                        document.getElementById('jup-alt').innerText = (alt > 0 ? "+" : "") + alt.toFixed(1) + "°";
+                        document.getElementById('jup-vis').innerText = visText;
+                        document.getElementById('jup-vis').style.color = visColor;
+                    }
+                }
+            }
+            requestAnimationFrame(updateAndRender);
+        }
+
+        function drawSystemPlanet(key, cx, cy, days, t) {
+            let p = planetData[key];
+            let pos = getPlanetPos(key, days, zoom);
+            let px = cx + pos.x; 
+            let py = cy + pos.y;
+            let pRadius = p.size * zoom;
+            
+            ctx.beginPath(); 
+            ctx.strokeStyle = currentPlanetKey === key ? 'rgba(56, 189, 248, 0.4)' : 'rgba(51, 65, 85, 0.25)'; 
+            ctx.lineWidth = currentPlanetKey === key ? 1.5 : 1; 
+
+            if (p.isComet) {
+                for (let i = 0; i <= 60; i++) {
+                    let M_i = i * Math.PI * 2 / 60;
+                    let E_i = M_i;
+                    for(let k = 0; k < 5; k++) E_i = E_i - (E_i - p.e * Math.sin(E_i) - M_i) / (1 - p.e * Math.cos(E_i));
+                    let ox = p.a * zoom * (Math.cos(E_i) - p.e);
+                    let oy = p.a * zoom * Math.sqrt(1 - p.e*p.e) * Math.sin(E_i);
+                    let omega = p.omega || 0;
+                    let rx = cx + ox * Math.cos(omega) - oy * Math.sin(omega);
+                    let ry = cy + ox * Math.sin(omega) + oy * Math.cos(omega);
+                    if (i === 0) ctx.moveTo(rx, ry);
+                    else ctx.lineTo(rx, ry);
+                }
+                ctx.stroke();
+            } else if (key === "Moon") {
+                let ePos = getPlanetPos("Earth", days, zoom);
+                ctx.arc(cx + ePos.x, cy + ePos.y, 18 * zoom, 0, Math.PI * 2); 
+                ctx.stroke();
+            } else if (jplData[key]) {
+                const T = (simDate.getTime() - EPOCH_J2000) / 3155760000000;
+                let j = jplData[key];
+                let e = j.e + j.e_r * T;
+                let w = (j.w + j.w_r * T) * Math.PI / 180;
+                
+                let vis_a = p.radius * zoom;
+                let vis_b = vis_a * Math.sqrt(1 - e*e);
+                let cx_off = cx - vis_a * e * Math.cos(w);
+                let cy_off = cy - vis_a * e * Math.sin(w);
+                
+                ctx.ellipse(cx_off, cy_off, vis_a, vis_b, w, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.arc(cx, cy, p.radius * zoom, 0, Math.PI * 2); 
+                ctx.stroke();
+            }
+            
+            if (currentPlanetKey === key) { 
+                ctx.beginPath(); ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)'; ctx.lineWidth = 1; 
+                ctx.arc(px, py, pRadius + 6, 0, Math.PI * 2); ctx.stroke(); 
+            }
+            
+            if (key === "Moon") {
+                let ePos = getPlanetPos("Earth", days, 1);
+                let pPos = getPlanetPos("Moon", days, 1);
+                let dx = pPos.x - ePos.x; let dy = pPos.y - ePos.y;
+                let geoAngle = Math.atan2(dy, dx);
+                let sunGeoAngle = Math.atan2(-ePos.y, -ePos.x); 
+                let phase = (geoAngle - sunGeoAngle) / (Math.PI * 2);
+                drawMoonPhase(ctx, px, py, pRadius, phase);
+            } else if (p.isComet) {
+                let dx = pos.x; 
+                let dirX = dx;
+                let dy = pos.y;
+                let dist = Math.hypot(dx, dy);
+                let maxDist = p.a * zoom * (1 + p.e); 
+                let tailFactor = Math.max(0.4, 1 - Math.pow(dist / maxDist, 0.6)); 
+                let tailLen = 150 * zoom * tailFactor;
+
+                if (tailLen > 2) {
+                    let dirX_norm = dx / dist;
+                    let dirY_norm = dy / dist;
+                    let tailGrad = ctx.createLinearGradient(px, py, px + dirX_norm * tailLen, py + dirY_norm * tailLen);
+                    tailGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                    tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(px + dirY_norm * pRadius * 0.8, py - dirX_norm * pRadius * 0.8);
+                    ctx.lineTo(px + dirX_norm * tailLen, py + dirY_norm * tailLen);
+                    ctx.lineTo(px - dirY_norm * pRadius * 0.8, py + dirX_norm * pRadius * 0.8);
+                    ctx.fillStyle = tailGrad;
+                    ctx.fill();
+                }
+                
+                ctx.beginPath(); 
+                let cometGrad = ctx.createRadialGradient(px, py, pRadius*0.2, px, py, pRadius);
+                cometGrad.addColorStop(0, '#ffffff');
+                cometGrad.addColorStop(1, '#94a3b8');
+                ctx.fillStyle = cometGrad; 
+                ctx.arc(px, py, pRadius, 0, Math.PI * 2); 
+                ctx.fill();
+            } else {
+                let sunAngle = Math.atan2(pos.y, pos.x);
+                let hx = px - Math.cos(sunAngle) * (pRadius * 0.4);
+                let hy = py - Math.sin(sunAngle) * (pRadius * 0.4);
+
+                let sphereGrad = ctx.createRadialGradient(hx, hy, pRadius * 0.1, px, py, pRadius * 1.1);
+                sphereGrad.addColorStop(0, '#ffffff');       
+                sphereGrad.addColorStop(0.15, p.color);      
+                sphereGrad.addColorStop(0.8, '#020617');     
+
+                let isSaturn = p.hasRings;
+                let ringRot = Math.PI / 6; 
+                let ringRx = (p.size + 8) * zoom;
+                let ringRy = (p.size / 2) * zoom;
+                let ringGrad;
+
+                if (isSaturn) {
+                    ringGrad = ctx.createLinearGradient(px - ringRx, py, px + ringRx, py);
+                    ringGrad.addColorStop(0, 'rgba(253, 224, 71, 0.1)');   
+                    ringGrad.addColorStop(0.2, 'rgba(253, 224, 71, 0.9)'); 
+                    ringGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.9)');
+                    ringGrad.addColorStop(0.8, 'rgba(180, 83, 9, 0.9)');   
+                    ringGrad.addColorStop(1, 'rgba(180, 83, 9, 0.1)'); 
+
+                    ctx.beginPath(); 
+                    ctx.strokeStyle = 'rgba(69, 26, 3, 0.6)'; 
+                    ctx.lineWidth = Math.max(1, 3.5 * zoom * 0.6); 
+                    ctx.ellipse(px, py + 1, ringRx, ringRy, ringRot, Math.PI, Math.PI * 2); 
+                    ctx.stroke(); 
+
+                    ctx.beginPath(); 
+                    ctx.strokeStyle = ringGrad; 
+                    ctx.lineWidth = 3.5 * zoom; 
+                    ctx.ellipse(px, py, ringRx, ringRy, ringRot, Math.PI, Math.PI * 2); 
+                    ctx.stroke(); 
+                }
+
+                ctx.beginPath(); 
+                ctx.fillStyle = sphereGrad; 
+                ctx.arc(px, py, pRadius, 0, Math.PI * 2); 
+                ctx.fill();
+
+                if (isSaturn) {
+                    ctx.beginPath(); 
+                    ctx.strokeStyle = 'rgba(69, 26, 3, 0.6)'; 
+                    ctx.lineWidth = Math.max(1, 3.5 * zoom * 0.6); 
+                    ctx.ellipse(px, py + 1, ringRx, ringRy, ringRot, 0, Math.PI); 
+                    ctx.stroke(); 
+
+                    ctx.beginPath(); 
+                    ctx.strokeStyle = ringGrad; 
+                    ctx.lineWidth = 3.5 * zoom; 
+                    ctx.ellipse(px, py, ringRx, ringRy, ringRot, 0, Math.PI); 
+                    ctx.stroke(); 
+                }
+            }
+            
+            ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#cbd5e1'; 
+            ctx.font = currentPlanetKey === key ? 'bold 14px sans-serif' : '14px sans-serif'; 
+            let textWidth = ctx.measureText(t.planets[key]).width;
+            ctx.fillText(t.planets[key], px + pRadius + 8, py + 5);
+            
+            horizonPositions[key] = { 
+                cx: px, cy: py, cr: Math.max(10, pRadius + 6),
+                rx1: px + pRadius + 5, rx2: px + pRadius + 12 + textWidth, 
+                ry1: py - 10, ry2: py + 10 
+            };
+        }
+
+        canvas.addEventListener('click', (e) => {
+            let rect = canvas.getBoundingClientRect();
+            let clickX = e.clientX - rect.left; let clickY = e.clientY - rect.top;
+            
+            let keys = Object.keys(horizonPositions).reverse();
+            for (let key of keys) {
+                let hp = horizonPositions[key];
+                let inCircle = Math.hypot(clickX - hp.cx, clickY - hp.cy) <= hp.cr;
+                let inRect = clickX >= hp.rx1 && clickX <= hp.rx2 && clickY >= hp.ry1 && clickY <= hp.ry2;
+                
+                if (inCircle || inRect) { 
+                    selectPlanet(key); 
+                    return; 
+                }
+            }
+        });
+
+        applyTranslations();
+        setMode('real'); 
+        
+        setTimeout(() => {
+            resizeCanvas();
+            selectPlanet('Halley', true);
+        }, 50);
+
+        requestAnimationFrame(updateAndRender);
+    </script>
+</body>
+</html>
