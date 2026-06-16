@@ -62,8 +62,7 @@
         
         .info-drawer { background: linear-gradient(0deg, rgba(10, 15, 30, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%); backdrop-filter: blur(15px); border-top: 1px solid rgba(51, 65, 85, 0.6); padding: 20px; height: 150px; position: relative; z-index: 10; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px; }
         .drawer-header { display: flex; justify-content: space-between; align-items: center; }
-        .planet-title { font-size: 1.3rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
-        .planet-color-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+        .planet-title { font-size: 1.3rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
         
         .planet-selector { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; outline: none; cursor: pointer; }
         
@@ -209,7 +208,7 @@
     <div class="info-drawer">
         <div class="drawer-header">
             <div class="planet-title">
-                <span class="planet-color-dot" id="title-dot" style="background-color: #38bdf8;"></span>
+                <canvas id="title-icon-canvas" width="32" height="32" style="position: static; width: 32px; height: 32px; margin-right: -2px; flex-shrink: 0;"></canvas>
                 <span id="selected-planet-name">Zem</span>
             </div>
             
@@ -1298,7 +1297,7 @@
             document.getElementById('planet-select-btn').innerText = t.planets[key];
 
             document.getElementById('selected-planet-name').innerText = t.planets[key];
-            document.getElementById('title-dot').style.backgroundColor = planetData[key].color;
+            drawTitleIcon(key);
             document.getElementById('stat-dist').innerText = planetData[key].dist;
             document.getElementById('stat-speed').innerText = planetData[key].speed + " km/s";
             
@@ -1337,6 +1336,64 @@
                     offsetY = -camWorldY * zoom;
                     targetOffsetX = offsetX;
                     targetOffsetY = offsetY;
+                }
+            }
+        }
+
+        function drawTitleIcon(key) {
+            let cvs = document.getElementById('title-icon-canvas');
+            if(!cvs) return;
+            let c = cvs.getContext('2d');
+            c.clearRect(0, 0, 32, 32);
+            let p = planetData[key];
+            if(!p) return;
+
+            let px = 16, py = 16;
+            let pRadius = 8; 
+            if(key === "Sun") pRadius = 12;
+            if(key === "Pluto") pRadius = 5;
+            if(key === "Jupiter") pRadius = 10;
+
+            if (p.isComet) {
+                let tailGrad = c.createLinearGradient(px, py, px - 12, py + 12);
+                tailGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                c.beginPath(); c.moveTo(px + pRadius*0.8, py + pRadius*0.8); c.lineTo(px - 14, py + 14); c.lineTo(px - pRadius*0.8, py - pRadius*0.8); c.fillStyle = tailGrad; c.fill();
+                
+                let cometGrad = c.createRadialGradient(px, py, pRadius*0.2, px, py, pRadius);
+                cometGrad.addColorStop(0, '#ffffff'); cometGrad.addColorStop(1, '#94a3b8');
+                c.fillStyle = cometGrad; c.beginPath(); c.arc(px, py, pRadius, 0, Math.PI * 2); c.fill();
+            } else {
+                let sphereGrad = c.createRadialGradient(px - pRadius*0.4, py - pRadius*0.4, pRadius * 0.1, px, py, pRadius * 1.1);
+                sphereGrad.addColorStop(0, '#ffffff');
+                sphereGrad.addColorStop(0.15, p.color);
+                sphereGrad.addColorStop(0.8, '#020617');
+
+                if (key === "Sun") {
+                    sphereGrad = c.createRadialGradient(px, py, 1, px, py, pRadius);
+                    sphereGrad.addColorStop(0, '#fffdf0'); sphereGrad.addColorStop(0.2, '#facc15'); sphereGrad.addColorStop(1, 'transparent');
+                }
+
+                let isSaturn = p.hasRings;
+                let ringRot = Math.PI / 6;
+                let ringRx = pRadius * 1.8; let ringRy = pRadius * 0.5;
+                let ringGrad;
+
+                if (isSaturn) {
+                    ringGrad = c.createLinearGradient(px - ringRx, py, px + ringRx, py);
+                    ringGrad.addColorStop(0, 'rgba(253, 224, 71, 0.1)'); ringGrad.addColorStop(0.2, 'rgba(253, 224, 71, 0.9)'); 
+                    ringGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.9)'); ringGrad.addColorStop(0.8, 'rgba(180, 83, 9, 0.9)'); 
+                    ringGrad.addColorStop(1, 'rgba(180, 83, 9, 0.1)');
+
+                    c.beginPath(); c.strokeStyle = 'rgba(69, 26, 3, 0.6)'; c.lineWidth = 1; c.ellipse(px, py + 1, ringRx, ringRy, ringRot, Math.PI, Math.PI * 2); c.stroke();
+                    c.beginPath(); c.strokeStyle = ringGrad; c.lineWidth = 2.5; c.ellipse(px, py, ringRx, ringRy, ringRot, Math.PI, Math.PI * 2); c.stroke();
+                }
+
+                c.beginPath(); c.fillStyle = sphereGrad; c.arc(px, py, pRadius, 0, Math.PI * 2); c.fill();
+
+                if (isSaturn) {
+                    c.beginPath(); c.strokeStyle = 'rgba(69, 26, 3, 0.6)'; c.lineWidth = 1; c.ellipse(px, py + 1, ringRx, ringRy, ringRot, 0, Math.PI); c.stroke();
+                    c.beginPath(); c.strokeStyle = ringGrad; c.lineWidth = 2.5; c.ellipse(px, py, ringRx, ringRy, ringRot, 0, Math.PI); c.stroke();
                 }
             }
         }
