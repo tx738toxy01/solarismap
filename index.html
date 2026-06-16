@@ -51,7 +51,7 @@
         .divider { width: 80%; height: 1px; background-color: rgba(51, 65, 85, 0.6); margin: 2px 0; }
         
         .speed-row { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; color: #94a3b8; margin: 2px 0; }
-        .speed-btn { background: transparent; border: none; color: #475569; font-size: 0.9rem; cursor: pointer; padding: 4px 0; width: 22px; display: flex; justify-content: center; transition: all 0.2s; letter-spacing: -1px; }
+        .speed-btn { background: transparent; border: none; color: #475569; font-size: 0.9rem; cursor: pointer; padding: 4px 0; width: 22px; display: flex; justify-content: center; transition: all 0.2s; letter-spacing: -1px; transform: scaleY(2.0); transform-origin: center; }
         .speed-btn:hover { color: #94a3b8; }
         .speed-btn.active-fwd { color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
         .speed-btn.active-bwd { color: #ef4444; text-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
@@ -59,6 +59,10 @@
 
         .zoom-controls { position: absolute; right: 20px; top: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 5; }
         .btn-zoom { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #e2e8f0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        
+        #sun-times-panel { position: absolute; top: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; gap: 6px; z-index: 5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-align: right; }
+        .sun-time-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 0.85rem; color: #cbd5e1; font-family: monospace; font-weight: normal; letter-spacing: 0.5px;}
+        .sun-icon { display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.6)); margin-right: 2px; }
         
         .info-drawer { background: linear-gradient(0deg, rgba(10, 15, 30, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%); backdrop-filter: blur(15px); border-top: 1px solid rgba(51, 65, 85, 0.6); padding: 20px; height: 150px; position: relative; z-index: 10; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px; }
         .drawer-header { display: flex; justify-content: space-between; align-items: center; }
@@ -75,6 +79,10 @@
         .tab-btn { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
         .tab-btn.active { background: #0284c7 !important; border-color: #0284c7 !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .tab-btn-location-mode { padding: 8px 12px; display: flex; align-items: center; gap: 6px; }
+        
+        .btn-tab-map { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #38bdf8; padding: 5px 10px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; display: none; align-items: center; justify-content: center; transition: background 0.2s; }
+        .btn-tab-map:hover { background: #334155; }
+        #quick-map-panel { position: absolute; top: calc(100% + 8px); left: 0; width: 260px; height: 200px; background: #1e293b; border: 1px solid #38bdf8; border-radius: 12px; overflow: hidden; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 50; }
         
         #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 240px; z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .radar-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
@@ -112,10 +120,13 @@
         .picker-close-wrapper { display: flex; justify-content: flex-end; }
         
         .search-box { position: relative; display: flex; width: 100%; z-index: 20; }
-        .search-input { flex: 1; background: #1e293b; border: 1px solid #475569; color: #fff; padding: 12px 40px 12px 14px; border-radius: 8px; font-size: 0.95rem; outline: none; }
+        .search-input { flex: 1; background: #1e293b; border: 1px solid #475569; color: #fff; padding: 12px 70px 12px 14px; border-radius: 8px; font-size: 0.95rem; outline: none; }
         .search-input:focus { border-color: #38bdf8; }
-        .btn-gps-inline { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 5px; transition: transform 0.2s; color: #38bdf8; }
+        .btn-gps-inline { position: absolute; right: 35px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 5px; transition: transform 0.2s; color: #38bdf8; }
         .btn-gps-inline:hover { transform: translateY(-50%) scale(1.15); }
+        .btn-map-inline { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; transition: transform 0.2s; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)); }
+        .btn-map-inline:hover { transform: translateY(-50%) scale(1.15); }
+        #map-preview-container { display: none; width: 100%; height: 200px; border-radius: 8px; overflow: hidden; border: 1px solid #38bdf8; margin-top: 5px; background: #1e293b; }
         
         /* Absolute positioning pre výsledky - pôjdu ponad rýchlu voľbu */
         .search-results { display: none; position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: #0f172a; border: 1px solid #38bdf8; border-radius: 8px; padding: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-height: 220px; overflow-y: auto; z-index: 100; }
@@ -140,7 +151,7 @@
         <h1><span>🌌</span> Solaris Map</h1>
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="position: relative; z-index: 100;">
-                <div class="lang-picker" id="lang-select-btn" onclick="let d = document.getElementById('lang-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">Slovenčina</div>
+                <div class="lang-picker" id="lang-select-btn" onclick="let d = document.getElementById('lang-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">SK</div>
                 <div id="lang-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #1e293b; border: 1px solid #475569; border-radius: 8px; margin-bottom: 5px; padding: 5px 0; min-width: 140px; box-shadow: 0 5px 20px rgba(0,0,0,0.6);"></div>
             </div>
 
@@ -155,8 +166,13 @@
 
         <div class="tab-menu">
             <button class="tab-btn active" id="tab-btn-system" onclick="switchView('system')">Solárna mapa</button>
-            <div style="position: relative;">
+            <div style="position: relative; display: flex; gap: 6px;">
                 <button class="tab-btn" id="tab-btn-horizon" onclick="onHorizonTabClick(event)">Lokálny Horizont</button>
+                <button class="btn-tab-map" id="btn-tab-map" onclick="toggleQuickMap(event)" title="Zobraziť mapu na rýchlu kontrolu">🗺️</button>
+                
+                <div id="quick-map-panel">
+                    <iframe id="quick-map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
+                </div>
             </div>
         </div>
 
@@ -176,6 +192,21 @@
             <button class="btn-zoom" onclick="buttonZoomOut()">-</button>
         </div>
 
+        <div id="sun-times-panel">
+            <div class="sun-time-row">
+                <span class="sun-icon" title="Východ slnka">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fde047" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16h18M5 20h14M8 16a4 4 0 0 1 8 0M5 11l2 2M19 11l-2 2M12 10V2M8 6l4-4 4 4"/></svg>
+                </span> 
+                <span id="val-sunrise">--:--</span>
+            </div>
+            <div class="sun-time-row">
+                <span class="sun-icon" title="Západ slnka">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fde047" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16h18M5 20h14M8 16a4 4 0 0 1 8 0M5 11l2 2M19 11l-2 2M12 2v8M8 6l4 4 4-4"/></svg>
+                </span> 
+                <span id="val-sunset">--:--</span>
+            </div>
+        </div>
+
         <div id="canvas-container">
             <canvas id="solarCanvas"></canvas>
         </div>
@@ -186,21 +217,9 @@
             <div class="divider"></div>
             
             <div class="speed-row">
-                <button class="speed-btn" id="btn-bwd-2" onclick="setModeDir('acc', 2, -1)">◄◄</button>
-                <span class="speed-label">2x</span>
-                <button class="speed-btn" id="btn-fwd-2" onclick="setModeDir('acc', 2, 1)">►►</button>
-            </div>
-            
-            <div class="speed-row">
-                <button class="speed-btn" id="btn-bwd-10" onclick="setModeDir('acc', 10, -1)">◄◄</button>
-                <span class="speed-label">10x</span>
-                <button class="speed-btn" id="btn-fwd-10" onclick="setModeDir('acc', 10, 1)">►►</button>
-            </div>
-            
-            <div class="speed-row">
-                <button class="speed-btn" id="btn-bwd-100" onclick="setModeDir('acc', 100, -1)">◄◄</button>
-                <span class="speed-label">100x</span>
-                <button class="speed-btn" id="btn-fwd-100" onclick="setModeDir('acc', 100, 1)">►►</button>
+                <button class="speed-btn" id="btn-bwd" onclick="stepSpeed(-1)">◄◄</button>
+                <span class="speed-label" id="current-speed-label">1x</span>
+                <button class="speed-btn" id="btn-fwd" onclick="stepSpeed(1)">►►</button>
             </div>
         </div>
     </div>
@@ -289,9 +308,13 @@
             <div class="search-box">
                 <input type="text" id="loc-search-inp" class="search-input" placeholder="Hľadať miesto..." oninput="onSearchInput()">
                 <button class="btn-gps-inline" onclick="requestGPS()" title="Zistiť moju presnú polohu">📍</button>
+                <button class="btn-map-inline" onclick="toggleMapPreview()" title="Skontrolovať polohu na mape">🗺️</button>
                 
-                <!-- Autokomplet drop-down box -->
                 <div class="search-results" id="loc-results"></div>
+            </div>
+            
+            <div id="map-preview-container">
+                <iframe id="map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
             </div>
             
             <div class="loading-text" id="loc-loading">Načítavam...</div>
@@ -311,6 +334,8 @@
             if (dp && dp.style.display === 'block') dp.style.display = 'none';
             let dl = document.getElementById('lang-dropdown');
             if (dl && dl.style.display === 'block') dl.style.display = 'none';
+            let qm = document.getElementById('quick-map-panel');
+            if (qm && qm.style.display === 'block') qm.style.display = 'none';
         });
 
         const langNames = { en: "English", de: "Deutsch", fr: "Français", es: "Español", sk: "Slovenčina", cs: "Čeština", zh: "中文", hi: "हिन्दी" };
@@ -470,15 +495,36 @@
 
         function updateHorizonTabButton() {
             let btn = document.getElementById('tab-btn-horizon');
+            let mapBtn = document.getElementById('btn-tab-map');
+            
             if (activeTab === 'horizon') {
                 btn.innerHTML = `📍 ${myLocName}`;
                 btn.classList.add('tab-btn-location-mode');
+                if (mapBtn) mapBtn.style.display = 'flex';
             } else {
                 btn.innerHTML = translations[currentLang].tabHorizon;
                 btn.classList.remove('tab-btn-location-mode');
+                if (mapBtn) mapBtn.style.display = 'none';
+                
+                let qm = document.getElementById('quick-map-panel');
+                if (qm) qm.style.display = 'none';
             }
         }
 
+        function toggleQuickMap(event) {
+            event.stopPropagation();
+            let panel = document.getElementById('quick-map-panel');
+            let iframe = document.getElementById('quick-map-iframe');
+            
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+                let encName = encodeURIComponent(myLocName);
+                // Oficiálny a funkčný formát pre Google Maps Embed s pinom a názvom
+                iframe.src = `https://www.google.com/maps?q=${myLat},${myLon}&hl=sk&z=11&output=embed`;
+            }
+        }
         // --- VYHĽADÁVACÍ LOKÁCIA MODAL LOGIKA ---
         function onHorizonTabClick(event) {
             if (activeTab === 'system') {
@@ -493,8 +539,9 @@
             document.getElementById('loc-picker-overlay').style.display = 'flex';
             document.getElementById('loc-search-inp').value = '';
             document.getElementById('loc-results').innerHTML = '';
-            document.getElementById('loc-results').style.display = 'none'; // Defaultne skrytý drop-down
+            document.getElementById('loc-results').style.display = 'none'; 
             document.getElementById('loc-loading').style.display = 'none';
+            document.getElementById('map-preview-container').style.display = 'none';
             
             let grid = document.getElementById('loc-presets-grid');
             grid.innerHTML = '';
@@ -511,9 +558,41 @@
             document.getElementById('loc-picker-overlay').style.display = 'none';
         }
 
+        function toggleMapPreview() {
+            let container = document.getElementById('map-preview-container');
+            let iframe = document.getElementById('map-iframe');
+            
+            if (container && iframe) {
+                if (container.style.display === 'block') {
+                    container.style.display = 'none';
+                } else {
+                    container.style.display = 'block';
+                    let encName = encodeURIComponent(myLocName);
+                    // Oficiálny a funkčný formát pre Google Maps Embed s pinom a názvom
+                    iframe.src = `https://www.google.com/maps?q=${myLat},${myLon}&hl=sk&z=11&output=embed`;
+                }
+            }
+        }
+
+        function toggleQuickMap(event) {
+            event.stopPropagation();
+            let panel = document.getElementById('quick-map-panel');
+            let iframe = document.getElementById('quick-map-iframe');
+            
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+                // Čistý Google Maps iframe, ktorý prilepí nad pin aj bublinu s názvom
+                let encName = encodeURIComponent(myLocName);
+                iframe.src = `https://maps.google.com/maps?q=${myLat},${myLon}+(${encName})&hl=sk&z=11&output=embed`;
+            }
+        }
+
         document.getElementById('loc-picker-overlay').addEventListener('click', function(e) {
             if (e.target === this) closeLocPicker();
         });
+
 
         function requestGPS() {
             if (navigator.geolocation) {
@@ -554,36 +633,40 @@
             
             resDiv.innerHTML = '';
             
-            if (q.length < 2) return;
+            if (q.length < 2) {
+                resDiv.style.display = 'none';
+                loadDiv.style.display = 'none';
+                return;
+            }
             
             resDiv.style.display = 'none';
             loadDiv.style.display = 'block';
             loadDiv.innerText = "Vyhľadávam...";
 
             try {
-                let response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6`, {
-                    headers: { 'Accept-Language': 'sk,en' }
-                });
+                // Zmena na Photon API (optimalizované pre autokomplet)
+                let response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6`);
                 let data = await response.json();
                 
                 loadDiv.style.display = 'none';
                 resDiv.style.display = 'block';
                 
-                if (data.length === 0) {
+                if (!data.features || data.features.length === 0) {
                     resDiv.innerHTML = '<div class="res-item" style="cursor:default;"><div class="res-item-title" style="color:#94a3b8;">Nič sme nenašli.</div></div>';
                     return;
                 }
 
-                data.forEach(item => {
-                    let addr = item.address || {};
-                    let city = addr.city || addr.town || addr.village || addr.name || "Neznáme miesto";
+                data.features.forEach(feature => {
+                    let prop = feature.properties;
+                    let geom = feature.geometry;
                     
-                    let county = addr.county || addr.district || addr.state_district || addr.municipality || "";
+                    let city = prop.name || "Neznáme miesto";
+                    let county = prop.state || prop.county || "";
                     if (county) {
                         county = county.replace(/okres\s/i, "okr. ").replace(/District/i, "okr.");
                     }
                     
-                    let countryCode = addr.country_code ? addr.country_code.toUpperCase() : "";
+                    let countryCode = prop.countrycode ? prop.countrycode.toUpperCase() : "";
                     
                     let subText = [];
                     if (county && county !== city) subText.push(county);
@@ -596,7 +679,8 @@
                     div.className = 'res-item';
                     div.innerHTML = `<div class="res-item-title">${city}</div><div class="res-item-sub">${subText.join(', ')}</div>`;
                     
-                    div.onclick = () => fetchTimezoneAndSet(item.lat, item.lon, shortName);
+                    // Photon vracia súradnice ako [lon, lat], preto ich musíme prehodiť
+                    div.onclick = () => fetchTimezoneAndSet(geom.coordinates[1], geom.coordinates[0], shortName);
                     resDiv.appendChild(div);
                 });
 
@@ -1231,6 +1315,22 @@
             }
         }
 
+        const speedSteps = [2, 10, 100, 1000];
+        let currentSpeedIndex = -1;
+
+        function stepSpeed(dir) {
+            if (timeDirection !== dir || timeMode !== 'acc') {
+                timeDirection = dir;
+                currentSpeedIndex = 0; 
+            } else {
+                currentSpeedIndex++;
+                if (currentSpeedIndex >= speedSteps.length) {
+                    currentSpeedIndex = speedSteps.length - 1; 
+                }
+            }
+            setMode('acc', speedSteps[currentSpeedIndex]);
+        }
+
         function setModeDir(mode, speed, dir) {
             timeDirection = dir;
             setMode(mode, speed);
@@ -1238,10 +1338,10 @@
 
         function setMode(mode, speed = 1) {
             document.getElementById('speed-pause').classList.remove('active');
-            document.querySelectorAll('.speed-btn').forEach(b => {
-                b.classList.remove('active-fwd');
-                b.classList.remove('active-bwd');
-            });
+            let btnFwd = document.getElementById('btn-fwd');
+            let btnBwd = document.getElementById('btn-bwd');
+            if (btnFwd) btnFwd.classList.remove('active-fwd');
+            if (btnBwd) btnBwd.classList.remove('active-bwd');
             
             if (mode !== 'paused') {
                 timeMode = mode;
@@ -1249,11 +1349,17 @@
                 lastRunningMode = timeMode; lastRunningSpeed = timeSpeed;
                 document.getElementById('speed-pause').innerText = '⏸';
                 
+                let lbl = document.getElementById('current-speed-label');
                 if (mode === 'acc') {
-                    let btnId = (timeDirection === 1) ? `btn-fwd-${speed}` : `btn-bwd-${speed}`;
-                    let cls = (timeDirection === 1) ? 'active-fwd' : 'active-bwd';
-                    let b = document.getElementById(btnId);
-                    if (b) b.classList.add(cls);
+                    if (lbl) lbl.innerText = speed + 'x';
+                    if (timeDirection === 1 && btnFwd) btnFwd.classList.add('active-fwd');
+                    else if (timeDirection === -1 && btnBwd) btnBwd.classList.add('active-bwd');
+                    
+                    let idx = speedSteps.indexOf(speed);
+                    currentSpeedIndex = idx >= 0 ? idx : 0;
+                } else {
+                    if (lbl) lbl.innerText = '1x';
+                    currentSpeedIndex = -1;
                 }
             } else {
                 timeMode = 'paused'; 
@@ -1403,10 +1509,13 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             hideTooltip();
             
+            let sunPnl = document.getElementById('sun-times-panel');
+            
             if (view === 'system') {
                 document.getElementById('tab-btn-system').classList.add('active');
                 document.getElementById('jupiter-radar-panel').style.display = 'none';
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'flex';
+                if (sunPnl) sunPnl.style.display = 'none';
                 updateHorizonTabButton(); 
                 
                 selectPlanet(currentPlanetKey, true);
@@ -1414,6 +1523,7 @@
                 document.getElementById('tab-btn-horizon').classList.add('active');
                 document.getElementById('jupiter-radar-panel').style.display = 'block';
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'none';
+                if (sunPnl) sunPnl.style.display = 'flex';
                 updateHorizonTabButton(); 
                 
                 selectPlanet(currentPlanetKey, true);
@@ -1556,12 +1666,23 @@
             let eraStr = dYear <= 0 ? "BC" : "AD";
             
             document.getElementById('live-date').innerHTML = 
-                `${pad(displayDate.getDate())}.${pad(displayDate.getMonth()+1)}.${displayYear.toString().padStart(4, '0')}&nbsp;${eraStr}<br>${pad(displayDate.getHours())}:${pad(displayDate.getMinutes())}:${pad(displayDate.getSeconds())}`;
+            `${pad(displayDate.getDate())}.${pad(displayDate.getMonth()+1)}.${displayYear.toString().padStart(4, '0')}&nbsp;${eraStr}<br>${pad(displayDate.getHours())}:${pad(displayDate.getMinutes())}:${pad(displayDate.getSeconds())}`;
 
-            ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+        // --- DYNAMICKÉ ZNAMENIE SLNKA ---
+        if (currentPlanetKey === "Sun") {
+            let ePosR = getPlanetPos("Earth", days, 1);
+            let sunDeg = (Math.atan2(-ePosR.y, -ePosR.x) * 180 / Math.PI + 360) % 360;
+            let cSign = zodiacSigns[Math.floor(sunDeg / 30) % 12];
+            let t = translations[currentLang];
+            document.getElementById('selected-planet-name').innerHTML = t.planets["Sun"] + " <span style='font-size: 0.85rem; font-weight: normal; color: #cbd5e1; margin-left: 6px;'>• " + cSign.sym + " " + t.zodiac[cSign.id] + "</span>";
+        }
+
+        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
             horizonPositions = {}; 
             const t = translations[currentLang];
+            
+            updateSunTimes();
 
             if (activeTab === "system") {
                 let cx = canvas.clientWidth / 2 + offsetX;
@@ -1650,12 +1771,36 @@
                 ctx.fillStyle = '#090d16'; ctx.fillRect(0, horizonY, canvas.clientWidth, canvas.clientHeight - horizonY);
                 ctx.beginPath(); ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2; ctx.moveTo(0, horizonY); ctx.lineTo(canvas.clientWidth, horizonY); ctx.stroke();
 
-                const cardinalAngles = [0, 90, 180, 270, 360];
+                // --- DYNAMICKÉ OTOČENIE KAMERY ZA SLNKOM ---
+                let testD = new Date(simDate); testD.setUTCHours(12,0,0,0);
+                let maxA = -999, culAz = 180;
+                for(let i=0; i<=24; i+=2) {
+                    let p = getSkyPos(new Date(testD.getTime() - 12*3600000 + i*3600000), myLat, myLon, 0);
+                    if (p.alt > maxA) { maxA = p.alt; culAz = p.az; }
+                }
+                
+                let centerAz = (culAz > 90 && culAz < 270) ? 180 : 0;
+                let startAz = centerAz === 180 ? 0 : 180;
+
+                function getScreenX(az) {
+                    let diff = az - startAz;
+                    diff = ((diff % 360) + 360) % 360;
+                    return (diff / 360) * canvas.clientWidth;
+                }
+
+                const cardinalOffsets = [0, 90, 180, 270, 360];
                 ctx.font = '13px monospace';
-                cardinalAngles.forEach((angle, index) => {
-                    let x = (angle / 360) * canvas.clientWidth;
+                cardinalOffsets.forEach((offset) => {
+                    let x = (offset / 360) * canvas.clientWidth;
+                    let realAz = (startAz + offset) % 360;
+                    
+                    let idx = realAz / 90;
+                    let label = t.cardinals[idx];
+                    if (offset === 360 && realAz === 0) label = t.cardinals[4] || t.cardinals[0];
+                    if (offset === 360 && realAz === 180) label = t.cardinals[2];
+
                     ctx.beginPath(); ctx.strokeStyle = 'rgba(51, 65, 85, 0.2)'; ctx.setLineDash([4, 4]); ctx.moveTo(x, 0); ctx.lineTo(x, horizonY); ctx.stroke(); ctx.setLineDash([]);
-                    ctx.fillStyle = '#94a3b8'; ctx.fillText(t.cardinals[index], x - 18, horizonY + 20);
+                    ctx.fillStyle = '#94a3b8'; ctx.fillText(label, x - 18, horizonY + 20);
                 });
 
                 let zodiacAltOffset = 18; 
@@ -1665,27 +1810,35 @@
                 ctx.lineWidth = 1.5;
                 let eclipPoints = [];
                 for (let i = 0; i < 360; i += 4) { eclipPoints.push(getSkyPos(simDate, myLat, myLon, i)); }
-                eclipPoints.sort((a,b) => a.az - b.az);
+                
+                eclipPoints.sort((a,b) => getScreenX(a.az) - getScreenX(b.az));
+                
+                let lastScX = -999;
                 eclipPoints.forEach((pt, i) => {
-                    let screenX = (pt.az / 360) * canvas.clientWidth;
-                    let screenY = horizonY - ((pt.alt + zodiacAltOffset) / 90) * horizonY;
-                    if (i === 0 || Math.abs(screenX - ((eclipPoints[i-1].az / 360) * canvas.clientWidth)) > canvas.clientWidth / 2) { ctx.moveTo(screenX, screenY); } 
-                    else { ctx.lineTo(screenX, screenY); }
+                    let scX = getScreenX(pt.az);
+                    let scY = horizonY - ((pt.alt + zodiacAltOffset) / 90) * horizonY;
+                    if (i === 0 || Math.abs(scX - lastScX) > canvas.clientWidth / 2) { ctx.moveTo(scX, scY); } 
+                    else { ctx.lineTo(scX, scY); }
+                    lastScX = scX;
                 });
                 ctx.stroke();
 
                 zodiacSigns.forEach(z => {
                     let elongation = z.angle - sunDeg;
                     let pos = getSkyPos(simDate, myLat, myLon, elongation);
-                    let screenX = (pos.az / 360) * canvas.clientWidth;
+                    let screenX = getScreenX(pos.az);
                     let screenY = horizonY - ((pos.alt + zodiacAltOffset) / 90) * horizonY;
                     
                     if (pos.alt > -15) { 
+                        ctx.save();
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                        ctx.shadowBlur = 4;
                         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; ctx.font = '18px sans-serif'; 
+                        ctx.fillStyle = '#ffffff'; ctx.font = '18px sans-serif'; 
                         ctx.fillText(z.sym, screenX, screenY - 8);
-                        ctx.fillStyle = 'rgba(148, 163, 184, 0.9)'; ctx.font = '12px sans-serif'; 
+                        ctx.fillStyle = '#e2e8f0'; ctx.font = '13px sans-serif'; 
                         ctx.fillText(t.zodiac[z.id], screenX, screenY + 10);
+                        ctx.restore();
                     }
                 });
                 ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
@@ -1706,7 +1859,7 @@
                     let az = pos.az;
                     let alt = pos.alt + (p.altOffset || 0);
                     
-                    let screenX = (az / 360) * canvas.clientWidth;
+                    let screenX = getScreenX(az);
                     let screenY = horizonY - (alt / 90) * horizonY;
                     let isVisible = alt > 0;
                     
@@ -2116,6 +2269,54 @@
             }
         });
 
+        let lastSunCalcDate = "";
+        let lastSunCalcLoc = "";
+
+        function updateSunTimes() {
+            if (activeTab !== 'horizon') return;
+            
+            let currentDateStr = simDate.toDateString();
+            let currentLocStr = myLat + "_" + myLon;
+            
+            if (currentDateStr === lastSunCalcDate && currentLocStr === lastSunCalcLoc) return;
+            
+            lastSunCalcDate = currentDateStr;
+            lastSunCalcLoc = currentLocStr;
+            
+            let baseT = new Date(simDate);
+            baseT.setUTCHours(0,0,0,0);
+            let startT = baseT.getTime() - 12 * 3600000; 
+            
+            let sunrise = null;
+            let sunset = null;
+            let prevAlt = getSkyPos(new Date(startT), myLat, myLon).alt;
+            
+            for(let i = 1; i <= 24 * 12; i++) { 
+                let t = startT + i * 300000;
+                let currentAlt = getSkyPos(new Date(t), myLat, myLon).alt;
+                
+                if (prevAlt < -0.833 && currentAlt >= -0.833) sunrise = new Date(t);
+                if (prevAlt > -0.833 && currentAlt <= -0.833) sunset = new Date(t);
+                
+                prevAlt = currentAlt;
+            }
+            
+            let formatTime = (d) => {
+                if (!d) return "---"; 
+                if (myTimezone) {
+                    try {
+                        let str = d.toLocaleString('en-US', { timeZone: myTimezone, hour12: false, hour: '2-digit', minute: '2-digit' });
+                        if (str !== "Invalid Date") return str;
+                    } catch(e) {}
+                }
+                return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+            };
+            
+            document.getElementById('val-sunrise').innerText = sunrise ? formatTime(sunrise) : "---";
+            document.getElementById('val-sunset').innerText = sunset ? formatTime(sunset) : "---";
+        }
+
+        populateLangDropdown();
         applyTranslations();
         setMode('real'); 
         
