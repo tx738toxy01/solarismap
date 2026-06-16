@@ -108,29 +108,29 @@
         .picker-btn-confirm { background: #0284c7; color: #fff; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4); }
 
         /* LOKÁCIA PICKER MODAL (NOVÝ AUTOKOMPLET DIZAJN) */
-        #loc-picker-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-        .loc-modal { background: #0f172a; border: 1px solid #334155; border-radius: 16px; width: 95%; max-width: 400px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 15px; max-height: 85vh; }
-        .loc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .loc-title { color: #38bdf8; font-weight: bold; font-size: 1.1rem; }
+        #loc-picker-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 8vh; backdrop-filter: blur(4px); }
+        .loc-modal { background: #0f172a; border: 1px solid #334155; border-radius: 16px; width: 95%; max-width: 400px; padding: 15px 20px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 10px; max-height: 85vh; }
+        .picker-close-wrapper { display: flex; justify-content: flex-end; }
         
-        .search-box { position: relative; display: flex; width: 100%; }
+        .search-box { position: relative; display: flex; width: 100%; z-index: 20; }
         .search-input { flex: 1; background: #1e293b; border: 1px solid #475569; color: #fff; padding: 12px 40px 12px 14px; border-radius: 8px; font-size: 0.95rem; outline: none; }
         .search-input:focus { border-color: #38bdf8; }
         .btn-gps-inline { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 5px; transition: transform 0.2s; color: #38bdf8; }
         .btn-gps-inline:hover { transform: translateY(-50%) scale(1.15); }
         
-        .search-results { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; padding-right: 5px; }
-        .res-item { background: #1e293b; border: 1px solid #334155; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-        .res-item:hover { background: #334155; border-color: #475569; }
-        .res-item-title { font-weight: bold; color: #fff; font-size: 1rem; margin-bottom: 2px; }
-        .res-item-sub { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* Absolute positioning pre výsledky - pôjdu ponad rýchlu voľbu */
+        .search-results { display: none; position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: #0f172a; border: 1px solid #38bdf8; border-radius: 8px; padding: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); max-height: 220px; overflow-y: auto; z-index: 100; }
+        .res-item { background: transparent; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: background 0.2s; margin-bottom: 2px; }
+        .res-item:hover { background: #334155; }
+        .res-item-title { font-weight: bold; color: #fff; font-size: 0.9rem; margin-bottom: 1px; }
+        .res-item-sub { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .preset-section { margin-top: 5px; border-top: 1px solid #334155; padding-top: 15px; }
-        .preset-title { font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .preset-list { display: flex; flex-direction: column; gap: 4px; }
+        .preset-section { margin-top: 5px; }
+        .preset-title { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .preset-list { display: flex; flex-direction: column; gap: 2px; }
         .preset-item { background: transparent; border: none; color: #cbd5e1; padding: 8px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
         .preset-item:hover { background: rgba(51, 65, 85, 0.5); color: #fff; }
-        .loading-text { text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 5px; display: none; }
+        .loading-text { text-align: center; color: #38bdf8; font-size: 0.8rem; padding: 8px; display: none; font-weight: bold; }
 
         canvas { touch-action: none; }
     </style>
@@ -283,18 +283,19 @@
     <!-- LOKÁCIA PICKER MODAL -->
     <div id="loc-picker-overlay">
         <div class="loc-modal">
-            <div class="loc-header">
-                <div class="loc-title">📍 Lokálny Horizont</div>
+            <div class="picker-close-wrapper">
                 <button class="picker-close" onclick="closeLocPicker()">×</button>
             </div>
 
             <div class="search-box">
                 <input type="text" id="loc-search-inp" class="search-input" placeholder="Hľadať miesto..." oninput="onSearchInput()">
                 <button class="btn-gps-inline" onclick="requestGPS()" title="Zistiť moju presnú polohu">📍</button>
+                
+                <!-- Autokomplet drop-down box -->
+                <div class="search-results" id="loc-results"></div>
             </div>
             
             <div class="loading-text" id="loc-loading">Načítavam...</div>
-            <div class="search-results" id="loc-results"></div>
 
             <div class="preset-section">
                 <div class="preset-title">⭐ Rýchly výber</div>
@@ -493,6 +494,7 @@
             document.getElementById('loc-picker-overlay').style.display = 'flex';
             document.getElementById('loc-search-inp').value = '';
             document.getElementById('loc-results').innerHTML = '';
+            document.getElementById('loc-results').style.display = 'none'; // Defaultne skrytý drop-down
             document.getElementById('loc-loading').style.display = 'none';
             
             let grid = document.getElementById('loc-presets-grid');
@@ -536,8 +538,14 @@
 
         let searchTimeout = null;
         function onSearchInput() {
+            let q = document.getElementById('loc-search-inp').value.trim();
+            if (q.length < 2) {
+                document.getElementById('loc-results').style.display = 'none';
+                document.getElementById('loc-loading').style.display = 'none';
+                return;
+            }
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(searchLocation, 500); 
+            searchTimeout = setTimeout(searchLocation, 250); 
         }
 
         async function searchLocation() {
@@ -547,24 +555,23 @@
             
             resDiv.innerHTML = '';
             
-            if (q.length < 2) {
-                loadDiv.style.display = 'none';
-                return;
-            }
+            if (q.length < 2) return;
             
+            resDiv.style.display = 'none';
             loadDiv.style.display = 'block';
             loadDiv.innerText = "Vyhľadávam...";
 
             try {
-                let response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=5`, {
+                let response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6`, {
                     headers: { 'Accept-Language': 'sk,en' }
                 });
                 let data = await response.json();
                 
                 loadDiv.style.display = 'none';
+                resDiv.style.display = 'block';
                 
                 if (data.length === 0) {
-                    resDiv.innerHTML = '<div class="loading-text" style="display:block">Nič sme nenašli.</div>';
+                    resDiv.innerHTML = '<div class="res-item" style="cursor:default;"><div class="res-item-title" style="color:#94a3b8;">Nič sme nenašli.</div></div>';
                     return;
                 }
 
@@ -572,8 +579,10 @@
                     let addr = item.address || {};
                     let city = addr.city || addr.town || addr.village || addr.name || "Neznáme miesto";
                     
-                    let county = addr.county || addr.state || "";
-                    if (county) county = county.replace(/okres\s/i, "okr. ");
+                    let county = addr.county || addr.district || addr.state_district || addr.municipality || "";
+                    if (county) {
+                        county = county.replace(/okres\s/i, "okr. ").replace(/District/i, "okr.");
+                    }
                     
                     let countryCode = addr.country_code ? addr.country_code.toUpperCase() : "";
                     
@@ -594,6 +603,7 @@
 
             } catch (error) {
                 loadDiv.innerText = "Chyba pripojenia.";
+                resDiv.style.display = 'none';
             }
         }
 
