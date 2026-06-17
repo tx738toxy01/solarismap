@@ -163,13 +163,15 @@
     <header>
         <h1><span>🌌</span> Solaris Map</h1>
         <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="position: relative; z-index: 100;">
-                <div class="lang-picker" id="lang-select-btn" onclick="let d = document.getElementById('lang-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">SK</div>
-                <div id="lang-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #1e293b; border: 1px solid #475569; border-radius: 8px; margin-bottom: 5px; padding: 5px 0; min-width: 140px; box-shadow: 0 5px 20px rgba(0,0,0,0.6);"></div>
-            </div>
-
             <div title="Zmeniť dátum a čas">
                 <div class="date-picker-btn" id="live-date" onclick="openPicker()">--.--.---- --:--:--</div>
+            </div>
+            
+            <div onclick="document.getElementById('settings-overlay').style.display='flex'" style="cursor: pointer; display: flex; align-items: center; color: #94a3b8; transition: all 0.3s;" onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='#94a3b8'; this.style.transform='rotate(0deg)'" title="Nastavenia">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
             </div>
         </div>
     </header>
@@ -308,6 +310,29 @@
         </div>
     </div>
 
+    <div class="picker-overlay" id="settings-overlay" onclick="if(event.target === this) document.getElementById('settings-overlay').style.display='none'">
+        <div class="picker-modal" style="max-width: 300px;">
+            <div class="picker-header">
+                <div class="picker-title" id="lbl-settings-title">⚙️ Nastavenia</div>
+                <button class="picker-close" onclick="document.getElementById('settings-overlay').style.display='none'">×</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <span class="input-label" id="lbl-settings-lang" style="text-align: left;">Jazyk</span>
+                    <select id="setting-lang-select" onchange="changeLanguage(this.value)" class="num-input" style="text-align: left; padding: 8px 12px; cursor: pointer;">
+                        </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <span class="input-label" id="lbl-settings-startup" style="text-align: left;">Objekt po štarte</span>
+                    <select id="setting-startup-select" onchange="changeStartupPlanet(this.value)" class="num-input" style="text-align: left; padding: 8px 12px; cursor: pointer;">
+                        </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- LOKÁCIA PICKER MODAL -->
     <div id="loc-picker-overlay">
         <div class="loc-modal">
@@ -366,6 +391,7 @@
                 btnToday: "Teraz", swipeTip: "Potiahnutím posúvaš čas (← Minulosť | Budúcnosť →)",
                 periodY: " r", periodD: " d", pickerTitle: "Dátum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušiť", pickerConfirm: "Potvrdiť",
                 pickerDay: "Deň", pickerMonth: "Mesiac", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
+                settingsTitle: "⚙️ Nastavenia", settingsLang: "Jazyk", settingsStartup: "Objekt po štarte",
                 toastMaxZoom: "Blahoželám, Orol pristál!", toastMinZoom: "Blahoželám, toto je Boží pohľad!",
                 cardinals: ["S (0°)", "V (90°)", "J (180°)", "Z (270°)", "S (360°)"],
                 planets: { Sun: "Slnko", Moon: "Mesiac", Mercury: "Merkúr", Venus: "Venuša", Earth: "Zem", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Urán", Neptune: "Neptún", Pluto: "Pluto", Halley: "Halleyho kométa" },
@@ -380,6 +406,7 @@
                 btnToday: "Nyní", swipeTip: "Tažením posouváš čas (← Minulost | Budoucnost →)",
                 periodY: " r", periodD: " d", pickerTitle: "Datum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušit", pickerConfirm: "Potvrdit",
                 pickerDay: "Den", pickerMonth: "Měsíc", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
+                settingsTitle: "⚙️ Nastavení", settingsLang: "Jazyk", settingsStartup: "Objekt po startu",
                 toastMaxZoom: "Gratuluji, Orel přistál!", toastMinZoom: "Gratuluji, to je Boží pohled!",
                 cardinals: ["S (0°)", "V (90°)", "J (180°)", "Z (270°)", "S (360°)"],
                 planets: { Sun: "Slunce", Moon: "Měsíc", Mercury: "Merkur", Venus: "Venuše", Earth: "Země", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Uran", Neptune: "Neptun", Pluto: "Pluto", Halley: "Halleyova kometa" },
@@ -394,6 +421,7 @@
                 btnToday: "Now", swipeTip: "Swipe to change time (← Past | Future →)",
                 periodY: " y", periodD: " d", pickerTitle: "Date & Time <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(year -9999 to +9999)</small>", pickerCancel: "Cancel", pickerConfirm: "Confirm",
                 pickerDay: "Day", pickerMonth: "Month", pickerYear: "Year", pickerHour: "Hr", pickerMinute: "Min",
+                settingsTitle: "⚙️ Settings", settingsLang: "Language", settingsStartup: "Startup Object",
                 toastMaxZoom: "Congratulations, the Eagle has landed!", toastMinZoom: "Congratulations, this is God's view!",
                 cardinals: ["N (0°)", "E (90°)", "S (180°)", "W (270°)", "N (360°)"],
                 planets: { Sun: "Sun", Moon: "Moon", Mercury: "Mercury", Venus: "Venus", Earth: "Earth", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Uranus", Neptune: "Neptune", Pluto: "Pluto", Halley: "Halley's Comet" },
@@ -408,6 +436,7 @@
                 btnToday: "Jetzt", swipeTip: "Wischen, um Zeit zu ändern (← Verg. | Zukunft →)",
                 periodY: " J", periodD: " T", pickerTitle: "Datum & Uhrzeit <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(Jahr -9999 bis +9999)</small>", pickerCancel: "Abbrechen", pickerConfirm: "Bestätigen",
                 pickerDay: "Tag", pickerMonth: "Monat", pickerYear: "Jahr", pickerHour: "Std", pickerMinute: "Min",
+                settingsTitle: "⚙️ Einstellungen", settingsLang: "Sprache", settingsStartup: "Startobjekt",
                 toastMaxZoom: "Glückwunsch, der Adler ist gelandet!", toastMinZoom: "Glückwunsch, das ist der Blick Gottes!",
                 cardinals: ["N (0°)", "O (90°)", "S (180°)", "W (270°)", "N (360°)"],
                 planets: { Sun: "Sonne", Moon: "Mond", Mercury: "Merkur", Venus: "Venus", Earth: "Erde", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturn", Uranus: "Uranus", Neptune: "Neptun", Pluto: "Pluto", Halley: "Halleyscher Komet" },
@@ -422,6 +451,7 @@
                 btnToday: "Mnt", swipeTip: "Glisser pour changer l'heure (← Passé | Futur →)",
                 periodY: " a", periodD: " j", pickerTitle: "Date et Heure <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(an -9999 à +9999)</small>", pickerCancel: "Annuler", pickerConfirm: "Valider",
                 pickerDay: "Jour", pickerMonth: "Mois", pickerYear: "An", pickerHour: "H", pickerMinute: "Min",
+                settingsTitle: "⚙️ Paramètres", settingsLang: "Langue", settingsStartup: "Objet au démarrage",
                 toastMaxZoom: "Félicitations, l'Aigle s'est posé !", toastMinZoom: "Félicitations, c'est la vue de Dieu !",
                 cardinals: ["N (0°)", "E (90°)", "S (180°)", "O (270°)", "N (360°)"],
                 planets: { Sun: "Soleil", Moon: "Lune", Mercury: "Mercure", Venus: "Vénus", Earth: "Terre", Mars: "Mars", Jupiter: "Jupiter", Saturn: "Saturne", Uranus: "Uranus", Neptune: "Neptune", Pluto: "Pluton", Halley: "Comète de Halley" },
@@ -436,6 +466,7 @@
                 btnToday: "Ahora", swipeTip: "Desliza para cambiar la hora (← Pasado | Futuro →)",
                 periodY: " a", periodD: " d", pickerTitle: "Fecha y Hora <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(año -9999 a +9999)</small>", pickerCancel: "Cancelar", pickerConfirm: "Aceptar",
                 pickerDay: "Día", pickerMonth: "Mes", pickerYear: "Año", pickerHour: "H", pickerMinute: "Min",
+                settingsTitle: "⚙️ Ajustes", settingsLang: "Idioma", settingsStartup: "Objeto de inicio",
                 toastMaxZoom: "¡Felicidades, el Águila ha aterrizado!", toastMinZoom: "¡Felicidades, esta es la vista de Dios!",
                 cardinals: ["N (0°)", "E (90°)", "S (180°)", "O (270°)", "N (360°)"],
                 planets: { Sun: "Sol", Moon: "Luna", Mercury: "Mercurio", Venus: "Venus", Earth: "Tierra", Mars: "Marte", Jupiter: "Júpiter", Saturn: "Saturno", Uranus: "Urano", Neptune: "Neptuno", Pluto: "Plutón", Halley: "Cometa Halley" },
@@ -450,6 +481,7 @@
                 btnToday: "现在", swipeTip: "滑动以更改时间 (← 过去 | 未来 →)",
                 periodY: " 年", periodD: " 天", pickerTitle: "日期和时间 <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(年份 -9999 至 +9999)</small>", pickerCancel: "取消", pickerConfirm: "确认",
                 pickerDay: "日", pickerMonth: "月", pickerYear: "年", pickerHour: "时", pickerMinute: "分",
+                settingsTitle: "⚙️ 设置", settingsLang: "语言", settingsStartup: "启动对象",
                 toastMaxZoom: "祝贺，老鹰已着陆！", toastMinZoom: "祝贺，这是上帝的视角！",
                 cardinals: ["北 (0°)", "东 (90°)", "南 (180°)", "西 (270°)", "北 (360°)"],
                 planets: { Sun: "太阳", Moon: "月球", Mercury: "水星", Venus: "金星", Earth: "地球", Mars: "火星", Jupiter: "木星", Saturn: "土星", Uranus: "天王星", Neptune: "海王星", Pluto: "冥王星", Halley: "哈雷彗星" },
@@ -464,6 +496,7 @@
                 btnToday: "अभी", swipeTip: "समय बदलने के लिए स्वाइप करें (← अतीत | भविष्य →)",
                 periodY: " वर्ष", periodD: " दिन", pickerTitle: "दिनांक और समय <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(वर्ष -9999 से +9999)</small>", pickerCancel: "रद्द करें", pickerConfirm: "पुष्टि करें",
                 pickerDay: "दिन", pickerMonth: "माह", pickerYear: "वर्ष", pickerHour: "घंटे", pickerMinute: "मिनट",
+                settingsTitle: "⚙️ सेटिंग्स", settingsLang: "भाषा", settingsStartup: "स्टार्टअप ऑब्जेक्ट",
                 toastMaxZoom: "बधाई हो, ईगल उतर चुका है!", toastMinZoom: "बधाई हो, यह भगवान का दृश्य है!",
                 cardinals: ["उ (0°)", "पू (90°)", "द (180°)", "प (270°)", "उ (360°)"],
                 planets: { Sun: "सूर्य", Moon: "चंद्रमा", Mercury: "बुध", Venus: "शुक्र", Earth: "पृथ्वी", Mars: "मंगल", Jupiter: "बृहस्पति", Saturn: "शनि", Uranus: "अरुण", Neptune: "वरुण", Pluto: "यम", Halley: "हैली धूमकेतु" },
@@ -832,32 +865,28 @@ function changeMapZoom(delta) {
             return progress * 2 * Math.PI;
         }
 
-        function populateLangDropdown() {
-            const dropdown = document.getElementById('lang-dropdown');
-            dropdown.innerHTML = '';
+        let startupPlanet = localStorage.getItem('solaris_startup_planet') || 'Sun';
+
+        function changeStartupPlanet(val) {
+            startupPlanet = val;
+            localStorage.setItem('solaris_startup_planet', val);
+        }
+
+        function populateSettings() {
+            let langSel = document.getElementById('setting-lang-select');
+            langSel.innerHTML = '';
             for (let key in langNames) {
-                let div = document.createElement('div');
-                div.innerText = langNames[key];
-                div.style.padding = '8px 15px';
-                div.style.color = '#e2e8f0';
-                div.style.cursor = 'pointer';
-                div.style.fontSize = '0.9rem';
-                div.onmouseover = () => div.style.background = '#334155';
-                div.onmouseout = () => div.style.background = 'transparent';
-                div.onclick = (e) => { 
-                    changeLanguage(key); 
-                    e.stopPropagation(); 
-                    dropdown.style.display = 'none';
-                };
-                dropdown.appendChild(div);
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = langNames[key];
+                if (key === currentLang) opt.selected = true;
+                langSel.appendChild(opt);
             }
-            document.getElementById('lang-select-btn').innerText = currentLang.toUpperCase();
         }
 
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('solaris_lang', lang);
-            document.getElementById('lang-select-btn').innerText = lang.toUpperCase();
             applyTranslations();
         }
 
@@ -880,6 +909,11 @@ function changeMapZoom(delta) {
             document.getElementById('lbl-picker-title').innerHTML = t.pickerTitle;
             document.getElementById('lbl-picker-cancel').innerText = t.pickerCancel;
             document.getElementById('lbl-picker-confirm').innerText = t.pickerConfirm;
+            
+            // Preklady pre okno Nastavení
+            let stTitle = document.getElementById('lbl-settings-title'); if (stTitle) stTitle.innerText = t.settingsTitle;
+            let stLang = document.getElementById('lbl-settings-lang'); if (stLang) stLang.innerText = t.settingsLang;
+            let stStartup = document.getElementById('lbl-settings-startup'); if (stStartup) stStartup.innerText = t.settingsStartup;
             
             document.getElementById('lbl-day').innerText = t.pickerDay;
             document.getElementById('lbl-month').innerText = t.pickerMonth;
@@ -914,6 +948,18 @@ function changeMapZoom(delta) {
             let p = planetData[currentPlanetKey].period;
             let pText = p > 365 ? (p/365.25).toFixed(1) + t.periodY : p.toFixed(0) + t.periodD;
             document.getElementById('stat-period').innerText = pText;
+// Naplnenie planét v nastaveniach podľa zvoleného jazyka
+            let stSel = document.getElementById('setting-startup-select');
+            if (stSel) {
+                stSel.innerHTML = '';
+                planetKeys.forEach(key => {
+                    let opt = document.createElement('option');
+                    opt.value = key;
+                    opt.innerText = t.planets[key];
+                    if (key === startupPlanet) opt.selected = true;
+                    stSel.appendChild(opt);
+                });
+            }
         }
 
         const canvas = document.getElementById('solarCanvas');
@@ -2346,15 +2392,15 @@ function changeMapZoom(delta) {
             document.getElementById('val-sunset').innerText = sunset ? formatTime(sunset) : "---";
         }
 
-        populateLangDropdown();
+        populateSettings();
         applyTranslations();
         setMode('real'); 
         
         setTimeout(() => {
             resizeCanvas();
-            selectPlanet('Sun', true); // <-- Tu zmeň Halley na Sun
+            // Aplikácia si po štarte načíta planétu z tvojich nastavení
+            selectPlanet(startupPlanet, true);
         }, 50);
-
         requestAnimationFrame(updateAndRender);
 
         // Funkcia pre otváranie a zatváranie okna sledovania cez ℹ️ ikonku
