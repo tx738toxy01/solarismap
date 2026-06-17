@@ -82,7 +82,22 @@
         
         .btn-tab-map { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #38bdf8; padding: 5px 10px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; display: none; align-items: center; justify-content: center; transition: background 0.2s; }
         .btn-tab-map:hover { background: #334155; }
-        #quick-map-panel { position: absolute; top: calc(100% + 8px); left: 0; width: 260px; height: 200px; background: #1e293b; border: 1px solid #38bdf8; border-radius: 12px; overflow: hidden; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 50; }
+        #quick-map-panel { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 85vw; 
+            height: 70vh; 
+            max-width: 800px;
+            background: #1e293b; 
+            border: 2px solid #38bdf8; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            display: none; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            z-index: 2000; 
+        }
         
         #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 240px; z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .radar-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
@@ -168,16 +183,13 @@
             <button class="tab-btn active" id="tab-btn-system" onclick="switchView('system')">Solárna mapa</button>
             <div style="position: relative; display: flex; gap: 6px;">
                 <button class="tab-btn" id="tab-btn-horizon" onclick="onHorizonTabClick(event)">Lokálny Horizont</button>
-                <button class="btn-tab-map" id="btn-tab-map" onclick="toggleQuickMap(event)" title="Zobraziť mapu na rýchlu kontrolu">🗺️</button>
-                
-                <div id="quick-map-panel">
-                    <iframe id="quick-map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
-                </div>
+                <button class="btn-tab-map" id="btn-tab-map" onclick="toggleQuickMap(event)" title="Zobraziť mapu na rýchlu kontrolu">🗺️</button>               
             </div>
         </div>
 
-        <div id="jupiter-radar-panel">
-            <div class="radar-title" id="radar-planet-title">📡 Sledovanie: Zem</div>
+        <div id="jupiter-radar-panel" style="position: absolute;">
+            <button onclick="document.getElementById('jupiter-radar-panel').style.display='none'; event.stopPropagation();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
+            <div class="radar-title" id="radar-planet-title" style="padding-right: 20px;">📡 Sledovanie: Zem</div>
             <div class="radar-row"><span id="lbl-az">Azimut (Smer):</span><span id="jup-az">---.-°</span></div>
             <div class="radar-row"><span id="lbl-alt">Výška nad obzorom:</span><span id="jup-alt">---.-°</span></div>
             
@@ -214,9 +226,9 @@
         <div class="controls-panel">
             <button class="btn-teraz" id="btn-today" onclick="resetToToday()">Teraz</button>
             <button class="btn-pause active" id="speed-pause" onclick="togglePlayPause()">⏸</button>
-            <div class="divider"></div>
+            <div class="divider" id="controls-divider"></div>
             
-            <div class="speed-row">
+            <div class="speed-row" id="controls-speed-row">
                 <button class="speed-btn" id="btn-bwd" onclick="stepSpeed(-1)">◄◄</button>
                 <span class="speed-label" id="current-speed-label">1x</span>
                 <button class="speed-btn" id="btn-fwd" onclick="stepSpeed(1)">►►</button>
@@ -229,6 +241,7 @@
             <div class="planet-title">
                 <canvas id="title-icon-canvas" width="32" height="32" style="position: static; width: 32px; height: 32px; margin-right: -2px; flex-shrink: 0;"></canvas>
                 <span id="selected-planet-name">Zem</span>
+                <span id="btn-radar-info" onclick="toggleRadarPanel(event)" style="cursor: pointer; margin-left: 8px; font-size: 1.1rem; filter: drop-shadow(0 0 2px #38bdf8); display: none;" title="Zobraziť sledovanie">ℹ️</span>
             </div>
             
             <div style="position: relative;">
@@ -308,13 +321,8 @@
             <div class="search-box">
                 <input type="text" id="loc-search-inp" class="search-input" placeholder="Hľadať miesto..." oninput="onSearchInput()">
                 <button class="btn-gps-inline" onclick="requestGPS()" title="Zistiť moju presnú polohu">📍</button>
-                <button class="btn-map-inline" onclick="toggleMapPreview()" title="Skontrolovať polohu na mape">🗺️</button>
                 
                 <div class="search-results" id="loc-results"></div>
-            </div>
-            
-            <div id="map-preview-container">
-                <iframe id="map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
             </div>
             
             <div class="loading-text" id="loc-loading">Načítavam...</div>
@@ -327,6 +335,17 @@
             </div>
         </div>
     </div>
+<div id="quick-map-panel">
+                    <button onclick="document.getElementById('quick-map-panel').style.display='none'; event.stopPropagation();" style="position: absolute; top: 12px; left: 12px; width: 40px; height: 40px; border-radius: 50%; background: #ef4444; border: 2px solid #fff; color: white; font-size: 1.2rem; cursor: pointer; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">✕</button>
+                    
+                    <div style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 10px; z-index: 10;">
+                        <button onclick="changeMapZoom(1); event.stopPropagation();" style="width: 45px; height: 45px; border-radius: 8px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-size: 1.8rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">+</button>
+                        
+                        <button onclick="changeMapZoom(-1); event.stopPropagation();" style="width: 45px; height: 45px; border-radius: 8px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-size: 2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">-</button>
+                    </div>
+
+                    <iframe id="quick-map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
+                </div>
 
     <script>
         window.addEventListener('click', () => {
@@ -511,20 +530,6 @@
             }
         }
 
-        function toggleQuickMap(event) {
-            event.stopPropagation();
-            let panel = document.getElementById('quick-map-panel');
-            let iframe = document.getElementById('quick-map-iframe');
-            
-            if (panel.style.display === 'block') {
-                panel.style.display = 'none';
-            } else {
-                panel.style.display = 'block';
-                let encName = encodeURIComponent(myLocName);
-                // Oficiálny a funkčný formát pre Google Maps Embed s pinom a názvom
-                iframe.src = `https://www.google.com/maps?q=${myLat},${myLon}&hl=sk&z=11&output=embed`;
-            }
-        }
         // --- VYHĽADÁVACÍ LOKÁCIA MODAL LOGIKA ---
         function onHorizonTabClick(event) {
             if (activeTab === 'system') {
@@ -541,7 +546,6 @@
             document.getElementById('loc-results').innerHTML = '';
             document.getElementById('loc-results').style.display = 'none'; 
             document.getElementById('loc-loading').style.display = 'none';
-            document.getElementById('map-preview-container').style.display = 'none';
             
             let grid = document.getElementById('loc-presets-grid');
             grid.innerHTML = '';
@@ -558,20 +562,16 @@
             document.getElementById('loc-picker-overlay').style.display = 'none';
         }
 
-        function toggleMapPreview() {
-            let container = document.getElementById('map-preview-container');
-            let iframe = document.getElementById('map-iframe');
+        let currentMapZoom = 11;
+function changeMapZoom(delta) {
+            let iframe = document.getElementById('quick-map-iframe');
+            currentMapZoom += delta;
             
-            if (container && iframe) {
-                if (container.style.display === 'block') {
-                    container.style.display = 'none';
-                } else {
-                    container.style.display = 'block';
-                    let encName = encodeURIComponent(myLocName);
-                    // Oficiálny a funkčný formát pre Google Maps Embed s pinom a názvom
-                    iframe.src = `https://www.google.com/maps?q=${myLat},${myLon}&hl=sk&z=11&output=embed`;
-                }
-            }
+            if (currentMapZoom < 2) currentMapZoom = 2;
+            if (currentMapZoom > 20) currentMapZoom = 20;
+            
+            // Opravený a oficiálny link pre čistú mapu bez špendlíka
+            iframe.src = `https://maps.google.com/maps?ll=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
         }
 
         function toggleQuickMap(event) {
@@ -583,12 +583,13 @@
                 panel.style.display = 'none';
             } else {
                 panel.style.display = 'block';
-                // Čistý Google Maps iframe, ktorý prilepí nad pin aj bublinu s názvom
-                let encName = encodeURIComponent(myLocName);
-                iframe.src = `https://maps.google.com/maps?q=${myLat},${myLon}+(${encName})&hl=sk&z=11&output=embed`;
+                currentMapZoom = 11; 
+                
+                // Opravený a oficiálny link pre čistú mapu bez špendlíka
+                iframe.src = `https://maps.google.com/maps?ll=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
             }
         }
-
+        		
         document.getElementById('loc-picker-overlay').addEventListener('click', function(e) {
             if (e.target === this) closeLocPicker();
         });
@@ -1510,22 +1511,37 @@
             hideTooltip();
             
             let sunPnl = document.getElementById('sun-times-panel');
+            let infoBtn = document.getElementById('btn-radar-info');
             
             if (view === 'system') {
                 document.getElementById('tab-btn-system').classList.add('active');
                 document.getElementById('jupiter-radar-panel').style.display = 'none';
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'flex';
                 if (sunPnl) sunPnl.style.display = 'none';
-                updateHorizonTabButton(); 
+                if (infoBtn) infoBtn.style.display = 'none'; // Na Solárnej mape ikonku skryjeme
                 
+                // Zobrazenie kompletného prehrávača na Solárnej mape
+                let sp = document.getElementById('speed-pause'); if(sp) sp.style.display = 'block';
+                let cd = document.getElementById('controls-divider'); if(cd) cd.style.display = 'block';
+                let sr = document.getElementById('controls-speed-row'); if(sr) sr.style.display = 'flex';
+                
+                updateHorizonTabButton(); 
                 selectPlanet(currentPlanetKey, true);
             } else {
                 document.getElementById('tab-btn-horizon').classList.add('active');
+                
+                // ZMENA: Radar sa pri prepnutí na horizont VŽDY automaticky otvorí
                 document.getElementById('jupiter-radar-panel').style.display = 'block';
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'none';
                 if (sunPnl) sunPnl.style.display = 'flex';
-                updateHorizonTabButton(); 
+                if (infoBtn) infoBtn.style.display = 'inline'; // Zobrazíme ikonku
                 
+                // Skryjeme všetko okrem tlačidla "Teraz"
+                let sp = document.getElementById('speed-pause'); if(sp) sp.style.display = 'none';
+                let cd = document.getElementById('controls-divider'); if(cd) cd.style.display = 'none';
+                let sr = document.getElementById('controls-speed-row'); if(sr) sr.style.display = 'none';
+                
+                updateHorizonTabButton(); 
                 selectPlanet(currentPlanetKey, true);
                 showToast(translations[currentLang].swipeTip);
             }
@@ -2326,6 +2342,17 @@
         }, 50);
 
         requestAnimationFrame(updateAndRender);
+
+        // Funkcia pre otváranie a zatváranie okna sledovania cez ℹ️ ikonku
+        function toggleRadarPanel(event) {
+            if (event) event.stopPropagation();
+            let panel = document.getElementById('jupiter-radar-panel');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
