@@ -1702,7 +1702,7 @@ function changeMapZoom(delta) {
 
 // --- ZÁCHRANA HALLEYHO KOMÉTY PRE HISTÓRIU ---
         function syncHalleyWithHistory(simDate) {
-            if (!planets["Halley"]) return;
+            if (!planetData["Halley"]) return;
             
             // Záznamy preletov okolo Slnka od roku 240 pred n.l. až po budúcnosť (desatinné roky)
             const pYears = [
@@ -1736,9 +1736,9 @@ function changeMapZoom(delta) {
             let periodDays = currentPeriodYears * 365.25;
             
             // "Oklameme" údaje kométy presne pre túto chvíľu
-            planets["Halley"].period = periodDays;
+            planetData["Halley"].period = periodDays;
             let rawM0 = exactM - (360 / periodDays) * daysSinceEpoch;
-            planets["Halley"].M0 = ((rawM0 % 360) + 360) % 360; // Udržíme uhol v intervale 0-360
+            planetData["Halley"].M0 = ((rawM0 % 360) + 360) % 360; // Udržíme uhol v intervale 0-360
         }
 
         function updateAndRender() {
@@ -2191,8 +2191,8 @@ function changeMapZoom(delta) {
                         let visText = "";
                         let visColor = "#ef4444";
 
-                        // VÝPOČET ELONGÁCIE (Uhol od Slnka)
-                        let elongation = Math.acos(Math.max(-1, Math.min(1, Math.cos(alt) * Math.cos(az - sunAz)))) * 180 / Math.PI;
+                        // VÝPOČET ELONGÁCIE PRE RADAR (Uhol od Slnka)
+                        let skyElongation = Math.acos(Math.max(-1, Math.min(1, Math.cos(alt) * Math.cos(az - sunAz)))) * 180 / Math.PI;
 
                         if (key === "Earth") {
                             visText = "Domovská planéta (Tu sa nachádzaš)";
@@ -2214,10 +2214,10 @@ function changeMapZoom(delta) {
                             if (mag < -2) {
                                 visText = "WOW! Viditeľná aj cez deň!"; 
                                 visColor = "#ff00ff";
-                            } else if (mag < 4 && elongation > 20) {
+                            } else if (mag < 4 && skyElongation > 20) {
                                 visText = "Áno (Veľmi jasná)";
                                 visColor = "#22c55e";
-                            } else if (mag < 6 && elongation > 15) {
+                            } else if (mag < 6 && skyElongation > 15) {
                                 visText = "Áno (Slabo viditeľná)";
                                 visColor = "#eab308";
                             } else {
