@@ -185,7 +185,7 @@
         </div>
 
         <div id="jupiter-radar-panel" style="position: absolute;">
-            <button onclick="document.getElementById('jupiter-radar-panel').style.display='none'; event.stopPropagation();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
+            <button onclick="toggleRadarPanel(event)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
             <div class="radar-title" id="radar-planet-title" style="padding-right: 20px;">📡 Sledovanie: Zem</div>
             <div class="radar-row"><span id="lbl-az">Azimut (Smer):</span><span id="jup-az">---.-°</span></div>
             <div class="radar-row"><span id="lbl-alt">Výška nad obzorom:</span><span id="jup-alt">---.-°</span></div>
@@ -1595,7 +1595,7 @@ function changeMapZoom(delta) {
                 document.getElementById('jupiter-radar-panel').style.display = 'block';
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'none';
                 if (sunPnl) sunPnl.style.display = 'flex';
-                if (infoBtn) infoBtn.style.display = 'inline';
+                if (infoBtn) infoBtn.style.display = 'none';
                 
                 // Skryjeme celý veľký panel s podkladom a ukážeme len čisté modré tlačidlo
                 if (mainControls) mainControls.style.display = 'none';
@@ -1879,45 +1879,7 @@ function changeMapZoom(delta) {
                     ctx.fillStyle = '#94a3b8'; ctx.fillText(label, x - 18, horizonY + 20);
                 });
 
-                let zodiacAltOffset = 18; 
                 
-                ctx.beginPath();
-                ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
-                ctx.lineWidth = 1.5;
-                let eclipPoints = [];
-                for (let i = 0; i < 360; i += 4) { eclipPoints.push(getSkyPos(simDate, myLat, myLon, i)); }
-                
-                eclipPoints.sort((a,b) => getScreenX(a.az) - getScreenX(b.az));
-                
-                let lastScX = -999;
-                eclipPoints.forEach((pt, i) => {
-                    let scX = getScreenX(pt.az);
-                    let scY = horizonY - ((pt.alt + zodiacAltOffset) / 90) * horizonY;
-                    if (i === 0 || Math.abs(scX - lastScX) > canvas.clientWidth / 2) { ctx.moveTo(scX, scY); } 
-                    else { ctx.lineTo(scX, scY); }
-                    lastScX = scX;
-                });
-                ctx.stroke();
-
-                zodiacSigns.forEach(z => {
-                    let elongation = z.angle - sunDeg;
-                    let pos = getSkyPos(simDate, myLat, myLon, elongation);
-                    let screenX = getScreenX(pos.az);
-                    let screenY = horizonY - ((pos.alt + zodiacAltOffset) / 90) * horizonY;
-                    
-                    if (pos.alt > -15) { 
-                        ctx.save();
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-                        ctx.shadowBlur = 4;
-                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.fillStyle = '#ffffff'; ctx.font = '18px sans-serif'; 
-                        ctx.fillText(z.sym, screenX, screenY - 8);
-                        ctx.fillStyle = '#e2e8f0'; ctx.font = '13px sans-serif'; 
-                        ctx.fillText(t.zodiac[z.id], screenX, screenY + 10);
-                        ctx.restore();
-                    }
-                });
-                ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
 
                 let renderKeys = Object.keys(planetData).filter(k => k !== "Earth");
                 renderKeys.sort((a, b) => a === currentPlanetKey ? 1 : (b === currentPlanetKey ? -1 : 0));
@@ -2407,10 +2369,16 @@ function changeMapZoom(delta) {
         function toggleRadarPanel(event) {
             if (event) event.stopPropagation();
             let panel = document.getElementById('jupiter-radar-panel');
+            let infoBtn = document.getElementById('btn-radar-info');
+            
             if (panel.style.display === 'block') {
+                // Ak okno zatvárame -> zobrazíme ikonku
                 panel.style.display = 'none';
+                if (infoBtn && activeTab === 'horizon') infoBtn.style.display = 'inline';
             } else {
+                // Ak okno otvárame -> skryjeme ikonku
                 panel.style.display = 'block';
+                if (infoBtn) infoBtn.style.display = 'none';
             }
         }
     </script>
