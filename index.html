@@ -184,7 +184,18 @@
             <button class="tab-btn active" id="tab-btn-system" onclick="switchView('system')">Solárna mapa</button>
             <button class="tab-btn" id="tab-btn-horizon" onclick="onHorizonTabClick(event)">Lokálny Horizont</button>
         </div>
-
+<div id="weather-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 24px; padding: 24px; width: 90%; max-width: 340px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px; margin-bottom: 16px;">
+                <div style="font-size: 1.1rem; font-weight: bold; color: #f8fafc;">📡 Atmosférické podmienky</div>
+                <button onclick="document.getElementById('weather-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            
+            <div id="weather-content" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.5;">
+                Načítavam dáta z družice... ⏳
+            </div>
+        </div>
+    </div>
         <div id="jupiter-radar-panel" style="position: absolute;">
             <button onclick="toggleRadarPanel(event)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
             <div class="radar-title" id="radar-planet-title" style="padding-right: 20px;">📡 Sledovanie: Zem</div>
@@ -194,6 +205,7 @@
             <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; flex-direction: column; gap: 4px;">
                 <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
                 <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold;">---</span>
+                <span id="weather-link" onclick="openWeatherModal()" style="font-size: 0.85rem; color: #38bdf8; cursor: pointer; text-decoration: underline; margin-top: 2px; display: none;">(aktuálne podmienky)</span>
             </div>
         </div>
 
@@ -1688,7 +1700,49 @@ function changeMapZoom(delta) {
             ctx.restore();
         }
 
+// --- ZÁCHRANA HALLEYHO KOMÉTY PRE HISTÓRIU ---
+        function syncHalleyWithHistory(simDate) {
+            if (!planets["Halley"]) return;
+            
+            // Záznamy preletov okolo Slnka od roku 240 pred n.l. až po budúcnosť (desatinné roky)
+            const pYears = [
+                -239.4, -163.8, -86.6, -11.8, 66.0, 141.2, 218.3, 295.2, 374.1, 451.4, 530.7, 607.2, 684.7, 
+                760.3, 837.1, 912.5, 989.6, 1066.2, 1145.3, 1222.7, 1301.8, 1378.8, 1456.4, 1531.6, 
+                1607.8, 1682.7, 1759.2, 1835.8, 1910.3, 1986.1, 2061.6, 2134.2
+            ];
+            
+            let simYear = simDate.getFullYear() + (simDate.getMonth() / 12) + (simDate.getDate() / 365);
+            
+            // Nájdeme do ktorého historického obehu práve naša simulácia patrí
+            let yStart = pYears[29]; // Default: prelet z roku 1986
+            let yEnd = pYears[30];   // Default: prelet v roku 2061
+            
+            for (let i = 0; i < pYears.length - 1; i++) {
+                if (simYear >= pYears[i] && simYear < pYears[i+1]) {
+                    yStart = pYears[i];
+                    yEnd = pYears[i+1];
+                    break;
+                }
+            }
+            
+            // Vypočítame, koľko trval TENTO konkrétny obeh a v akej jeho časti sa nachádzame
+            let currentPeriodYears = yEnd - yStart;
+            let fraction = (simYear - yStart) / currentPeriodYears;
+            let exactM = fraction * 360; // Presný uhol od Slnka pre daný historický moment
+            
+            // Prepočítame tento uhol späť na našu hlavnú epochu (1.1.2026), aby vzorce nehavarovali
+            let msSinceEpoch = simDate.getTime() - new Date(2026, 0, 1).getTime();
+            let daysSinceEpoch = msSinceEpoch / 86400000;
+            let periodDays = currentPeriodYears * 365.25;
+            
+            // "Oklameme" údaje kométy presne pre túto chvíľu
+            planets["Halley"].period = periodDays;
+            let rawM0 = exactM - (360 / periodDays) * daysSinceEpoch;
+            planets["Halley"].M0 = ((rawM0 % 360) + 360) % 360; // Udržíme uhol v intervale 0-360
+        }
+
         function updateAndRender() {
+            syncHalleyWithHistory(simDate); // <--- Zosynchronizuje kométu s dejepisom
             let now = Date.now();
             let realDelta = now - lastFrameTime;
             lastFrameTime = now;
@@ -2135,9 +2189,15 @@ function changeMapZoom(delta) {
                         let absElongation = Math.abs(elDeg);
 
                         let visText = "";
-                        let visColor = "#ef4444"; 
+                        let visColor = "#ef4444";
 
-                        if (alt <= 0) {
+                        // VÝPOČET ELONGÁCIE (Uhol od Slnka)
+                        let elongation = Math.acos(Math.max(-1, Math.min(1, Math.cos(alt) * Math.cos(az - sunAz)))) * 180 / Math.PI;
+
+                        if (key === "Earth") {
+                            visText = "Domovská planéta (Tu sa nachádzaš)";
+                            visColor = "#94a3b8";
+                        } else if (alt <= 0) {
                             visText = t.visNoHor;
                         } else if (key === "Sun") {
                             visText = t.visYesBright;
@@ -2145,39 +2205,52 @@ function changeMapZoom(delta) {
                         } else if (key === "Moon") {
                             if (absElongation < 25) {
                                 visText = t.visNoMoonPhase;
-                                visColor = "#ef4444";
                             } else {
                                 visText = (sunAlt > -2) ? t.visYesDayMoon : t.visYesBright;
                                 visColor = "#22c55e"; 
                             }
-                        } else if (!p.isVisibleNakedEye) {
-                            visText = t.visNoHubble;
-                            visColor = "#ef4444";
-                        } else if (mag > 6.0) {
-                            visText = t.visNoFar;
-                        } else if (sunAlt > 0) {
-                            visText = t.visNoSun;
-                        } else if (sunAlt > -6 && mag > 1.0) {
-                            visText = t.visNoSun;
-                        } else if (sunAlt > -12 && mag > 3.0) {
-                            visText = t.visNoSun; 
-                        } else if (mag < 0) {
-                            visText = t.visYesBright;
-                            visColor = "#22c55e";
-                        } else if (mag <= 3.5) {
-                            visText = t.visYesNormal;
-                            visColor = "#22c55e"; 
-                        } else if (mag <= 6.0) {
-                            visText = t.visYesFaint;
-                            visColor = "#eab308"; 
+                        } else if (key === "Halley") {
+                            // ŠPECIÁLNA LOGIKA PRE KOMÉTU
+                            if (mag < -2) {
+                                visText = "WOW! Viditeľná aj cez deň!"; 
+                                visColor = "#ff00ff";
+                            } else if (mag < 4 && elongation > 20) {
+                                visText = "Áno (Veľmi jasná)";
+                                visColor = "#22c55e";
+                            } else if (mag < 6 && elongation > 15) {
+                                visText = "Áno (Slabo viditeľná)";
+                                visColor = "#eab308";
+                            } else {
+                                visText = t.visNoHubble;
+                            }
                         } else {
-                            visText = t.visNoFar;
+                            // ŠTANDARDNÁ LOGIKA PRE PLANÉTY
+                            if (mag > 7.5) visText = t.visNoHubble;
+                            else if (mag > 6.0) visText = t.visNoFar;
+                            else if (sunAlt > 0) visText = t.visNoSun;
+                            else if (sunAlt > -6 && mag > 1.0) visText = t.visNoSun;
+                            else if (sunAlt > -12 && mag > 3.0) visText = t.visNoSun;
+                            else if (mag < 0) { visText = t.visYesBright; visColor = "#22c55e"; }
+                            else if (mag <= 3.5) { visText = t.visYesNormal; visColor = "#22c55e"; }
+                            else { visText = t.visYesFaint; visColor = "#eab308"; }
                         }
 
                         document.getElementById('jup-az').innerText = az.toFixed(1) + "°";
                         document.getElementById('jup-alt').innerText = (alt > 0 ? "+" : "") + alt.toFixed(1) + "°";
                         document.getElementById('jup-vis').innerText = visText;
                         document.getElementById('jup-vis').style.color = visColor;
+                        
+                        // Zobrazenie alebo skrytie odkazu na počasie podľa času a planéty
+                        let weatherLink = document.getElementById('weather-link');
+                        if (weatherLink) {
+                            let diffMinutes = Math.abs(simDate.getTime() - new Date().getTime()) / 60000;
+                            // Ukážeme ho len ak to NIE JE Zem a sme v prítomnosti
+                            if (key !== "Earth" && diffMinutes < 5) {
+                                weatherLink.style.display = 'inline';
+                            } else {
+                                weatherLink.style.display = 'none';
+                            }
+                        }
                     }
                 }
             }
@@ -2433,6 +2506,55 @@ function changeMapZoom(delta) {
                 // Ak okno otvárame -> skryjeme ikonku
                 panel.style.display = 'block';
                 if (infoBtn) infoBtn.style.display = 'none';
+            }
+        }
+    // FUNKCIA PRE ZISTENIE POČASIA Z OPEN-METEO API
+        async function openWeatherModal() {
+            let overlay = document.getElementById('weather-overlay');
+            let content = document.getElementById('weather-content');
+            
+            // 1. Zobrazíme okno s loadingom
+            overlay.style.display = 'flex';
+            content.innerHTML = 'Načítavam dáta z družice... ⏳';
+
+            try {
+                // Súradnice pre Bratislavu
+                let lat = 48.1486; 
+                let lon = 17.1077;
+                
+                // 2. Opýtame sa API
+                let url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=cloud_cover,weather_code`;
+                let response = await fetch(url);
+                let data = await response.json();
+
+                let clouds = data.current.cloud_cover;
+                let code = data.current.weather_code;
+                
+                // 3. Naša logika 10 úrovní viditeľnosti
+                let verdict = "";
+                let vColor = "#cbd5e1";
+
+                if (code >= 51 && code <= 99) { verdict = "⚠️ Extrém. Zrážky alebo hmla. Zostaň v teple."; vColor = "#ef4444"; }
+                else if (clouds === 0) { verdict = "🌌 0 % – Astronomický raj. Ideálny čas na pozorovanie."; vColor = "#22c55e"; }
+                else if (clouds <= 10) { verdict = "✨ 1-10 % – Krištáľový vzduch. Vynikajúce podmienky."; vColor = "#22c55e"; }
+                else if (clouds <= 20) { verdict = "🔭 11-20 % – Skvelá noc. Drobné mraky neprekážajú."; vColor = "#22c55e"; }
+                else if (clouds <= 35) { verdict = "🪐 21-35 % – Sľubný večer. Občasné zakrytie objektov."; vColor = "#eab308"; }
+                else if (clouds <= 50) { verdict = "🌓 36-50 % – Premenlivá obloha. Hra na mačku a myš."; vColor = "#eab308"; }
+                else if (clouds <= 65) { verdict = "🌥️ 51-65 % – Sťažené podmienky. Hľadaj len jasné objekty."; vColor = "#eab308"; }
+                else if (clouds <= 80) { verdict = "🛑 66-80 % – Slabé vyhliadky. Skôr frustrujúce."; vColor = "#f97316"; }
+                else if (clouds <= 95) { verdict = "🌫️ 81-95 % – Kritická deka. Pozorovanie nemá zmysel."; vColor = "#ef4444"; }
+                else { verdict = "⬛ 96-100 % – Totálne zatiahnuté. Nulová viditeľnosť."; vColor = "#ef4444"; }
+
+                // 4. Vypíšeme to pekne do okna
+                content.innerHTML = `
+                    <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px; text-transform: uppercase;">Lokácia: Bratislava</div>
+                    <div style="font-size: 3.5rem; font-weight: bold; color: #f8fafc; margin-bottom: 15px; line-height: 1;">${clouds}<span style="font-size: 1.5rem; color: #64748b;">%</span></div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px;">Hodnotenie podmienok:</div>
+                    <div style="font-size: 1rem; font-weight: bold; color: ${vColor}; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px;">${verdict}</div>
+                `;
+            } catch (error) {
+                // Keby náhodou vypadol internet
+                content.innerHTML = '<div style="color: #ef4444; padding: 20px;">Spojenie so serverom zlyhalo. Skontroluj internetové pripojenie. ❌</div>';
             }
         }
     </script>
