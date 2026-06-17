@@ -1411,9 +1411,29 @@ function changeMapZoom(delta) {
 
             if (activeTab === "system") {
                 let targetRadius = planetData[key].radius;
-                if (key === "Sun") targetRadius = 60; 
-                if (key === "Moon") targetRadius = planetData["Moon"].radius * 1.2; 
-                if (planetData[key].isComet) targetRadius = planetData[key].a * 1.2; 
+                
+                if (key === "Sun") {
+                    let maxDist = 0;
+                    // Vypočítame presný aktuálny čas simulácie
+                    let msE = simDate.getTime() - new Date(2026, 0, 1).getTime();
+                    let dE = msE / (1000 * 60 * 60 * 24);
+                    
+                    // Prejdeme úplne všetky planéty a zistíme, ktorá je PRÁVE TERAZ najďalej
+                    for (let pKey in planetData) {
+                        if (pKey !== "Sun" && pKey !== "Moon") {
+                            let pos = getPlanetPos(pKey, dE, 1);
+                            // Vzdialenosť od Slnka + veľkosť samotnej planéty, aby nebola odrezaná
+                            let dist = Math.hypot(pos.x, pos.y) + (planetData[pKey].size * 2);
+                            if (dist > maxDist) maxDist = dist;
+                        }
+                    }
+                    // Nastavíme zoom presne na najvzdialenejší objekt + 5% okraj pre eleganciu
+                    targetRadius = maxDist * 1.05; 
+                } else if (key === "Moon") {
+                    targetRadius = planetData["Moon"].radius * 1.2; 
+                } else if (planetData[key].isComet) {
+                    targetRadius = planetData[key].a * 1.2; 
+                }
                 
                 let minDimension = Math.min(canvas.clientWidth, canvas.clientHeight);
                 let padding = 40; 
@@ -2332,7 +2352,7 @@ function changeMapZoom(delta) {
         
         setTimeout(() => {
             resizeCanvas();
-            selectPlanet('Halley', true);
+            selectPlanet('Sun', true); // <-- Tu zmeň Halley na Sun
         }, 50);
 
         requestAnimationFrame(updateAndRender);
