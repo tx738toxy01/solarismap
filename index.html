@@ -367,7 +367,7 @@
             <div class="loading-text" id="loc-loading">Načítavam...</div>
 
             <div class="preset-section">
-                <div class="preset-title">⭐ Rýchly výber</div>
+                <div class="preset-title">⭐ <span id="lbl-quick-select">Rýchly výber</span></div>
                 <div class="preset-list" id="loc-presets-grid">
                     <!-- Generované cez JS -->
                 </div>
@@ -408,7 +408,7 @@
                 btnToday: "Teraz", swipeTip: "Potiahnutím posúvaš čas (← Minulosť | Budúcnosť →)",
                 periodY: " r", periodD: " d", pickerTitle: "Dátum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušiť", pickerConfirm: "Potvrdiť",
                 pickerDay: "Deň", pickerMonth: "Mesiac", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
-                settingsTitle: "⚙️ Nastavenia", settingsLang: "Jazyk", settingsStartup: "Objekt po štarte",
+                settingsTitle: "⚙️ Nastavenia", settingsLang: "Jazyk", settingsStartup: "Objekt po štarte", quickSelect: "Rýchly výber",
                 weatherLink: "(pozorovacie podmienky)", homePlanet: "Domovská planéta (Tu sa nachádzaš)", cometDay: "WOW! Viditeľná cez deň!", cometBright: "Áno (Veľmi jasná)", cometFaint: "Áno (Slabo viditeľná)",
                 toastMaxZoom: "Blahoželám, Orol pristál!", toastMinZoom: "Blahoželám, toto je Boží pohľad!",
                 cardinals: ["S (0°)", "V (90°)", "J (180°)", "Z (270°)", "S (360°)"],
@@ -416,7 +416,9 @@
                 zodiac: { Aries: "Baran", Taurus: "Býk", Gemini: "Blíženci", Cancer: "Rak", Leo: "Lev", Virgo: "Panna", Libra: "Váhy", Scorpio: "Škorpión", Sagittarius: "Strelec", Capricorn: "Kozorožec", Aquarius: "Vodnár", Pisces: "Ryby" },
                 moonPhases: ["Nov", "Dorastajúci kosák", "Prvá štvrť", "Dorastajúci mesiac", "Spln", "Cúvajúci mesiac", "Posledná štvrť", "Cúvajúci kosák"],
                 weatherTitle: "📡 Atmosférické podmienky", weatherLoading: "Načítavam dáta z družice... ⏳", weatherLoc: "Lokácia", weatherTemp: "Teplota", weatherWind: "Vietor", weatherHum: "Vlhkosť", weatherEval: "Astronomické hodnotenie", weatherError: "Spojenie so serverom zlyhalo. Skontroluj internetové pripojenie. ❌",
-                weatherVerdicts: ["⚠️ Extrém. Zrážky/hmla. Zostaň v teple.", "🌌 Astronomický raj. Dokonalé podmienky.", "✨ Krištáľový vzduch. Vynikajúce.", "🔭 Skvelá noc. Drobné mraky neprekážajú.", "🪐 Sľubný večer. Občasné zakrytie.", "🌓 Premenlivá obloha. Hra na schovávačku.", "🌥️ Sťažené podmienky. Iba jasné objekty.", "🛑 Slabé vyhliadky. Skôr frustrujúce.", "🌫️ Kritická deka. Bez šance.", "⬛ Totálne zatiahnuté. Nulová viditeľnosť."]
+                weatherVerdicts: ["⚠️ Extrém. Zrážky/hmla. Zostaň v teple.", "🌌 Astronomický raj. Dokonalé podmienky.", "✨ Krištáľový vzduch. Vynikajúce.", "🔭 Skvelá noc. Drobné mraky neprekážajú.", "🪐 Sľubný večer. Občasné zakrytie.", "🌓 Premenlivá obloha. Hra na schovávačku.", "🌥️ Sťažené podmienky. Iba jasné objekty.", "🛑 Slabé vyhliadky. Skôr frustrujúce.", "🌫️ Kritická deka. Bez šance.", "⬛ Totálne zatiahnuté. Nulová viditeľnosť."],
+                searchPlaceholder: "Hľadať miesto...", searchSats: "Hľadám satelity...", searchWait: "Vyhľadávam...", searchTime: "Zisťujem lokálny čas...", searchError: "Chyba pripojenia.", searchNoRes: "Nič sme nenašli.", searchAlert: "Nepodarilo sa získať polohu.", searchMyLoc: "Moja poloha",
+                locPresets: [ { t: "Bratislava", s: "Slovensko" }, { t: "Sydney", s: "Austrália (Zima v júni)" }, { t: "New York", s: "USA" }, { t: "Tokio", s: "Japonsko" }, { t: "Tromsø", s: "Nórsko (Polárny deň)" }, { t: "Quito", s: "Ekvádor (Rovník)" } ]
             },
             cs: {
                 tabSystem: "Solární mapa", tabHorizon: "Lokální Horizont",
@@ -427,7 +429,7 @@
                 btnToday: "Nyní", swipeTip: "Tažením posouváš čas (← Minulost | Budoucnost →)",
                 periodY: " r", periodD: " d", pickerTitle: "Datum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušit", pickerConfirm: "Potvrdit",
                 pickerDay: "Den", pickerMonth: "Měsíc", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
-                settingsTitle: "⚙️ Nastavení", settingsLang: "Jazyk", settingsStartup: "Objekt po startu",
+                settingsTitle: "⚙️ Nastavení", settingsLang: "Jazyk", settingsStartup: "Objekt po startu", quickSelect: "Rychlý výběr",
                 weatherLink: "(pozorovací podmínky)", homePlanet: "Domovská planeta (Zde se nacházíš)", cometDay: "WOW! Viditelná ve dne!", cometBright: "Ano (Velmi jasná)", cometFaint: "Ano (Slabě viditelná)",
                 toastMaxZoom: "Gratuluji, Orel přistál!", toastMinZoom: "Gratuluji, to je Boží pohled!",
                 cardinals: ["S (0°)", "V (90°)", "J (180°)", "Z (270°)", "S (360°)"],
@@ -435,7 +437,9 @@
                 zodiac: { Aries: "Beran", Taurus: "Býk", Gemini: "Blíženci", Cancer: "Rak", Leo: "Lev", Virgo: "Panna", Libra: "Váhy", Scorpio: "Štír", Sagittarius: "Střelec", Capricorn: "Kozoroh", Aquarius: "Vodnář", Pisces: "Ryby" },
                 moonPhases: ["Nov", "Dorůstající srpek", "První čtvrť", "Dorůstající měsíc", "Úplněk", "Couvající měsíc", "Poslední čtvrť", "Couvající srpek"],
                 weatherTitle: "📡 Atmosférické podmínky", weatherLoading: "Načítám data z družice... ⏳", weatherLoc: "Lokace", weatherTemp: "Teplota", weatherWind: "Vítr", weatherHum: "Vlhkost", weatherEval: "Astronomické hodnocení", weatherError: "Spojení se serverem selhalo. Zkontroluj internet. ❌",
-                weatherVerdicts: ["⚠️ Extrém. Srážky/mlha. Zůstaň v teple.", "🌌 Astronomický ráj. Dokonalé podmínky.", "✨ Křišťálový vzduch. Vynikající.", "🔭 Skvělá noc. Drobné mraky nevadí.", "🪐 Slibný večer. Občasné zakrytí.", "🌓 Proměnlivá obloha. Hra na schovávanou.", "🌥️ Ztížené podmínky. Jen jasné objekty.", "🛑 Slabé vyhlídky. Spíše frustrující.", "🌫️ Kritická deka. Bez šance.", "⬛ Totálně zataženo. Nulová viditelnost."]
+                weatherVerdicts: ["⚠️ Extrém. Srážky/mlha. Zůstaň v teple.", "🌌 Astronomický ráj. Dokonalé podmínky.", "✨ Křišťálový vzduch. Vynikající.", "🔭 Skvělá noc. Drobné mraky nevadí.", "🪐 Slibný večer. Občasné zakrytí.", "🌓 Proměnlivá obloha. Hra na schovávanou.", "🌥️ Ztížené podmínky. Jen jasné objekty.", "🛑 Slabé vyhlídky. Spíše frustrující.", "🌫️ Kritická deka. Bez šance.", "⬛ Totálně zataženo. Nulová viditelnost."],
+                searchPlaceholder: "Hledat místo...", searchSats: "Hledám satelity...", searchWait: "Vyhledávám...", searchTime: "Zjišťuji lokální čas...", searchError: "Chyba připojení.", searchNoRes: "Nic jsme nenašli.", searchAlert: "Nepodařilo se získat polohu.", searchMyLoc: "Moje poloha",
+                locPresets: [ { t: "Bratislava", s: "Slovensko" }, { t: "Sydney", s: "Austrálie (Zima v červnu)" }, { t: "New York", s: "USA" }, { t: "Tokio", s: "Japonsko" }, { t: "Tromsø", s: "Norsko (Polární den)" }, { t: "Quito", s: "Ekvádor (Rovník)" } ]
             },
             en: {
                 tabSystem: "System Map", tabHorizon: "Local Horizon",
@@ -446,7 +450,7 @@
                 btnToday: "Now", swipeTip: "Swipe to change time (← Past | Future →)",
                 periodY: " y", periodD: " d", pickerTitle: "Date & Time <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(year -9999 to +9999)</small>", pickerCancel: "Cancel", pickerConfirm: "Confirm",
                 pickerDay: "Day", pickerMonth: "Month", pickerYear: "Year", pickerHour: "Hr", pickerMinute: "Min",
-                settingsTitle: "⚙️ Settings", settingsLang: "Language", settingsStartup: "Startup Object",
+                settingsTitle: "⚙️ Settings", settingsLang: "Language", settingsStartup: "Startup Object", quickSelect: "Quick Select",
                 weatherLink: "(observation conditions)", homePlanet: "Home planet (You are here)", cometDay: "WOW! Visible during the day!", cometBright: "Yes (Very bright)", cometFaint: "Yes (Faintly visible)",
                 toastMaxZoom: "Congratulations, the Eagle has landed!", toastMinZoom: "Congratulations, this is God's view!",
                 cardinals: ["N (0°)", "E (90°)", "S (180°)", "W (270°)", "N (360°)"],
@@ -454,7 +458,9 @@
                 zodiac: { Aries: "Aries", Taurus: "Taurus", Gemini: "Gemini", Cancer: "Cancer", Leo: "Leo", Virgo: "Virgo", Libra: "Libra", Scorpio: "Scorpio", Sagittarius: "Sagittarius", Capricorn: "Capricorn", Aquarius: "Aquarius", Pisces: "Pisces" },
                 moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"],
                 weatherTitle: "📡 Atmospheric conditions", weatherLoading: "Loading satellite data... ⏳", weatherLoc: "Location", weatherTemp: "Temperature", weatherWind: "Wind", weatherHum: "Humidity", weatherEval: "Astronomical rating", weatherError: "Connection failed. Check your internet. ❌",
-                weatherVerdicts: ["⚠️ Extreme. Rain/fog. Stay inside.", "🌌 Astronomical paradise. Perfect.", "✨ Crystal clear air. Excellent.", "🔭 Great night. Minor clouds.", "🪐 Promising evening. Occasional cover.", "🌓 Changing sky. Hide and seek.", "🌥️ Difficult conditions. Bright objects only.", "🛑 Poor outlook. Frustrating.", "🌫️ Critical cloud cover. No chance.", "⬛ Totally overcast. Zero visibility."]
+                weatherVerdicts: ["⚠️ Extreme. Rain/fog. Stay inside.", "🌌 Astronomical paradise. Perfect.", "✨ Crystal clear air. Excellent.", "🔭 Great night. Minor clouds.", "🪐 Promising evening. Occasional cover.", "🌓 Changing sky. Hide and seek.", "🌥️ Difficult conditions. Bright objects only.", "🛑 Poor outlook. Frustrating.", "🌫️ Critical cloud cover. No chance.", "⬛ Totally overcast. Zero visibility."],
+                searchPlaceholder: "Search location...", searchSats: "Searching satellites...", searchWait: "Searching...", searchTime: "Getting local time...", searchError: "Connection error.", searchNoRes: "Nothing found.", searchAlert: "Failed to get location.", searchMyLoc: "My location",
+                locPresets: [ { t: "Bratislava", s: "Slovakia" }, { t: "Sydney", s: "Australia (Winter in June)" }, { t: "New York", s: "USA" }, { t: "Tokyo", s: "Japan" }, { t: "Tromsø", s: "Norway (Midnight sun)" }, { t: "Quito", s: "Ecuador (Equator)" } ]
             },
             de: {
                 tabSystem: "Systemkarte", tabHorizon: "Lokaler Horizont",
@@ -465,7 +471,7 @@
                 btnToday: "Jetzt", swipeTip: "Wischen, um Zeit zu ändern (← Verg. | Zukunft →)",
                 periodY: " J", periodD: " T", pickerTitle: "Datum & Uhrzeit <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(Jahr -9999 bis +9999)</small>", pickerCancel: "Abbrechen", pickerConfirm: "Bestätigen",
                 pickerDay: "Tag", pickerMonth: "Monat", pickerYear: "Jahr", pickerHour: "Std", pickerMinute: "Min",
-                settingsTitle: "⚙️ Einstellungen", settingsLang: "Sprache", settingsStartup: "Startobjekt",
+                settingsTitle: "⚙️ Einstellungen", settingsLang: "Sprache", settingsStartup: "Startobjekt", quickSelect: "Schnellauswahl",
                 weatherLink: "(Beobachtungsbedingungen)", homePlanet: "Heimatplanet (Du bist hier)", cometDay: "WOW! Sichtbar am Tag!", cometBright: "Ja (Sehr hell)", cometFaint: "Ja (Schwach sichtbar)",
                 toastMaxZoom: "Glückwunsch, der Adler ist gelandet!", toastMinZoom: "Glückwunsch, das ist der Blick Gottes!",
                 cardinals: ["N (0°)", "O (90°)", "S (180°)", "W (270°)", "N (360°)"],
@@ -473,7 +479,9 @@
                 zodiac: { Aries: "Widder", Taurus: "Stier", Gemini: "Zwillinge", Cancer: "Krebs", Leo: "Löwe", Virgo: "Jungfrau", Libra: "Waage", Scorpio: "Skorpion", Sagittarius: "Schütze", Capricorn: "Steinbock", Aquarius: "Wassermann", Pisces: "Fische" },
                 moonPhases: ["Neumond", "Zunehmende Sichel", "Erstes Viertel", "Zunehmender Mond", "Vollmond", "Abnehmender Mond", "Letztes Viertel", "Abnehmende Sichel"],
                 weatherTitle: "📡 Atmosphärische Bedingungen", weatherLoading: "Lade Satellitendaten... ⏳", weatherLoc: "Ort", weatherTemp: "Temperatur", weatherWind: "Wind", weatherHum: "Luftfeuchtigkeit", weatherEval: "Astronomische Bewertung", weatherError: "Verbindung fehlgeschlagen. ❌",
-                weatherVerdicts: ["⚠️ Extrem. Regen/Nebel. Bleib drinnen.", "🌌 Astronomisches Paradies. Perfekt.", "✨ Kristallklare Luft. Hervorragend.", "🔭 Tolle Nacht. Wenig Wolken.", "🪐 Vielversprechend. Gelegentlich bedeckt.", "🌓 Wechselhaft. Versteckspiel.", "🌥️ Schwierig. Nur helle Objekte.", "🛑 Schlechte Aussichten. Frustrierend.", "🌫️ Kritische Wolkendecke. Keine Chance.", "⬛ Völlig bedeckt. Null Sicht."]
+                weatherVerdicts: ["⚠️ Extrem. Regen/Nebel. Bleib drinnen.", "🌌 Astronomisches Paradies. Perfekt.", "✨ Kristallklare Luft. Hervorragend.", "🔭 Tolle Nacht. Wenig Wolken.", "🪐 Vielversprechend. Gelegentlich bedeckt.", "🌓 Wechselhaft. Versteckspiel.", "🌥️ Schwierig. Nur helle Objekte.", "🛑 Schlechte Aussichten. Frustrierend.", "🌫️ Kritische Wolkendecke. Keine Chance.", "⬛ Völlig bedeckt. Null Sicht."],
+                searchPlaceholder: "Ort suchen...", searchSats: "Suche Satelliten...", searchWait: "Suchen...", searchTime: "Lokale Zeit abrufen...", searchError: "Verbindungsfehler.", searchNoRes: "Nichts gefunden.", searchAlert: "Standort konnte nicht ermittelt werden.", searchMyLoc: "Mein Standort",
+                locPresets: [ { t: "Bratislava", s: "Slowakei" }, { t: "Sydney", s: "Australien (Winter im Juni)" }, { t: "New York", s: "USA" }, { t: "Tokio", s: "Japan" }, { t: "Tromsø", s: "Norwegen (Mitternachtssonne)" }, { t: "Quito", s: "Ecuador (Äquator)" } ]
             },
             fr: {
                 tabSystem: "Carte du Système", tabHorizon: "Horizon Local",
@@ -484,7 +492,7 @@
                 btnToday: "Mnt", swipeTip: "Glisser pour changer l'heure (← Passé | Futur →)",
                 periodY: " a", periodD: " j", pickerTitle: "Date et Heure <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(an -9999 à +9999)</small>", pickerCancel: "Annuler", pickerConfirm: "Valider",
                 pickerDay: "Jour", pickerMonth: "Mois", pickerYear: "An", pickerHour: "H", pickerMinute: "Min",
-                settingsTitle: "⚙️ Paramètres", settingsLang: "Langue", settingsStartup: "Objet au démarrage",
+                settingsTitle: "⚙️ Paramètres", settingsLang: "Langue", settingsStartup: "Objet au démarrage", quickSelect: "Sélection rapide",
                 weatherLink: "(conditions d'observation)", homePlanet: "Planète d'origine (Tu es ici)", cometDay: "WOW! Visible de jour!", cometBright: "Oui (Très brillant)", cometFaint: "Oui (Faiblement visible)",
                 toastMaxZoom: "Félicitations, l'Aigle s'est posé !", toastMinZoom: "Félicitations, c'est la vue de Dieu !",
                 cardinals: ["N (0°)", "E (90°)", "S (180°)", "O (270°)", "N (360°)"],
@@ -492,7 +500,9 @@
                 zodiac: { Aries: "Bélier", Taurus: "Taureau", Gemini: "Gémeaux", Cancer: "Cancer", Leo: "Lion", Virgo: "Vierge", Libra: "Balance", Scorpio: "Scorpion", Sagittarius: "Sagittaire", Capricorn: "Capricorne", Aquarius: "Verseau", Pisces: "Poissons" },
                 moonPhases: ["Nouvelle Lune", "Premier Croissant", "Premier Quartier", "Gibbeuse Croissante", "Pleine Lune", "Gibbeuse Décroissante", "Dernier Quartier", "Dernier Croissant"],
                 weatherTitle: "📡 Conditions atmosphériques", weatherLoading: "Chargement des données... ⏳", weatherLoc: "Lieu", weatherTemp: "Température", weatherWind: "Vent", weatherHum: "Humidité", weatherEval: "Évaluation astronomique", weatherError: "Échec de la connexion. ❌",
-                weatherVerdicts: ["⚠️ Extrême. Pluie/brouillard. Restez à l'abri.", "🌌 Paradis astronomique. Parfait.", "✨ Air cristallin. Excellent.", "🔭 Superbe nuit. Nuages mineurs.", "🪐 Soirée prometteuse. Couverture occasionnelle.", "🌓 Ciel changeant. Cache-cache.", "🌥️ Conditions difficiles. Objets brillants uniquement.", "🛑 Mauvaises perspectives. Frustrant.", "🌫️ Couverture critique. Aucune chance.", "⬛ Totalement couvert. Visibilité nulle."]
+                weatherVerdicts: ["⚠️ Extrême. Pluie/brouillard. Restez à l'abri.", "🌌 Paradis astronomique. Parfait.", "✨ Air cristallin. Excellent.", "🔭 Superbe nuit. Nuages mineurs.", "🪐 Soirée prometteuse. Couverture occasionnelle.", "🌓 Ciel changeant. Cache-cache.", "🌥️ Conditions difficiles. Objets brillants uniquement.", "🛑 Mauvaises perspectives. Frustrant.", "🌫️ Couverture critique. Aucune chance.", "⬛ Totalement couvert. Visibilité nulle."],
+                searchPlaceholder: "Rechercher un lieu...", searchSats: "Recherche de satellites...", searchWait: "Recherche en cours...", searchTime: "Obtention de l'heure locale...", searchError: "Erreur de connexion.", searchNoRes: "Aucun résultat.", searchAlert: "Impossible d'obtenir la position.", searchMyLoc: "Ma position",
+                locPresets: [ { t: "Bratislava", s: "Slovaquie" }, { t: "Sydney", s: "Australie (Hiver en juin)" }, { t: "New York", s: "États-Unis" }, { t: "Tokyo", s: "Japon" }, { t: "Tromsø", s: "Norvège (Soleil minuit)" }, { t: "Quito", s: "Équateur (Équateur)" } ]
             },
             es: {
                 tabSystem: "Mapa del Sistema", tabHorizon: "Horizonte Local",
@@ -503,7 +513,7 @@
                 btnToday: "Ahora", swipeTip: "Desliza para cambiar la hora (← Pasado | Futuro →)",
                 periodY: " a", periodD: " d", pickerTitle: "Fecha y Hora <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(año -9999 a +9999)</small>", pickerCancel: "Cancelar", pickerConfirm: "Aceptar",
                 pickerDay: "Día", pickerMonth: "Mes", pickerYear: "Año", pickerHour: "H", pickerMinute: "Min",
-                settingsTitle: "⚙️ Ajustes", settingsLang: "Idioma", settingsStartup: "Objeto de inicio",
+                settingsTitle: "⚙️ Ajustes", settingsLang: "Idioma", settingsStartup: "Objeto de inicio", quickSelect: "Selección rápida",
                 weatherLink: "(condiciones de observación)", homePlanet: "Planeta de origen (Estás aquí)", cometDay: "WOW! ¡Visible de día!", cometBright: "Sí (Muy brillante)", cometFaint: "Sí (Débilmente visible)",
                 toastMaxZoom: "¡Felicidades, el Águila ha aterrizado!", toastMinZoom: "¡Felicidades, esta es la vista de Dios!",
                 cardinals: ["N (0°)", "E (90°)", "S (180°)", "O (270°)", "N (360°)"],
@@ -511,7 +521,9 @@
                 zodiac: { Aries: "Aries", Taurus: "Tauro", Gemini: "Géminis", Cancer: "Cáncer", Leo: "Leo", Virgo: "Virgo", Libra: "Libra", Scorpio: "Escorpio", Sagittarius: "Sagitario", Capricorn: "Capricornio", Aquarius: "Acuario", Pisces: "Piscis" },
                 moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Gibosa Creciente", "Luna Llena", "Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"],
                 weatherTitle: "📡 Condiciones atmosféricas", weatherLoading: "Cargando datos... ⏳", weatherLoc: "Ubicación", weatherTemp: "Temperatura", weatherWind: "Viento", weatherHum: "Humedad", weatherEval: "Evaluación astronómica", weatherError: "Fallo de conexión. ❌",
-                weatherVerdicts: ["⚠️ Extremo. Lluvia/niebla. Quédate adentro.", "🌌 Paraíso astronómico. Perfecto.", "✨ Aire cristalino. Excelente.", "🔭 Gran noche. Nubes menores.", "🪐 Noche prometedora. Cubierta ocasional.", "🌓 Cielo cambiante. El escondite.", "🌥️ Condiciones difíciles. Solo objetos brillantes.", "🛑 Malas perspectivas. Frustrante.", "🌫️ Cubierta crítica. Sin posibilidad.", "⬛ Totalmente nublado. Visibilidad nula."]
+                weatherVerdicts: ["⚠️ Extremo. Lluvia/niebla. Quédate adentro.", "🌌 Paraíso astronómico. Perfecto.", "✨ Aire cristalino. Excelente.", "🔭 Gran noche. Nubes menores.", "🪐 Noche prometedora. Cubierta ocasional.", "🌓 Cielo cambiante. El escondite.", "🌥️ Condiciones difíciles. Solo objetos brillantes.", "🛑 Malas perspectivas. Frustrante.", "🌫️ Cubierta crítica. Sin posibilidad.", "⬛ Totalmente nublado. Visibilidad nula."],
+                searchPlaceholder: "Buscar ubicación...", searchSats: "Buscando satélites...", searchWait: "Buscando...", searchTime: "Obteniendo hora local...", searchError: "Error de conexión.", searchNoRes: "No se encontró nada.", searchAlert: "Error al obtener la ubicación.", searchMyLoc: "Mi ubicación",
+                locPresets: [ { t: "Bratislava", s: "Eslovaquia" }, { t: "Sídney", s: "Australia (Invierno en junio)" }, { t: "Nueva York", s: "EE. UU." }, { t: "Tokio", s: "Japón" }, { t: "Tromsø", s: "Noruega (Sol medianoche)" }, { t: "Quito", s: "Ecuador (Ecuador)" } ]
             },
             zh: {
                 tabSystem: "星系地图", tabHorizon: "本地地平线",
@@ -522,7 +534,7 @@
                 btnToday: "现在", swipeTip: "滑动以更改时间 (← 过去 | 未来 →)",
                 periodY: " 年", periodD: " 天", pickerTitle: "日期和时间 <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(年份 -9999 至 +9999)</small>", pickerCancel: "取消", pickerConfirm: "确认",
                 pickerDay: "日", pickerMonth: "月", pickerYear: "年", pickerHour: "时", pickerMinute: "分",
-                settingsTitle: "⚙️ 设置", settingsLang: "语言", settingsStartup: "启动对象",
+                settingsTitle: "⚙️ 设置", settingsLang: "语言", settingsStartup: "启动对象", quickSelect: "快速选择",
                 weatherLink: "(观测条件)", homePlanet: "母星 (你在这)", cometDay: "哇！白天可见！", cometBright: "是 (非常亮)", cometFaint: "是 (微弱可见)",
                 toastMaxZoom: "祝贺，老鹰已着陆！", toastMinZoom: "祝贺，这是上帝的视角！",
                 cardinals: ["北 (0°)", "东 (90°)", "南 (180°)", "西 (270°)", "北 (360°)"],
@@ -530,7 +542,9 @@
                 zodiac: { Aries: "白羊座", Taurus: "金牛座", Gemini: "双子座", Cancer: "巨蟹座", Leo: "狮子座", Virgo: "处女座", Libra: "天秤座", Scorpio: "天蝎座", Sagittarius: "射手座", Capricorn: "摩羯座", Aquarius: "水瓶座", Pisces: "双鱼座" },
                 moonPhases: ["新月", "蛾眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"],
                 weatherTitle: "📡 大气条件", weatherLoading: "正在加载卫星数据... ⏳", weatherLoc: "位置", weatherTemp: "温度", weatherWind: "风速", weatherHum: "湿度", weatherEval: "天文评价", weatherError: "服务器连接失败. ❌",
-                weatherVerdicts: ["⚠️ 极端天气。留在室内。", "🌌 天文天堂。完美的条件。", "✨ 晶莹的空气。极佳。", "🔭 很棒的夜晚。微云。", "🪐 充满希望的夜晚。偶尔被遮挡。", "🌓 多变的天空。捉迷藏。", "🌥️ 艰难的条件。只能看到明亮的物体。", "🛑 糟糕的展望。令人沮丧。", "🌫️ 严重的云层。没有机会。", "⬛ 完全阴天。能见度为零。"]
+                weatherVerdicts: ["⚠️ 极端天气。留在室内。", "🌌 天文天堂。完美的条件。", "✨ 晶莹的空气。极佳。", "🔭 很棒的夜晚。微云。", "🪐 充满希望的夜晚。偶尔被遮挡。", "🌓 多变的天空。捉迷藏。", "🌥️ 艰难的条件。只能看到明亮的物体。", "🛑 糟糕的展望。令人沮丧。", "🌫️ 严重的云层。没有机会。", "⬛ 完全阴天。能见度为零。"],
+                searchPlaceholder: "搜索位置...", searchSats: "正在搜索卫星...", searchWait: "搜索中...", searchTime: "获取当地时间...", searchError: "连接错误.", searchNoRes: "未找到任何内容.", searchAlert: "无法获取位置.", searchMyLoc: "我的位置",
+                locPresets: [ { t: "布拉迪斯拉发", s: "斯洛伐克" }, { t: "悉尼", s: "澳大利亚 (六月的冬天)" }, { t: "纽约", s: "美国" }, { t: "东京", s: "日本" }, { t: "特罗姆瑟", s: "挪威 (极昼)" }, { t: "基多", s: "厄瓜多尔 (赤道)" } ]
             },
             hi: {
                 tabSystem: "सौर मानचित्र", tabHorizon: "स्थानीय क्षितिज",
@@ -541,7 +555,7 @@
                 btnToday: "अभी", swipeTip: "समय बदलने के लिए स्वाइप करें (← अतीत | भविष्य →)",
                 periodY: " वर्ष", periodD: " दिन", pickerTitle: "दिनांक और समय <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(वर्ष -9999 से +9999)</small>", pickerCancel: "रद्द करें", pickerConfirm: "पुष्टि करें",
                 pickerDay: "दिन", pickerMonth: "माह", pickerYear: "वर्ष", pickerHour: "घंटे", pickerMinute: "मिनट",
-                settingsTitle: "⚙️ सेटिंग्स", settingsLang: "भाषा", settingsStartup: "स्टार्टअप ऑब्जेक्ट",
+                settingsTitle: "⚙️ सेटिंग्स", settingsLang: "भाषा", settingsStartup: "स्टार्टअप ऑब्जेक्ट", quickSelect: "त्वरित चयन",
                 weatherLink: "(अवलोकन की स्थिति)", homePlanet: "गृह ग्रह (आप यहाँ हैं)", cometDay: "वाह! दिन में दिखाई देता है!", cometBright: "हाँ (बहुत चमकीला)", cometFaint: "हाँ (हल्का दिखाई देता है)",
                 toastMaxZoom: "बधाई हो, ईगल उतर चुका है!", toastMinZoom: "बधाई हो, यह भगवान का दृश्य है!",
                 cardinals: ["उ (0°)", "पू (90°)", "द (180°)", "प (270°)", "उ (360°)"],
@@ -549,7 +563,9 @@
                 zodiac: { Aries: "मेष", Taurus: "वृषभ", Gemini: "मिथुन", Cancer: "कर्क", Leo: "सिंह", Virgo: "कन्या", Libra: "तुला", Scorpio: "वृश्चिक", Sagittarius: "धनु", Capricorn: "मकर", Aquarius: "कुंभ", Pisces: "मीन" },
                 moonPhases: ["अमावस्या", "बाल चंद्र", "प्रथम तिमाही", "वर्धमान चंद्र", "पूर्णिमा", "क्षयमान चंद्र", "अंतिम तिमाही", "घटता चंद्र"],
                 weatherTitle: "📡 वायुमंडलीय स्थितियां", weatherLoading: "उपग्रह डेटा लोड हो रहा है... ⏳", weatherLoc: "स्थान", weatherTemp: "तापमान", weatherWind: "हवा", weatherHum: "नमी", weatherEval: "खगोलीय रेटिंग", weatherError: "सर्वर कनेक्शन विफल. ❌",
-                weatherVerdicts: ["⚠️ चरम मौसम। अंदर रहें।", "🌌 खगोलीय स्वर्ग। बिल्कुल सही।", "✨ क्रिस्टल साफ़ हवा। उत्कृष्ट।", "🔭 शानदार रात। मामूली बादल।", "🪐 आशाजनक शाम। कभी-कभी बादल।", "🌓 बदलता आसमान। लुका-छिपी।", "🌥️ कठिन परिस्थितियां। केवल चमकीली वस्तुएं।", "🛑 खराब दृष्टिकोण। निराशाजनक।", "🌫️ गंभीर बादल। कोई चांस नहीं।", "⬛ पूरी तरह से घने बादल। शून्य दृश्यता।"]
+                weatherVerdicts: ["⚠️ चरम मौसम। अंदर रहें।", "🌌 खगोलीय स्वर्ग। बिल्कुल सही।", "✨ क्रिस्टल साफ़ हवा। उत्कृष्ट।", "🔭 शानदार रात। मामूली बादल।", "🪐 आशाजनक शाम। कभी-कभी बादल।", "🌓 बदलता आसमान। लुका-छिपी।", "🌥️ कठिन परिस्थितियां। केवल चमकीली वस्तुएं।", "🛑 खराब दृष्टिकोण। निराशाजनक।", "🌫️ गंभीर बादल। कोई चांस नहीं।", "⬛ पूरी तरह से घने बादल। शून्य दृश्यता।"],
+                searchPlaceholder: "स्थान खोजें...", searchSats: "उपग्रहों की खोज...", searchWait: "खोज रहे हैं...", searchTime: "स्थानीय समय प्राप्त कर रहा है...", searchError: "कनेक्शन त्रुटि.", searchNoRes: "कुछ नहीं मिला.", searchAlert: "स्थान प्राप्त करने में विफल.", searchMyLoc: "मेरा स्थान",
+                locPresets: [ { t: "ब्रातिस्लावा", s: "स्लोवाकिया" }, { t: "सिडनी", s: "ऑस्ट्रेलिया (जून में सर्दी)" }, { t: "न्यूयॉर्क", s: "अमेरीका" }, { t: "टोक्यो", s: "जापान" }, { t: "ट्रोम्सो", s: "नॉर्वे (मध्यरात्रि का सूर्य)" }, { t: "क्विटो", s: "इक्वाडोर (भूमध्य रेखा)" } ]
             }
         };
 
@@ -625,11 +641,15 @@
             
             let grid = document.getElementById('loc-presets-grid');
             grid.innerHTML = '';
-            presetCitiesData.forEach(c => {
+            
+            // Generovanie miest s napojením na preložené štáty
+            const t = translations[currentLang];
+            presetCitiesData.forEach((c, index) => {
                 let btn = document.createElement('button');
                 btn.className = 'preset-item';
-                btn.innerHTML = `<span><strong>${c.title}</strong></span> <span style="font-size:0.75rem; opacity:0.6">${c.sub}</span>`;
-                btn.onclick = () => setCity(c.lat, c.lon, c.tz, c.isShort);
+                let locT = t.locPresets[index]; // Potiahnutie prekladu z poľa podľa indexu
+                btn.innerHTML = `<span><strong>${locT.t}</strong></span> <span style="font-size:0.75rem; opacity:0.6">${locT.s}</span>`;
+                btn.onclick = () => setCity(c.lat, c.lon, c.tz, locT.t);
                 grid.appendChild(btn);
             });
         }
@@ -639,14 +659,13 @@
         }
 
         let currentMapZoom = 11;
-function changeMapZoom(delta) {
+        function changeMapZoom(delta) {
             let iframe = document.getElementById('quick-map-iframe');
             currentMapZoom += delta;
             
             if (currentMapZoom < 2) currentMapZoom = 2;
             if (currentMapZoom > 20) currentMapZoom = 20;
             
-            // Opravený a oficiálny link pre čistú mapu bez špendlíka
             iframe.src = `https://maps.google.com/maps?ll=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
         }
 
@@ -660,8 +679,6 @@ function changeMapZoom(delta) {
             } else {
                 panel.style.display = 'block';
                 currentMapZoom = 11; 
-                
-                // Opravený a oficiálny link pre čistú mapu bez špendlíka
                 iframe.src = `https://maps.google.com/maps?ll=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
             }
         }
@@ -670,21 +687,21 @@ function changeMapZoom(delta) {
             if (e.target === this) closeLocPicker();
         });
 
-
         function requestGPS() {
+            const t = translations[currentLang]; // Potiahnutie slovníka
             if (navigator.geolocation) {
                 document.getElementById('loc-loading').style.display = 'block';
-                document.getElementById('loc-loading').innerText = "Hľadám satelity...";
+                document.getElementById('loc-loading').innerText = t.searchSats; // "Hľadám satelity..."
                 
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
                         let lat = pos.coords.latitude;
                         let lon = pos.coords.longitude;
                         let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                        setCity(lat, lon, tz, "Moja poloha");
+                        setCity(lat, lon, tz, t.searchMyLoc); // "Moja poloha"
                     },
                     (err) => {
-                        alert("Nepodarilo sa získať polohu (Skontrolujte práva v prehliadači).");
+                        alert(t.searchAlert); // "Nepodarilo sa získať polohu..."
                         document.getElementById('loc-loading').style.display = 'none';
                     }
                 );
@@ -707,6 +724,7 @@ function changeMapZoom(delta) {
             let q = document.getElementById('loc-search-inp').value.trim();
             let resDiv = document.getElementById('loc-results');
             let loadDiv = document.getElementById('loc-loading');
+            const t = translations[currentLang]; // Potiahnutie slovníka
             
             resDiv.innerHTML = '';
             
@@ -718,10 +736,9 @@ function changeMapZoom(delta) {
             
             resDiv.style.display = 'none';
             loadDiv.style.display = 'block';
-            loadDiv.innerText = "Vyhľadávam...";
+            loadDiv.innerText = t.searchWait; // "Vyhľadávam..."
 
             try {
-                // Zmena na Photon API (optimalizované pre autokomplet)
                 let response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6`);
                 let data = await response.json();
                 
@@ -729,7 +746,7 @@ function changeMapZoom(delta) {
                 resDiv.style.display = 'block';
                 
                 if (!data.features || data.features.length === 0) {
-                    resDiv.innerHTML = '<div class="res-item" style="cursor:default;"><div class="res-item-title" style="color:#94a3b8;">Nič sme nenašli.</div></div>';
+                    resDiv.innerHTML = `<div class="res-item" style="cursor:default;"><div class="res-item-title" style="color:#94a3b8;">${t.searchNoRes}</div></div>`; // "Nič sme nenašli."
                     return;
                 }
 
@@ -737,7 +754,7 @@ function changeMapZoom(delta) {
                     let prop = feature.properties;
                     let geom = feature.geometry;
                     
-                    let city = prop.name || "Neznáme miesto";
+                    let city = prop.name || "---";
                     let county = prop.state || prop.county || "";
                     if (county) {
                         county = county.replace(/okres\s/i, "okr. ").replace(/District/i, "okr.");
@@ -756,27 +773,26 @@ function changeMapZoom(delta) {
                     div.className = 'res-item';
                     div.innerHTML = `<div class="res-item-title">${city}</div><div class="res-item-sub">${subText.join(', ')}</div>`;
                     
-                    // Photon vracia súradnice ako [lon, lat], preto ich musíme prehodiť
                     div.onclick = () => fetchTimezoneAndSet(geom.coordinates[1], geom.coordinates[0], shortName);
                     resDiv.appendChild(div);
                 });
 
             } catch (error) {
-                loadDiv.innerText = "Chyba pripojenia.";
+                loadDiv.innerText = t.searchError; // "Chyba pripojenia."
                 resDiv.style.display = 'none';
             }
         }
 
-        // 2. Krok: Zistenie Timezone pre kliknuté mesto
         async function fetchTimezoneAndSet(lat, lon, shortName) {
             let loadDiv = document.getElementById('loc-loading');
             let resDiv = document.getElementById('loc-results');
+            const t = translations[currentLang]; // Potiahnutie slovníka
+            
             resDiv.innerHTML = '';
             loadDiv.style.display = 'block';
-            loadDiv.innerText = "Zisťujem lokálny čas mesta...";
+            loadDiv.innerText = t.searchTime; // "Zisťujem lokálny čas..."
 
             try {
-                // Bezplatné API pre Timezone
                 let tzResponse = await fetch(`https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`);
                 if (!tzResponse.ok) throw new Error("TZ fail");
                 let tzData = await tzResponse.json();
@@ -784,7 +800,6 @@ function changeMapZoom(delta) {
                 let timeZoneStr = tzData.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
                 setCity(lat, lon, timeZoneStr, shortName);
             } catch (error) {
-                // Fallback (ak by API spadlo, použijeme odhad z prehliadača)
                 setCity(lat, lon, Intl.DateTimeFormat().resolvedOptions().timeZone, shortName);
             }
         }
@@ -962,7 +977,13 @@ function changeMapZoom(delta) {
             // Preklad odkazu na počasie
             let wLink = document.getElementById('weather-link');
             if (wLink) wLink.innerText = t.weatherLink;
-            
+
+            // Preklad nadpisu Rýchly výber
+            let lblQuick = document.getElementById('lbl-quick-select'); if (lblQuick) lblQuick.innerText = t.quickSelect;
+
+            // Preklad textu v poli hľadania
+            let searchInp = document.getElementById('loc-search-inp'); if (searchInp) searchInp.placeholder = t.searchPlaceholder;
+
             // Preklady pre okno Nastavení
             let stTitle = document.getElementById('lbl-settings-title'); if (stTitle) stTitle.innerText = t.settingsTitle;
             let stLang = document.getElementById('lbl-settings-lang'); if (stLang) stLang.innerText = t.settingsLang;
