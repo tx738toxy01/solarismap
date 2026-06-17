@@ -50,13 +50,13 @@
         .btn-pause.active { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
         .divider { width: 80%; height: 1px; background-color: rgba(51, 65, 85, 0.6); margin: 2px 0; }
         
-        .speed-row { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; color: #94a3b8; margin: 2px 0; }
-        .speed-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; width: 24px; height: 46px; display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
-        .speed-btn svg { width: 18px; height: 18px; fill: currentColor; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
-        .speed-btn:hover { color: #cbd5e1; }
-        .speed-btn.active-fwd { color: #38bdf8; filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8)); }
-        .speed-btn.active-bwd { color: #ef4444; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); }
-        .speed-label { width: 34px; text-align: center; font-weight: normal; font-size: 0.75rem; }
+        .speed-label { width: 100%; text-align: center; font-weight: bold; font-size: 1.15rem; color: #f8fafc; margin-top: 6px; letter-spacing: 1px; }
+        .speed-row { display: flex; align-items: center; justify-content: center; gap: 18px; width: 100%; color: #94a3b8; margin-top: 2px; }
+        .speed-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
+        .speed-btn svg { width: 34px; height: 34px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .speed-btn:hover { color: #cbd5e1; transform: scale(1.15); }
+        .speed-btn.active-fwd { color: #38bdf8; filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.9)); }
+        .speed-btn.active-bwd { color: #ef4444; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9)); }
 
         .zoom-controls { position: absolute; right: 20px; top: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 5; }
         .btn-zoom { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #e2e8f0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
@@ -240,11 +240,11 @@
             <button class="btn-pause active" id="speed-pause" onclick="togglePlayPause()">⏸</button>
             <div class="divider" id="controls-divider"></div>
             
+            <div class="speed-label" id="current-speed-label">1x</div>
             <div class="speed-row" id="controls-speed-row">
                 <button class="speed-btn" id="btn-bwd" onclick="stepSpeed(-1)">
                     <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm10 0V6l-8.5 6 8.5 6z"/></svg>
                 </button>
-                <span class="speed-label" id="current-speed-label">1x</span>
                 <button class="speed-btn" id="btn-fwd" onclick="stepSpeed(1)">
                     <svg viewBox="0 0 24 24"><path d="M13 6v12l8.5-6-8.5-6zM3 6v12l8.5-6-8.5-6z"/></svg>
                 </button>
