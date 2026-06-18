@@ -199,18 +199,29 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             <button class="tab-btn active" id="tab-btn-system" onclick="switchView('system')">Solárna mapa</button>
             <button class="tab-btn" id="tab-btn-horizon" onclick="onHorizonTabClick(event)">Lokálny Horizont</button>
         </div>
-<div id="weather-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
-        <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 24px; padding: 24px; width: 90%; max-width: 340px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px; margin-bottom: 16px;">
-                <div id="lbl-weather-title" style="font-size: 1.1rem; font-weight: bold; color: #f8fafc;">📡 Atmosférické podmienky</div>
-                <button onclick="document.getElementById('weather-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">×</button>
-            </div>
-            
-            <div id="weather-content" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.5;">
-                Načítavam dáta z družice... ⏳
-            </div>
+<div id="weather-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 24px; padding: 24px; width: 90%; max-width: 340px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px; margin-bottom: 16px;">
+            <div id="lbl-weather-title" style="font-size: 1.1rem; font-weight: bold; color: #f8fafc;">📡 Atmosférické podmienky</div>
+            <button onclick="document.getElementById('weather-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="weather-content" style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.5;">
+            Načítavam dáta z družice... ⏳
         </div>
     </div>
+</div>
+
+<div id="zodiac-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; justify-content: center; align-items: center; backdrop-filter: blur(6px);">
+    <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid #38bdf8; border-radius: 20px; padding: 24px; width: 90%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px;">
+            <div id="zodiac-simple-title" style="font-size: 1.25rem; font-weight: bold; color: #facc15;">Detail</div>
+            <button onclick="document.getElementById('zodiac-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1;">×</button>
+        </div>
+        <div id="zodiac-simple-content" style="color: #e2e8f0; font-size: 1rem; line-height: 1.5;">
+            --
+        </div>
+    </div>
+</div>
         <div id="jupiter-radar-panel">
             <button onclick="toggleRadarPanel(event)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
             <div class="radar-title" id="radar-planet-title" style="padding-right: 20px;">📡 Sledovanie: Zem</div>
@@ -292,15 +303,15 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         </div>
         
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card" id="stat-box-1" onclick="handleStatClick(1)" style="transition: all 0.2s;">
                 <div class="stat-label" id="lbl-stat-dist">Vzdialenosť</div>
                 <div class="stat-value" id="stat-dist">1.00 AU</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="stat-box-2" onclick="handleStatClick(2)" style="transition: all 0.2s;">
                 <div class="stat-label" id="lbl-stat-speed">Rýchlosť</div>
                 <div class="stat-value" id="stat-speed">29.8 km/s</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="stat-box-3" onclick="handleStatClick(3)" style="transition: all 0.2s;">
                 <div class="stat-label" id="lbl-stat-period">Doba obehu</div>
                 <div class="stat-value" id="stat-period">365.2 d</div>
             </div>
@@ -661,6 +672,192 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम", toastTapObject: "वस्तु पर टैप करें" });
         Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気", toastTapObject: "天体をタップ" });
         Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨", toastTapObject: "천체를 탭하세요" });
+        // --- PREKLADY PRE ZNAMENIA (ANGLIČTINA = ZÁKLADNÝ FALLBACK) ---
+        Object.assign(translations.en, {
+            zodiacUI: { title: "Zodiac: ", duration: "Duration (Tap for Fun Fact)", constellation: "Constellation (Tap for Info)", mythology: "Name & Mythology (Story)" },
+            zodiacDetails: {
+                Aries: { date: "March 21 - April 19", fact: "The vernal equinox hasn't been here for over 2000 years. The Earth's axis has shifted, and the Sun is now in Pisces on the first day of spring.", starsTitle: "4 main stars", stars: "The brightest star is Hamal. The constellation is relatively small and faint in the sky.", latin: "Aries", myth: "In Greek mythology, it represents the golden ram that rescued Phrixus and Helle. Its golden fleece was later sought by Jason and the Argonauts." },
+                Taurus: { date: "April 20 - May 20", fact: "The Crab Nebula is located directly in this constellation – the remnant of a supernova explosion from 1054 that was visible even during the day.", starsTitle: "19 main stars", stars: "The brightest star is the red giant Aldebaran (the Eye of the Bull). It also contains the Pleiades and Hyades star clusters.", latin: "Taurus", myth: "Represents the snow-white bull into which Zeus himself transformed to abduct the Phoenician princess Europa to Crete." },
+                Gemini: { date: "May 21 - June 20", fact: "While Castor looks like a single star to the naked eye, it's actually a system of six stars orbiting each other.", starsTitle: "17 main stars", stars: "The most famous are the twins Castor and Pollux. The open star cluster M35 is also located here.", latin: "Gemini", myth: "The brothers Castor and Pollux, one mortal and the other immortal. After Castor's death, Pollux begged Zeus so they could stay together forever." },
+                Cancer: { date: "June 21 - July 22", fact: "It is the faintest zodiac constellation, but hides the beautiful Beehive Cluster where hundreds of new stars are being born.", starsTitle: "5 main stars", stars: "The brightest star is Al Tarf. Due to its faint stars, it is hard to spot from light-polluted cities.", latin: "Cancer", myth: "A giant crab sent by the goddess Hera to hinder Hercules during his fight with the Hydra. Hercules crushed it with his foot." },
+                Leo: { date: "July 23 - August 22", fact: "The brightest star, Regulus, rotates so fast (over a million km/h) that it has the shape of a flattened egg.", starsTitle: "15 main stars", stars: "Regulus (the Lion's Heart) and Denebola (the Lion's Tail) form a bright pattern resembling a resting beast.", latin: "Leo", myth: "The Nemean lion with impenetrable skin, which Hercules defeated as the first of his twelve labors." },
+                Virgo: { date: "August 23 - September 22", fact: "It is the second-largest constellation in the sky. The center of the local supercluster of galaxies lies in its direction.", starsTitle: "15 main stars", stars: "The brightest star is the blue-white giant Spica, located about 250 light-years from Earth.", latin: "Virgo", myth: "Associated with Dike, the goddess of justice, who left Earth in disappointment when humanity began to wage wars." },
+                Libra: { date: "September 23 - October 22", fact: "Libra is the only zodiac sign that doesn't represent a living creature. In ancient Greece, these stars formed the claws of Scorpius.", starsTitle: "4 main stars", stars: "The stars Zubenelgenubi and Zubeneschamali have Arabic names that still mean 'southern' and 'northern claw'.", latin: "Libra", myth: "The scales of justice held by the neighboring constellation Virgo (the goddess Dike)." },
+                Scorpio: { date: "October 23 - November 21", fact: "In astronomy, the Sun passes through it for only 7 days! Its 'heart', Antares, is so huge it would engulf all planets up to Mars.", starsTitle: "18 main stars", stars: "The pattern perfectly resembles a scorpion with a tail and a venomous stinger (the star Shaula).", latin: "Scorpius", myth: "The giant scorpion that stung and killed the legendary hunter Orion. They are placed opposite each other in the sky so they never meet." },
+                Sagittarius: { date: "November 22 - December 21", fact: "When looking at Sagittarius, you are looking directly into the center of our Milky Way galaxy at the supermassive black hole Sagittarius A*.", starsTitle: "22 main stars", stars: "The brightest is Kaus Australis. The center of the constellation resembles a classic teapot.", latin: "Sagittarius", myth: "The wise centaur Chiron, teacher of many Greek heroes (including Hercules and Achilles), aiming his bow at the Scorpion." },
+                Capricorn: { date: "December 22 - January 19", fact: "Right in this constellation, the planet Neptune was discovered for the first time in 1846, based on mathematical calculations.", starsTitle: "10 main stars", stars: "The brightest star is Deneb Algedi. The entire constellation is shaped like a large triangle.", latin: "Capricornus", myth: "Pan, the god of the wild, who jumped into a river while fleeing the monster Typhon. Half of his body turned into a fish, the top remained a goat." },
+                Aquarius: { date: "January 20 - February 18", fact: "It hosts the TRAPPIST-1 star system, orbited by seven Earth-sized planets that might contain water.", starsTitle: "22 main stars", stars: "The brightest star is Sadalsuud. The constellation also contains the beautiful Helix Nebula (The Eye of God).", latin: "Aquarius", myth: "Represents Ganymede, the most beautiful boy on Earth, whom Zeus abducted to Mount Olympus to be the cupbearer of the gods." },
+                Pisces: { date: "February 19 - March 20", fact: "In real astronomy, the Sun stays here for a very long time – from March 12 all the way to April 18.", starsTitle: "21 main stars", stars: "They are two fishes tied together by a cord. The brightest star is Alpherg, but the constellation is very faint.", latin: "Pisces", myth: "The goddess Aphrodite and her son Eros, who transformed into fishes and tied themselves with a cord so they wouldn't lose each other while fleeing the monster Typhon." }
+            }
+        });
+
+        // --- PREKLADY PRE ZNAMENIA (SLOVENČINA) ---
+        Object.assign(translations.sk, {
+            zodiacUI: { title: "Znamenie: ", duration: "Trvanie (Klikni pre Fun Fact)", constellation: "Súhvezdie (Klikni pre Info)", mythology: "Názov a Mytológia (Príbeh)" },
+            zodiacDetails: {
+                Aries: { date: "21. Marec - 19. Apríl", fact: "Bod jarnej rovnodennosti sa tu už vyše 2000 rokov nenachádza. Zemská os sa vychýlila a Slnko v prvý jarný deň dnes svieti v súhvezdí Rýb.", starsTitle: "4 hlavné hviezdy", stars: "Najjasnejšia hviezda je Hamal. Súhvezdie je na oblohe pomerne malé a nevýrazné.", latin: "Aries", myth: "Podľa gréckej mytológie predstavuje zlatého barana, ktorý zachránil Frixa a Hellé. Jeho zlaté rúno neskôr hľadali Iasón a Argonauti." },
+                Taurus: { date: "20. Apríl - 20. Máj", fact: "Priamo v tomto súhvezdí sa nachádza Krabia hmlovina – zvyšok po explózii supernovy z roku 1054, ktorú bolo vidno aj cez deň.", starsTitle: "19 hlavných hviezd", stars: "Najjasnejšou hviezdou je červený obor Aldebaran (Oko Býka). Súčasťou sú aj hviezdokopy Plejády a Hyády.", latin: "Taurus", myth: "Predstavuje snehobieleho býka, na ktorého sa premenil samotný Zeus, aby uniesol fénickú princeznú Európu na Krétu." },
+                Gemini: { date: "21. Máj - 20. Jún", fact: "Zatiaľ čo voľným okom vyzerá Kastor ako jedna hviezda, v skutočnosti je to systém až šiestich hviezd obiehajúcich okolo seba.", starsTitle: "17 hlavných hviezd", stars: "Najznámejšie sú dvojičky Kastor a Pollux. Nachádza sa tu aj otvorená hviezdokopa M35.", latin: "Gemini", myth: "Bratia Kastor a Pollux, z ktorých jeden bol smrteľný a druhý nesmrteľný. Po Kastorovej smrti prosil Pollux Dia, aby mohli ostať navždy spolu." },
+                Cancer: { date: "21. Jún - 22. Júl", fact: "Je to najmenej jasné súhvezdie zverokruhu, ale ukrýva krásnu hviezdokopu Jasličky, kde sa rodia stovky nových hviezd.", starsTitle: "5 hlavných hviezd", stars: "Najjasnejšia hviezda je Al Tarf. Kvôli slabým hviezdam je ťažké ho v mestách vôbec spozorovať.", latin: "Cancer", myth: "Obrovský krab, ktorého poslala bohyňa Héra, aby sťažil Herkulesovi boj s deväťhlavou Hydrou. Herkules ho však rozšliapol." },
+                Leo: { date: "23. Júl - 22. August", fact: "Najjasnejšia hviezda Regulus rotuje tak rýchlo (vyše milión km/h), že má tvar splošteného vajca.", starsTitle: "15 hlavných hviezd", stars: "Regulus (Levie srdce) a Denebola (Chvost leva) tvoria jasný obrazec pripomínajúci ležiacu šelmu.", latin: "Leo", myth: "Nemejský lev s nezraniteľnou kožou, ktorého porazil Herkules v rámci svojich dvanástich úloh." },
+                Virgo: { date: "23. August - 22. September", fact: "Je to druhé najväčšie súhvezdie oblohy. Leží tu stred superkopy galaxií, do ktorej patrí aj naša Mliečna dráha.", starsTitle: "15 hlavných hviezd", stars: "Najjasnejšou hviezdou je modrobiely obor Spika, vzdialený asi 250 svetelných rokov od Zeme.", latin: "Virgo", myth: "Spája sa s bohyňou spravodlivosti Dike, ktorá sklamaná opustila Zem, keď ľudstvo začalo viesť vojny." },
+                Libra: { date: "23. September - 22. Október", fact: "Váhy sú jediné znamenie, ktoré nepredstavuje živého tvora. V starovekom Grécku tieto hviezdy tvorili klepetá Škorpióna.", starsTitle: "4 hlavné hviezdy", stars: "Hviezdy Zubenelgenubi a Zubeneschamali majú názvy z arabčiny, ktoré dodnes znamenajú 'južné' a 'severné klepeto'.", latin: "Libra", myth: "Váhy spravodlivosti, ktoré drží v rukách vedľajšie súhvezdie Panny (bohyne Dike)." },
+                Scorpio: { date: "23. Október - 21. November", fact: "Slnko ním v astronómii prechádza len 7 dní! Jeho 'srdce' Antares je také veľké, že by pohltilo všetky planéty až po Mars.", starsTitle: "18 hlavných hviezd", stars: "Obrazec dokonale pripomína škorpióna aj s chvostom a jedovatým bodcom (hviezda Shaula).", latin: "Scorpius", myth: "Obrovský škorpión, ktorý uštipol a zabil bájneho lovca Orióna. Na oblohe sú preto umiestnení oproti sebe – nikdy sa nestretnú." },
+                Sagittarius: { date: "22. November - 21. December", fact: "Keď sa pozeráš na Strelca, pozeráš sa priamo do stredu našej galaxie na supermasívnu čiernu dieru Sagittarius A*.", starsTitle: "22 hlavných hviezd", stars: "Najjasnejšia je Kaus Australis. Stred súhvezdia pripomína klasický čajník.", latin: "Sagittarius", myth: "Múdry kentaur Chiron, učiteľ mnohých gréckych hrdinov (vrátane Herkulesa či Achillea), ktorý mieril lukom na Škorpióna." },
+                Capricorn: { date: "22. December - 19. Január", fact: "Práve v tomto súhvezdí bola v roku 1846 na základe matematických výpočtov po prvýkrát objavená nová planéta – Neptún.", starsTitle: "10 hlavných hviezd", stars: "Najjasnejšou hviezdou je Deneb Algedi. Celé súhvezdie má tvar veľkého trojuholníka.", latin: "Capricornus", myth: "Boh lesov Pan, ktorý sa pri úteku pred netvorom Týfónom skočil do rieky. Polovica tela sa mu premenila na rybu, vrch ostal capí." },
+                Aquarius: { date: "20. Január - 18. Február", fact: "Nachádza sa tu hviezdny systém TRAPPIST-1, okolo ktorého obieha sedem planét vo veľkosti Zeme, kde by mohla byť voda.", starsTitle: "22 hlavných hviezd", stars: "Najjasnejšou hviezdou je Sadalsuud. Súhvezdie obsahuje aj krásnu planetárnu hmlovinu Helix (Oko Boha).", latin: "Aquarius", myth: "Predstavuje Ganyméda, najkrajšieho chlapca na Zemi, ktorého Zeus uniesol na Olymp, aby bohom nalieval nektár." },
+                Pisces: { date: "19. Február - 20. Marec", fact: "V reálnej astronómii tu Slnko pobudne naozaj dlho – od 12. marca až do 18. apríla.", starsTitle: "21 hlavných hviezd", stars: "Sú to dve ryby spojené stuhou. Najjasnejšou hviezdou je Alpherg, no súhvezdie je veľmi nenápadné.", latin: "Pisces", myth: "Bohyňa Afrodita a jej syn Eros, ktorí sa premenili na ryby a zviazali sa stuhou, aby sa nestratili, keď utekali pred netvorom Týfónom." }
+            }
+        });
+// --- PREKLADY PRE ZNAMENIA (ČEŠTINA) ---
+        Object.assign(translations.cs, {
+            zodiacUI: { title: "Znamení: ", duration: "Trvání (Klikni pro Fun Fact)", constellation: "Souhvězdí (Klikni pro Info)", mythology: "Název a Mytologie (Příběh)" },
+            zodiacDetails: {
+                Aries: { date: "21. Březen - 19. Duben", fact: "Bod jarní rovnodennosti se zde již přes 2000 let nenachází. Zemská osa se vychýlila a Slunce v první jarní den dnes svítí v souhvězdí Ryb.", starsTitle: "4 hlavní hvězdy", stars: "Nejjasnější hvězda je Hamal. Souhvězdí je na obloze poměrně malé a nevýrazné.", latin: "Aries", myth: "Podle řecké mytologie představuje zlatého berana, který zachránil Frixa a Hellé. Jeho zlaté rouno později hledali Iásón a Argonauti." },
+                Taurus: { date: "20. Duben - 20. Květen", fact: "Přímo v tomto souhvězdí se nachází Krabí mlhovina – zbytek po explozi supernovy z roku 1054, kterou bylo vidět i ve dne.", starsTitle: "19 hlavních hvězd", stars: "Nejjasnější hvězdou je červený obr Aldebaran (Oko Býka). Součástí jsou i hvězdokupy Plejády a Hyády.", latin: "Taurus", myth: "Představuje sněhobílého býka, na kterého se proměnil samotný Zeus, aby unesl fénickou princeznu Europu na Krétu." },
+                Gemini: { date: "21. Květen - 20. Červen", fact: "Zatímco pouhým okem vypadá Castor jako jedna hvězda, ve skutečnosti je to systém až šesti hvězd obíhajících kolem sebe.", starsTitle: "17 hlavních hvězd", stars: "Nejznámější jsou dvojčata Castor a Pollux. Nachází se zde i otevřená hvězdokupa M35.", latin: "Gemini", myth: "Bratři Castor a Pollux, z nichž jeden byl smrtelný a druhý nesmrtelný. Po Castorově smrti prosil Pollux Dia, aby mohli zůstat navždy spolu." },
+                Cancer: { date: "21. Červen - 22. Červenec", fact: "Je to nejméně jasné souhvězdí zvěrokruhu, ale ukrývá krásnou hvězdokupu Jesličky, kde se rodí stovky nových hvězd.", starsTitle: "5 hlavních hvězd", stars: "Nejjasnější hvězda je Al Tarf. Kvůli slabým hvězdám je těžké ho ve městech vůbec zpozorovat.", latin: "Cancer", myth: "Obrovský krab, kterého poslala bohyně Héra, aby ztížil Herkulovi boj s devítihlavou Hydrou. Herkules ho však rozšlápl." },
+                Leo: { date: "23. Červenec - 22. Srpen", fact: "Nejjasnější hvězda Regulus rotuje tak rychle (přes milion km/h), že má tvar zploštělého vejce.", starsTitle: "15 hlavních hvězd", stars: "Regulus (Lví srdce) a Denebola (Ocas lva) tvoří jasný obrazec připomínající ležící šelmu.", latin: "Leo", myth: "Nemejský lev s nezranitelnou kůží, kterého porazil Herkules v rámci svých dvanácti úkolů." },
+                Virgo: { date: "23. Srpen - 22. Září", fact: "Je to druhé největší souhvězdí oblohy. Leží tu střed superkupy galaxií, do které patří i naše Mléčná dráha.", starsTitle: "15 hlavních hvězd", stars: "Nejjasnější hvězdou je modrobílý obr Spica, vzdálený asi 250 světelných let od Země.", latin: "Virgo", myth: "Spojuje se s bohyní spravedlnosti Diké, která zklamaná opustila Zemi, když lidstvo začalo vést války." },
+                Libra: { date: "23. Září - 22. Říjen", fact: "Váhy jsou jediné znamení, které nepředstavuje živého tvora. Ve starověkém Řecku tyto hvězdy tvořily klepeta Štíra.", starsTitle: "4 hlavní hvězdy", stars: "Hvězdy Zubenelgenubi a Zubeneschamali mají názvy z arabštiny, které dodnes znamenají 'jižní' a 'severní klepeto'.", latin: "Libra", myth: "Váhy spravedlnosti, které drží v rukou vedlejší souhvězdí Panny (bohyně Diké)." },
+                Scorpio: { date: "23. Říjen - 21. Listopad", fact: "Slunce jím v astronomii prochází jen 7 dní! Jeho 'srdce' Antares je tak velké, že by pohltilo všechny planety až po Mars.", starsTitle: "18 hlavních hvězd", stars: "Obrazec dokonale připomíná štíra i s ocasem a jedovatým bodcem (hvězda Shaula).", latin: "Scorpius", myth: "Obrovský štír, který uštkl a zabil bájného lovce Orióna. Na obloze jsou proto umístěni naproti sobě – nikdy se nepotkají." },
+                Sagittarius: { date: "22. Listopad - 21. Prosinec", fact: "Když se díváš na Střelce, díváš se přímo do středu naší galaxie na supermasivní černou díru Sagittarius A*.", starsTitle: "22 hlavních hvězd", stars: "Nejjasnější je Kaus Australis. Střed souhvězdí připomíná klasickou čajovou konvičku.", latin: "Sagittarius", myth: "Moudrý kentaur Chiron, učitel mnoha řeckých hrdinů (včetně Herkula či Achilla), který mířil lukem na Štíra." },
+                Capricorn: { date: "22. Prosinec - 19. Leden", fact: "Právě v tomto souhvězdí byla v roce 1846 na základě matematických výpočtů poprvé objevena nová planeta – Neptun.", starsTitle: "10 hlavních hvězd", stars: "Nejjasnější hvězdou je Deneb Algedi. Celé souhvězdí má tvar velkého trojúhelníku.", latin: "Capricornus", myth: "Bůh lesů Pan, který při útěku před netvorem Týfónem skočil do řeky. Polovina těla se mu proměnila v rybu, vršek zůstal kozí." },
+                Aquarius: { date: "20. Leden - 18. Únor", fact: "Nachází se zde hvězdný systém TRAPPIST-1, kolem kterého obíhá sedm planet o velikosti Země, kde by mohla být voda.", starsTitle: "22 hlavních hvězd", stars: "Nejjasnější hvězdou je Sadalsuud. Souhvězdí obsahuje i krásnou planetární mlhovinu Helix (Oko Boha).", latin: "Aquarius", myth: "Představuje Ganyméda, nejkrásnějšího chlapce na Zemi, kterého Zeus unesl na Olymp, aby bohům naléval nektar." },
+                Pisces: { date: "19. Únor - 20. Březen", fact: "V reálné astronomii zde Slunce pobude opravdu dlouho – od 12. března až do 18. dubna.", starsTitle: "21 hlavních hvězd", stars: "Jsou to dvě ryby spojené stuhou. Nejjasnější hvězdou je Alpherg, ale souhvězdí je velmi nenápadné.", latin: "Pisces", myth: "Bohyně Afrodita a její syn Eros, kteří se proměnili v ryby a svázali se stuhou, aby se neztratili, když utíkali před netvorem Týfónem." }
+            }
+        });
+// --- PREKLADY PRE ZNAMENIA (NEMČINA) ---
+        Object.assign(translations.de, {
+            zodiacUI: { title: "Sternzeichen: ", duration: "Dauer (Tippen für Fun Fact)", constellation: "Sternbild (Tippen für Info)", mythology: "Name & Mythologie (Geschichte)" },
+            zodiacDetails: {
+                Aries: { date: "21. März - 19. April", fact: "Der Frühlingspunkt befindet sich hier seit über 2000 Jahren nicht mehr. Die Erdachse hat sich verschoben, und die Sonne steht am Frühlingsanfang nun im Sternbild Fische.", starsTitle: "4 Hauptsterne", stars: "Der hellste Stern ist Hamal. Das Sternbild ist relativ klein und unscheinbar am Himmel.", latin: "Aries", myth: "In der griechischen Mythologie stellt es den goldenen Widder dar, der Phrixos und Helle rettete. Sein Goldenes Vlies wurde später von Jason und den Argonauten gesucht." },
+                Taurus: { date: "20. April - 20. Mai", fact: "Direkt in diesem Sternbild befindet sich der Krebsnebel – der Überrest einer Supernova-Explosion aus dem Jahr 1054, die sogar tagsüber sichtbar war.", starsTitle: "19 Hauptsterne", stars: "Der hellste Stern ist der Rote Riese Aldebaran (das Auge des Stiers). Hier befinden sich auch die Sternhaufen der Plejaden und Hyaden.", latin: "Taurus", myth: "Repräsentiert den schneeweißen Stier, in den sich Zeus selbst verwandelte, um die phönizische Prinzessin Europa nach Kreta zu entführen." },
+                Gemini: { date: "21. Mai - 20. Juni", fact: "Während Castor mit bloßem Auge wie ein einziger Stern aussieht, ist er tatsächlich ein System von sechs Sternen, die einander umkreisen.", starsTitle: "17 Hauptsterne", stars: "Die bekanntesten sind die Zwillinge Castor und Pollux. Hier befindet sich auch der offene Sternhaufen M35.", latin: "Gemini", myth: "Die Brüder Castor und Pollux, der eine sterblich, der andere unsterblich. Nach Castors Tod bat Pollux Zeus darum, für immer zusammenbleiben zu dürfen." },
+                Cancer: { date: "21. Juni - 22. Juli", fact: "Es ist das unscheinbarste Tierkreiszeichen, verbirgt aber den wunderschönen Sternhaufen der Krippe (Praesepe), wo Hunderte neuer Sterne entstehen.", starsTitle: "5 Hauptsterne", stars: "Der hellste Stern ist Al Tarf. Wegen seiner schwachen Sterne ist es in lichtverschmutzten Städten schwer zu erkennen.", latin: "Cancer", myth: "Ein riesiger Krebs, der von der Göttin Hera geschickt wurde, um Herkules im Kampf gegen die Hydra zu behindern. Herkules zertrat ihn jedoch." },
+                Leo: { date: "23. Juli - 22. August", fact: "Der hellste Stern, Regulus, rotiert so schnell (über eine Million km/h), dass er die Form eines abgeflachten Eies hat.", starsTitle: "15 Hauptsterne", stars: "Regulus (Löwenherz) und Denebola (Löwenschwanz) bilden ein markantes Muster, das einer ruhenden Raubkatze ähnelt.", latin: "Leo", myth: "Der Nemeische Löwe mit undurchdringlicher Haut, den Herkules als erste seiner zwölf Aufgaben besiegte." },
+                Virgo: { date: "23. August - 22. September", fact: "Es ist das zweitgrößte Sternbild am Himmel. In dieser Richtung liegt das Zentrum des lokalen Supergalaxienhaufens, zu dem auch unsere Milchstraße gehört.", starsTitle: "15 Hauptsterne", stars: "Der hellste Stern ist der blauweiße Riese Spica, etwa 250 Lichtjahre von der Erde entfernt.", latin: "Virgo", myth: "Wird mit Dike, der Göttin der Gerechtigkeit, assoziiert, die die Erde enttäuscht verließ, als die Menschheit begann, Kriege zu führen." },
+                Libra: { date: "23. September - 22. Oktober", fact: "Die Waage ist das einzige Tierkreiszeichen, das kein Lebewesen darstellt. Im antiken Griechenland bildeten diese Sterne die Scheren des Skorpions.", starsTitle: "4 Hauptsterne", stars: "Die Sterne Zubenelgenubi und Zubeneschamali haben arabische Namen, die noch heute 'südliche' und 'nördliche Schere' bedeuten.", latin: "Libra", myth: "Die Waagschalen der Gerechtigkeit, die vom benachbarten Sternbild Jungfrau (der Göttin Dike) gehalten werden." },
+                Scorpio: { date: "23. Oktober - 21. November", fact: "In der Astronomie durchquert die Sonne dieses Sternbild nur 7 Tage lang! Sein 'Herz', Antares, ist so riesig, dass es alle Planeten bis zum Mars verschlingen würde.", starsTitle: "18 Hauptsterne", stars: "Das Muster ähnelt perfekt einem Skorpion mit Schwanz und giftigem Stachel (dem Stern Shaula).", latin: "Scorpius", myth: "Der riesige Skorpion, der den legendären Jäger Orion stach und tötete. Am Himmel sind sie daher gegenüber platziert – sie treffen sich nie." },
+                Sagittarius: { date: "22. November - 21. Dezember", fact: "Wenn man zum Schützen schaut, blickt man direkt in das Zentrum unserer Milchstraße auf das supermassive Schwarze Loch Sagittarius A*.", starsTitle: "22 Hauptsterne", stars: "Der hellste ist Kaus Australis. Das Zentrum des Sternbilds ähnelt einer klassischen Teekanne.", latin: "Sagittarius", myth: "Der weise Zentaur Chiron, Lehrer vieler griechischer Helden (darunter Herkules und Achilles), der mit seinem Bogen auf den Skorpion zielt." },
+                Capricorn: { date: "22. Dezember - 19. Januar", fact: "Genau in diesem Sternbild wurde im Jahr 1846 aufgrund mathematischer Berechnungen zum ersten Mal ein neuer Planet entdeckt – Neptun.", starsTitle: "10 Hauptsterne", stars: "Der hellste Stern ist Deneb Algedi. Das gesamte Sternbild hat die Form eines großen Dreiecks.", latin: "Capricornus", myth: "Hirtengott Pan, der auf der Flucht vor dem Monster Typhon in einen Fluss sprang. Die untere Körperhälfte wurde zu einem Fisch, die obere blieb eine Ziege." },
+                Aquarius: { date: "20. Januar - 18. Februar", fact: "Hier befindet sich das Sternensystem TRAPPIST-1, das von sieben erdgroßen Planeten umkreist wird, auf denen Wasser existieren könnte.", starsTitle: "22 Hauptsterne", stars: "Der hellste Stern ist Sadalsuud. Das Sternbild enthält auch den wunderschönen Helixnebel (Auge Gottes).", latin: "Aquarius", myth: "Repräsentiert Ganymed, den schönsten Knaben der Erde, den Zeus in den Olymp entführte, damit er den Göttern Nektar einschenkt." },
+                Pisces: { date: "19. Februar - 20. März", fact: "In der realen Astronomie hält sich die Sonne hier sehr lange auf – vom 12. März bis zum 18. April.", starsTitle: "21 Hauptsterne", stars: "Es sind zwei Fische, die durch ein Band verbunden sind. Der hellste Stern ist Alpherg, aber das Sternbild ist sehr unscheinbar.", latin: "Pisces", myth: "Die Göttin Aphrodite und ihr Sohn Eros, die sich in Fische verwandelten und mit einem Band zusammenbanden, um sich auf der Flucht vor Typhon nicht zu verlieren." }
+            }
+        });
+
+        // --- PREKLADY PRE ZNAMENIA (FRANCÚZŠTINA) ---
+        Object.assign(translations.fr, {
+            zodiacUI: { title: "Signe : ", duration: "Durée (Appuyez pour Fun Fact)", constellation: "Constellation (Appuyez pour Info)", mythology: "Nom & Mythologie (Histoire)" },
+            zodiacDetails: {
+                Aries: { date: "21 Mars - 19 Avril", fact: "L'équinoxe de printemps n'est plus ici depuis plus de 2000 ans. L'axe de la Terre s'est déplacé, et le Soleil est maintenant dans les Poissons le premier jour du printemps.", starsTitle: "4 étoiles principales", stars: "L'étoile la plus brillante est Hamal. La constellation est relativement petite et peu lumineuse.", latin: "Aries", myth: "Dans la mythologie grecque, il représente le bélier à la toison d'or qui a sauvé Phrixos et Hellé. Sa toison fut plus tard recherchée par Jason et les Argonautes." },
+                Taurus: { date: "20 Avril - 20 Mai", fact: "La nébuleuse du Crabe se trouve directement dans cette constellation – le reste d'une supernova de l'an 1054 visible même en plein jour.", starsTitle: "19 étoiles principales", stars: "La plus brillante est la géante rouge Aldébaran (l'Œil du Taureau). On y trouve aussi les Pléiades et les Hyades.", latin: "Taurus", myth: "Représente le taureau blanc comme neige en lequel Zeus s'est transformé pour enlever la princesse phénicienne Europe vers la Crète." },
+                Gemini: { date: "21 Mai - 20 Juin", fact: "Alors que Castor semble être une seule étoile à l'œil nu, c'est en fait un système de six étoiles orbitant les unes autour des autres.", starsTitle: "17 étoiles principales", stars: "Les plus célèbres sont les jumeaux Castor et Pollux. L'amas d'étoiles M35 s'y trouve également.", latin: "Gemini", myth: "Les frères Castor et Pollux, l'un mortel et l'autre immortel. Après la mort de Castor, Pollux supplia Zeus pour qu'ils restent ensemble pour toujours." },
+                Cancer: { date: "21 Juin - 22 Juillet", fact: "C'est la constellation du zodiaque la moins brillante, mais elle cache le magnifique amas de la Crèche où naissent des centaines de nouvelles étoiles.", starsTitle: "5 étoiles principales", stars: "L'étoile la plus brillante est Al Tarf. En raison de sa faible luminosité, elle est difficile à repérer en ville.", latin: "Cancer", myth: "Un crabe géant envoyé par la déesse Héra pour gêner Hercule lors de son combat contre l'Hydre. Hercule l'écrasa de son pied." },
+                Leo: { date: "23 Juillet - 22 Août", fact: "L'étoile la plus brillante, Régulus, tourne si vite (plus d'un million de km/h) qu'elle a la forme d'un œuf aplati.", starsTitle: "15 étoiles principales", stars: "Régulus (le cœur) et Denebola (la queue) forment un motif clair ressemblant à un fauve au repos.", latin: "Leo", myth: "Le lion de Némée à la peau impénétrable, qu'Hercule a vaincu comme premier de ses douze travaux." },
+                Virgo: { date: "23 Août - 22 Septembre", fact: "C'est la deuxième plus grande constellation. Le centre du superamas local de galaxies, auquel appartient notre Voie Lactée, se trouve dans cette direction.", starsTitle: "15 étoiles principales", stars: "L'étoile la plus brillante est l'éblouissante Spica, située à environ 250 années-lumière de la Terre.", latin: "Virgo", myth: "Associée à Dicé, déesse de la justice, qui a quitté la Terre déçue lorsque l'humanité a commencé à faire la guerre." },
+                Libra: { date: "23 Septembre - 22 Octobre", fact: "La Balance est le seul signe du zodiaque qui ne représente pas un être vivant. Dans la Grèce antique, ces étoiles formaient les pinces du Scorpion.", starsTitle: "4 étoiles principales", stars: "Zubenelgenubi et Zubeneschamali portent des noms arabes signifiant toujours 'pince sud' et 'pince nord'.", latin: "Libra", myth: "La balance de la justice tenue par la constellation voisine de la Vierge (la déesse Dicé)." },
+                Scorpio: { date: "23 Octobre - 21 Novembre", fact: "En astronomie, le Soleil ne la traverse que pendant 7 jours ! Son 'cœur', Antarès, est si immense qu'il engloutirait toutes les planètes jusqu'à Mars.", starsTitle: "18 étoiles principales", stars: "La forme rappelle parfaitement un scorpion avec sa queue et son dard venimeux (l'étoile Shaula).", latin: "Scorpius", myth: "Le scorpion géant qui a piqué et tué le chasseur légendaire Orion. Ils sont placés à l'opposé dans le ciel pour ne jamais se croiser." },
+                Sagittarius: { date: "22 Novembre - 21 Décembre", fact: "En regardant le Sagittaire, vous regardez directement le centre de notre galaxie, vers le trou noir supermassif Sagittarius A*.", starsTitle: "22 étoiles principales", stars: "La plus brillante est Kaus Australis. Le centre de la constellation ressemble à une théière classique.", latin: "Sagittarius", myth: "Le sage centaure Chiron, maître de nombreux héros (dont Hercule et Achille), qui pointe son arc vers le Scorpion." },
+                Capricorn: { date: "22 Décembre - 19 Janvier", fact: "C'est dans cette constellation que la planète Neptune a été découverte pour la première fois en 1846, grâce à des calculs mathématiques.", starsTitle: "10 étoiles principales", stars: "L'étoile la plus brillante est Deneb Algedi. Toute la constellation a la forme d'un grand triangle.", latin: "Capricornus", myth: "Le dieu Pan, qui, fuyant le monstre Typhon, a sauté dans une rivière. La moitié de son corps s'est transformée en poisson, le haut est resté chèvre." },
+                Aquarius: { date: "20 Janvier - 18 Février", fact: "Elle abrite le système stellaire TRAPPIST-1, orbité par sept planètes de la taille de la Terre où l'eau pourrait exister.", starsTitle: "22 étoiles principales", stars: "L'étoile la plus brillante est Sadalsuud. Elle contient aussi la magnifique nébuleuse de l'Hélice (L'Œil de Dieu).", latin: "Aquarius", myth: "Représente Ganymède, le plus beau garçon sur Terre, que Zeus a enlevé sur l'Olympe pour servir le nectar aux dieux." },
+                Pisces: { date: "19 Février - 20 Mars", fact: "En astronomie réelle, le Soleil séjourne ici très longtemps – du 12 mars jusqu'au 18 avril.", starsTitle: "21 étoiles principales", stars: "Ce sont deux poissons liés par un ruban. L'étoile la plus brillante est Alpherg, mais la constellation est très discrète.", latin: "Pisces", myth: "La déesse Aphrodite et son fils Éros, qui se sont transformés en poissons et se sont liés avec un ruban pour ne pas se perdre en fuyant Typhon." }
+            }
+        });
+
+        // --- PREKLADY PRE ZNAMENIA (ŠPANIELČINA) ---
+        Object.assign(translations.es, {
+            zodiacUI: { title: "Signo: ", duration: "Duración (Toca para Fun Fact)", constellation: "Constelación (Toca para Info)", mythology: "Nombre y Mitología (Historia)" },
+            zodiacDetails: {
+                Aries: { date: "21 Marzo - 19 Abril", fact: "El equinoccio de primavera no ha estado aquí por más de 2000 años. El eje de la Tierra se ha desplazado, y el Sol ahora está en Piscis el primer día de primavera.", starsTitle: "4 estrellas principales", stars: "La estrella más brillante es Hamal. La constelación es relativamente pequeña y tenue en el cielo.", latin: "Aries", myth: "En la mitología griega, representa al carnero dorado que rescató a Frixo y Hele. Su vellocino de oro fue buscado más tarde por Jasón y los Argonautas." },
+                Taurus: { date: "20 Abril - 20 Mayo", fact: "La Nebulosa del Cangrejo se encuentra directamente en esta constelación: el remanente de una supernova de 1054 que fue visible incluso de día.", starsTitle: "19 estrellas principales", stars: "La más brillante es la gigante roja Aldebarán (el Ojo del Toro). También contiene los cúmulos estelares de las Pléyades y las Híades.", latin: "Taurus", myth: "Represena al toro blanco como la nieve en el que el propio Zeus se transformó para secuestrar a la princesa fenicia Europa hacia Creta." },
+                Gemini: { date: "21 Mayo - 20 Junio", fact: "Aunque Cástor parece una sola estrella a simple vista, en realidad es un sistema de seis estrellas que orbitan entre sí.", starsTitle: "17 estrellas principales", stars: "Las más famosas son los gemelos Cástor y Pólux. El cúmulo estelar abierto M35 también se encuentra aquí.", latin: "Gemini", myth: "Los hermanos Cástor y Pólux, uno mortal y el otro inmortal. Tras la muerte de Cástor, Pólux rogó a Zeus para que pudieran estar juntos para siempre." },
+                Cancer: { date: "21 Junio - 22 Julio", fact: "Es la constelación más tenue del zodiaco, pero oculta el hermoso Cúmulo del Pesebre donde nacen cientos de nuevas estrellas.", starsTitle: "5 estrellas principales", stars: "La estrella más brillante es Al Tarf. Debido a sus estrellas tenues, es difícil de ver desde ciudades contaminadas por la luz.", latin: "Cancer", myth: "Un cangrejo gigante enviado por la diosa Hera para estorbar a Hércules durante su lucha contra la Hidra. Hércules lo aplastó con su pie." },
+                Leo: { date: "23 Julio - 22 Agosto", fact: "La estrella más brillante, Régulo, gira tan rápido (más de un millón de km/h) que tiene forma de huevo aplanado.", starsTitle: "15 estrellas principales", stars: "Régulo (el Corazón) y Denébola (la Cola) forman un patrón brillante que se asemeja a una fiera en reposo.", latin: "Leo", myth: "El león de Nemea, con piel impenetrable, que Hércules derrotó como el primero de sus doce trabajos." },
+                Virgo: { date: "23 Agosto - 22 Septiembre", fact: "Es la segunda constelación más grande del cielo. El centro del supercúmulo local de galaxias se encuentra en esta dirección.", starsTitle: "15 estrellas principales", stars: "La estrella más brillante es la gigante azul y blanca Espiga, a unos 250 años luz de la Tierra.", latin: "Virgo", myth: "Asociada a Dice, la diosa de la justicia, que abandonó la Tierra decepcionada cuando la humanidad comenzó a librar guerras." },
+                Libra: { date: "23 Septiembre - 22 Octubre", fact: "Libra es el único signo que no representa una criatura viva. En la antigua Grecia, estas estrellas formaban las pinzas de Escorpio.", starsTitle: "4 estrellas principales", stars: "Zubenelgenubi y Zubeneschamali tienen nombres árabes que aún significan 'pinza sur' y 'pinza norte'.", latin: "Libra", myth: "La balanza de la justicia sostenida por la constelación vecina de Virgo (la diosa Dice)." },
+                Scorpio: { date: "23 Octubre - 21 Noviembre", fact: "¡En astronomía, el Sol solo la atraviesa durante 7 días! Su 'corazón', Antares, es tan inmenso que engulliría a todos los planetas hasta Marte.", starsTitle: "18 estrellas principales", stars: "El patrón se asemeja perfectamente a un escorpión con cola y aguijón venenoso (la estrella Shaula).", latin: "Scorpius", myth: "El escorpión gigante que picó y mató al legendario cazador Orión. Están colocados opuestos en el cielo para que nunca se encuentren." },
+                Sagittarius: { date: "22 Noviembre - 21 Diciembre", fact: "Al mirar a Sagitario, estás mirando directamente al centro de nuestra galaxia, hacia el agujero negro supermasivo Sagittarius A*.", starsTitle: "22 estrellas principales", stars: "La más brillante es Kaus Australis. El centro de la constelación parece una tetera clásica.", latin: "Sagittarius", myth: "El sabio centauro Quirón, maestro de muchos héroes griegos (incluyendo a Hércules y Aquiles), apuntando su arco al Escorpión." },
+                Capricorn: { date: "22 Diciembre - 19 Enero", fact: "Justo en esta constelación, el planeta Neptuno fue descubierto por primera vez en 1846, basado en cálculos matemáticos.", starsTitle: "10 estrellas principales", stars: "La estrella más brillante es Deneb Algedi. Toda la constelación tiene forma de un gran triángulo.", latin: "Capricornus", myth: "Pan, el dios de los bosques, que saltó a un río huyendo del monstruo Tifón. La mitad de su cuerpo se convirtió en pez y la parte superior siguió siendo cabra." },
+                Aquarius: { date: "20 Enero - 18 Febrero", fact: "Alberga el sistema estelar TRAPPIST-1, orbitado por siete planetas del tamaño de la Tierra donde podría haber agua.", starsTitle: "22 estrellas principales", stars: "La estrella más brillante es Sadalsuud. La constelación también contiene la hermosa Nebulosa de la Hélice (El Ojo de Dios).", latin: "Aquarius", myth: "Representa a Ganimedes, el joven más hermoso de la Tierra, a quien Zeus secuestró al Monte Olimpo para ser el copero de los dioses." },
+                Pisces: { date: "19 Febrero - 20 Marzo", fact: "En la astronomía real, el Sol permanece aquí durante mucho tiempo: desde el 12 de marzo hasta el 18 de abril.", starsTitle: "21 estrellas principales", stars: "Son dos peces unidos por una cinta. La estrella más brillante es Alpherg, pero la constelación es muy tenue.", latin: "Pisces", myth: "La diosa Afrodita y su hijo Eros, quienes se transformaron en peces y se ataron con una cinta para no perderse mientras huían de Tifón." }
+            }
+        });
+// --- PREKLADY PRE ZNAMENIA (ČÍNŠTINA) ---
+        Object.assign(translations.zh, {
+            zodiacUI: { title: "星座：", duration: "持续时间 (点击查看趣闻)", constellation: "星座 (点击查看信息)", mythology: "名称与神话 (故事)" },
+            zodiacDetails: {
+                Aries: { date: "3月21日 - 4月19日", fact: "春分点已经不在这里超过2000年了。由于地轴进动，现在春天的第一天太阳实际上在双鱼座。", starsTitle: "4颗主要恒星", stars: "最亮的恒星是娄宿三 (Hamal)。这个星座在天空中相对较小且暗淡。", latin: "Aries", myth: "在希腊神话中，它代表拯救了佛里克索斯和赫勒的金羊。它的金羊毛后来成为了伊阿宋和阿尔戈英雄们寻找的目标。" },
+                Taurus: { date: "4月20日 - 5月20日", fact: "蟹状星云就位于这个星座中——这是1054年超新星爆发的残骸，当时即使在白天也清晰可见。", starsTitle: "19颗主要恒星", stars: "最亮的星是红巨星毕宿五 (Aldebaran，即“公牛之眼”)。著名的昴星团和毕星团也在这里。", latin: "Taurus", myth: "代表雪白的公牛，宙斯曾化身为它，将腓尼基公主欧罗巴劫持到了克里特岛。" },
+                Gemini: { date: "5月21日 - 6月20日", fact: "虽然北河二 (Castor) 肉眼看是一颗星，但它实际上是一个由六颗恒星互相环绕的复杂系统。", starsTitle: "17颗主要恒星", stars: "最著名的是双子星北河二和北河三 (Pollux)。M35疏散星团也位于此处。", latin: "Gemini", myth: "双子兄弟卡斯托耳和波吕克斯，一个是凡人，另一个是神。卡斯托耳死后，波吕克斯恳求宙斯让他们永远在一起。" },
+                Cancer: { date: "6月21日 - 7月22日", fact: "它是黄道十二宫中最暗淡的星座，但却隐藏着美丽的鬼星团 (Beehive Cluster)，那里正在诞生数百颗新恒星。", starsTitle: "5颗主要恒星", stars: "最亮的是柳宿增三 (Al Tarf)。由于恒星较暗，在光污染的城市里很难看到它。", latin: "Cancer", myth: "赫拉女神派来的一只巨蟹，目的是在赫拉克勒斯与九头蛇战斗时阻挠他。但赫拉克勒斯一脚踩碎了它。" },
+                Leo: { date: "7月23日 - 8月22日", fact: "最亮的轩辕十四 (Regulus) 自转极快（超过一百万公里/小时），导致它变成了一个扁平的椭球体形状。", starsTitle: "15颗主要恒星", stars: "轩辕十四 (狮子的心脏) 和五帝座一 (狮子的尾巴) 构成了一个明亮的图案，宛如一只趴着的猛兽。", latin: "Leo", myth: "拥有刀枪不入皮毛的涅墨亚狮子，赫拉克勒斯在完成十二项任务的第一项时击败了它。" },
+                Virgo: { date: "8月23日 - 9月22日", fact: "它是天空中第二大星座。包含我们银河系的本超星系团的中心就位于这个方向。", starsTitle: "15颗主要恒星", stars: "最亮的是蓝白色巨星角宿一 (Spica)，距离地球约250光年。", latin: "Virgo", myth: "与正义女神狄刻 (Dike) 有关，当人类开始发动战争时，她对地球感到失望并离开了这里。" },
+                Libra: { date: "9月23日 - 10月22日", fact: "天秤座是唯一一个不代表生物的黄道星座。在古希腊，这些星星曾是天蝎座的爪子。", starsTitle: "4颗主要恒星", stars: "氐宿一和氐宿四的名字源于阿拉伯语，至今仍意为“南爪”和“北爪”。", latin: "Libra", myth: "由相邻的室女座（正义女神狄刻）手中举起的正义天平。" },
+                Scorpio: { date: "10月23日 - 11月21日", fact: "在天文学中，太阳只经过天蝎座7天！它的“心脏”心宿二 (Antares) 极其巨大，如果放在太阳的位置，会吞噬火星以内的所有行星。", starsTitle: "18颗主要恒星", stars: "星座图案完美地呈现出一只蝎子，带有尾巴和毒刺（尾宿八 Shaula）。", latin: "Scorpius", myth: "那只刺死传奇猎人俄里翁的巨型蝎子。为了让它们永远不再相遇，众神将它们放置在星空的相对位置。" },
+                Sagittarius: { date: "11月22日 - 12月21日", fact: "当你看向射手座时，你正注视着我们银河系的中心，那里有一个超大质量黑洞——人马座A*。", starsTitle: "22颗主要恒星", stars: "最亮的是箕宿三 (Kaus Australis)。星座的中心部分看起来像一个经典的茶壶。", latin: "Sagittarius", myth: "智慧的半人马喀戎，他是许多希腊英雄（包括赫拉克勒斯和阿喀琉斯）的导师，正用弓箭瞄准天蝎。" },
+                Capricorn: { date: "12月22日 - 1月19日", fact: "1846年，天文学家正是通过数学计算，在这个星座区域首次发现了海王星。", starsTitle: "10颗主要恒星", stars: "最亮的星是垒壁阵四 (Deneb Algedi)。整个星座呈一个大三角形。", latin: "Capricornus", myth: "牧神潘 (Pan) 在躲避怪物堤丰时跳进河里，下半身变成了鱼，上半身依然是羊。" },
+                Aquarius: { date: "1月20日 - 2月18日", fact: "它拥有 TRAPPIST-1 恒星系统，周围有七颗地球大小的行星环绕，其中可能存在液态水。", starsTitle: "22颗主要恒星", stars: "最亮的是虚宿一 (Sadalsuud)。星座内还包含美丽的螺旋星云 (上帝之眼)。", latin: "Aquarius", myth: "代表伽倪墨得斯，地球上最美的少年，被宙斯带到奥林匹斯山为众神斟酒。" },
+                Pisces: { date: "2月19日 - 3月20日", fact: "在真实的天文学中，太阳在这里停留的时间非常长——从3月12日一直到4月18日。", starsTitle: "21颗主要恒星", stars: "它们是被一条丝带绑在一起的两条鱼。最亮的星是右更二 (Alpherg)，但整个星座非常暗淡。", latin: "Pisces", myth: "爱神阿佛洛狄忒和她的儿子厄洛斯，为了躲避怪物堤丰，他们化身为鱼并用丝带绑在一起以免走散。" }
+            }
+        });
+
+        // --- PREKLADY PRE ZNAMENIA (HINDČINA) ---
+        Object.assign(translations.hi, {
+            zodiacUI: { title: "राशि: ", duration: "अवधि (मजेदार तथ्य के लिए टैप करें)", constellation: "तारामंडल (जानकारी के लिए टैप करें)", mythology: "नाम और पौराणिक कथा (कहानी)" },
+            zodiacDetails: {
+                Aries: { date: "21 मार्च - 19 अप्रैल", fact: "वसंत विषुव (Vernal equinox) 2000 से अधिक वर्षों से यहाँ नहीं है। पृथ्वी की धुरी खिसक गई है, और वसंत के पहले दिन सूर्य अब मीन राशि में होता है।", starsTitle: "4 मुख्य तारे", stars: "सबसे चमकीला तारा हमाल है। यह तारामंडल आकाश में अपेक्षाकृत छोटा और धुंधला है।", latin: "Aries", myth: "ग्रीक पौराणिक कथाओं में, यह उस सुनहरे मेढ़े का प्रतिनिधित्व करता है जिसने फ्रिक्सस और हेले को बचाया था।" },
+                Taurus: { date: "20 अप्रैल - 20 मई", fact: "क्रैब नेबुला (Crab Nebula) सीधे इसी तारामंडल में स्थित है - 1054 के सुपरनोवा विस्फोट का अवशेष जो दिन में भी दिखाई देता था।", starsTitle: "19 मुख्य तारे", stars: "सबसे चमकीला लाल दानव तारा एल्डेबारन (वृषभ की आँख) है। इसमें प्लीएड्स और हाइड्स तारा समूह भी शामिल हैं।", latin: "Taurus", myth: "यह उस बर्फ-सफेद बैल का प्रतिनिधित्व करता है जिसमें स्वयं ज़ीउस ने फीनिशियन राजकुमारी यूरोपा का अपहरण करने के लिए खुद को बदल लिया था।" },
+                Gemini: { date: "21 मई - 20 जून", fact: "हालाँकि कैस्टर (Castor) नग्न आँखों से एक तारे की तरह दिखता है, यह वास्तव में एक-दूसरे की परिक्रमा करने वाले छह तारों का एक सिस्टम है।", starsTitle: "17 मुख्य तारे", stars: "सबसे प्रसिद्ध जुड़वां कैस्टर और पोलक्स हैं। खुला तारा समूह M35 भी यहीं स्थित है।", latin: "Gemini", myth: "कैस्टर और पोलक्स भाई, एक नश्वर और दूसरा अमर। कैस्टर की मृत्यु के बाद, पोलक्स ने ज़ीउस से प्रार्थना की कि वे हमेशा साथ रहें।" },
+                Cancer: { date: "21 जून - 22 जुलाई", fact: "यह राशि चक्र का सबसे धुंधला तारामंडल है, लेकिन यह खूबसूरत बीहाइव क्लस्टर (Beehive Cluster) को छुपाता है जहां सैकड़ों नए तारे पैदा हो रहे हैं।", starsTitle: "5 मुख्य तारे", stars: "सबसे चमकीला तारा अल टार्फ है। इसके धुंधले तारों के कारण, शहरों से इसे देखना मुश्किल है।", latin: "Cancer", myth: "हाइड्रा के साथ अपनी लड़ाई के दौरान हरक्यूलिस को बाधा पहुंचाने के लिए देवी हेरा द्वारा भेजा गया एक विशाल केकड़ा।" },
+                Leo: { date: "23 जुलाई - 22 अगस्त", fact: "सबसे चमकीला तारा, रेगुल्स (Regulus), इतनी तेज़ी से घूमता है (दस लाख किमी/घंटा से अधिक) कि इसका आकार चपटे अंडे जैसा हो गया है।", starsTitle: "15 मुख्य तारे", stars: "रेगुल्स और डेनेबोला एक चमकीला पैटर्न बनाते हैं जो एक आराम करते हुए शेर जैसा दिखता है।", latin: "Leo", myth: "अभेद्य त्वचा वाला निमियन शेर, जिसे हरक्यूलिस ने अपने बारह कार्यों में से पहले कार्य के रूप में हराया था।" },
+                Virgo: { date: "23 अगस्त - 22 सितंबर", fact: "यह आकाश का दूसरा सबसे बड़ा तारामंडल है। हमारी मिल्की वे गैलेक्सी जिस स्थानीय सुपरक्लस्टर का हिस्सा है, उसका केंद्र इसी दिशा में है।", starsTitle: "15 मुख्य तारे", stars: "सबसे चमकीला तारा नीला-सफेद दानव स्पिका (Spica) है, जो पृथ्वी से लगभग 250 प्रकाश वर्ष दूर है।", latin: "Virgo", myth: "न्याय की देवी डाइक से जुड़ी, जिन्होंने मानवता के युद्ध शुरू करने पर निराश होकर पृथ्वी छोड़ दी थी।" },
+                Libra: { date: "23 सितंबर - 22 अक्टूबर", fact: "तुला एकमात्र राशि है जो किसी जीवित प्राणी का प्रतिनिधित्व नहीं करती है। प्राचीन ग्रीस में, इन तारों ने वृश्चिक के पंजे बनाए थे।", starsTitle: "4 मुख्य तारे", stars: "ज़ुबेनेलजेनुबी और ज़ुबेनेस्चमाली तारों के अरबी नाम हैं जिनका अर्थ आज भी 'दक्षिणी पंजा' और 'उत्तरी पंजा' है।", latin: "Libra", myth: "न्याय का तराजू, जो पड़ोसी तारामंडल कन्या (देवी डाइक) के हाथों में है।" },
+                Scorpio: { date: "23 अक्टूबर - 21 नवंबर", fact: "खगोल विज्ञान में, सूर्य केवल 7 दिनों के लिए इससे होकर गुजरता है! इसका 'हृदय', एंटारेस (Antares), इतना विशाल है कि यह मंगल तक के सभी ग्रहों को निगल जाएगा।", starsTitle: "18 मुख्य तारे", stars: "पैटर्न पूरी तरह से पूंछ और जहरीले डंक वाले बिच्छू जैसा दिखता है।", latin: "Scorpius", myth: "विशाल बिच्छू जिसने पौराणिक शिकारी ओरियन को डंक मारकर मार डाला था। वे आकाश में एक-दूसरे के विपरीत रखे गए हैं ताकि वे कभी न मिलें।" },
+                Sagittarius: { date: "22 नवंबर - 21 दिसंबर", fact: "धनु राशि को देखते समय, आप सीधे हमारी मिल्की वे गैलेक्सी के केंद्र में स्थित सुपरमैसिव ब्लैक होल Sagittarius A* को देख रहे होते हैं।", starsTitle: "22 मुख्य तारे", stars: "सबसे चमकीला तारा कौस ऑस्ट्रेलिस है। तारामंडल का केंद्र एक क्लासिक चायदानी जैसा दिखता है।", latin: "Sagittarius", myth: "बुद्धिमान सेंटॉर चिरोन, जो कई ग्रीक नायकों (हरक्यूलिस और अकिलीज़ सहित) का शिक्षक था, वृश्चिक पर अपना धनुष ताने हुए है।" },
+                Capricorn: { date: "22 दिसंबर - 19 जनवरी", fact: "ठीक इसी तारामंडल में, 1846 में गणितीय गणनाओं के आधार पर पहली बार नेपच्यून ग्रह की खोज की गई थी।", starsTitle: "10 मुख्य तारे", stars: "सबसे चमकीला तारा डेनेब अल्जेडी है। पूरे तारामंडल का आकार एक बड़े त्रिकोण जैसा है।", latin: "Capricornus", myth: "जंगल के देवता पैन, जो राक्षस टाइफॉन से भागते समय नदी में कूद गए थे। उनके शरीर का आधा हिस्सा मछली बन गया, शीर्ष बकरी ही रहा।" },
+                Aquarius: { date: "20 जनवरी - 18 फरवरी", fact: "इसमें TRAPPIST-1 तारा प्रणाली है, जिसकी परिक्रमा पृथ्वी के आकार के सात ग्रह करते हैं जहां पानी हो सकता है।", starsTitle: "22 मुख्य तारे", stars: "सबसे चमकीला तारा सादलसूद है। तारामंडल में सुंदर हेलिक्स नेबुला (भगवान की आंख) भी शामिल है।", latin: "Aquarius", myth: "गैनीमेड का प्रतिनिधित्व करता है, जो पृथ्वी पर सबसे सुंदर लड़का था, जिसे ज़ीउस देवताओं का प्याला भरने वाले के रूप में माउंट ओलंपस ले गया था।" },
+                Pisces: { date: "19 फरवरी - 20 मार्च", fact: "वास्तविक खगोल विज्ञान में, सूर्य यहां बहुत लंबे समय तक रहता है - 12 मार्च से 18 अप्रैल तक।", starsTitle: "21 मुख्य तारे", stars: "वे एक रिबन द्वारा बंधी दो मछलियां हैं। सबसे चमकीला तारा अल्फर्ग है, लेकिन तारामंडल बहुत धुंधला है।", latin: "Pisces", myth: "देवी एफ़्रोडाइट और उनके पुत्र इरोस, जो टाइफॉन से भागते समय मछलियों में बदल गए और एक रिबन से खुद को बांध लिया ताकि वे एक-दूसरे को खो न दें।" }
+            }
+        });
+
+        // --- PREKLADY PRE ZNAMENIA (JAPONČINA) ---
+        Object.assign(translations.ja, {
+            zodiacUI: { title: "星座: ", duration: "期間 (タップして豆知識)", constellation: "星座 (タップして情報)", mythology: "名前と神話 (物語)" },
+            zodiacDetails: {
+                Aries: { date: "3月21日 - 4月19日", fact: "春分点は2000年以上前からここにはありません。地軸が移動したため、現在、春の最初の日に太陽は魚座にあります。", starsTitle: "4つの主要な星", stars: "最も明るい星はハマルです。この星座は空では比較的小さく、暗いです。", latin: "Aries", myth: "ギリシャ神話では、フリクソスとヘレを救った黄金の羊を表しています。その金羊毛は後にイアソンとアルゴナウタイによって探求されました。" },
+                Taurus: { date: "4月20日 - 5月20日", fact: "かに星雲はこの星座の中にあります。これは1054年の超新星爆発の残骸で、当時は昼間でも見えました。", starsTitle: "19の主要な星", stars: "最も明るい星は赤色巨星のアルデバラン（雄牛の目）です。プレアデス星団やヒアデス星団も含まれています。", latin: "Taurus", myth: "フェニキアの王女エウロパをクレタ島に誘拐するために、ゼウス自身が変身した雪のように白い雄牛を表しています。" },
+                Gemini: { date: "5月21日 - 6月20日", fact: "カストルは肉眼では一つの星に見えますが、実際には互いに軌道を回る6つの星のシステムです。", starsTitle: "17の主要な星", stars: "最も有名なのは双子の星カストルとポルックスです。散開星団M35もここにあります。", latin: "Gemini", myth: "カストルとポルックスの兄弟、一人は死すべき運命にあり、もう一人は不死でした。カストルの死後、ポルックスは永遠に一緒にいられるようゼウスに懇願しました。" },
+                Cancer: { date: "6月21日 - 7月22日", fact: "黄道十二星座の中で最も暗いですが、何百もの新しい星が生まれている美しいプレセペ星団（ビーハイブ星団）を隠し持っています。", starsTitle: "5つの主要な星", stars: "最も明るい星はアル・タルフです。星が暗いため、光害のある都市から見つけるのは困難です。", latin: "Cancer", myth: "ヘラクレスがヒドラと戦っている際に、彼を妨害するために女神ヘラが送った巨大なカニ。しかし、ヘラクレスに踏みつぶされました。" },
+                Leo: { date: "7月23日 - 8月22日", fact: "最も明るい星レグルスは非常に速く（時速100万km以上）回転しているため、平らな卵の形をしています。", starsTitle: "15の主要な星", stars: "レグルス（獅子の心臓）とデネボラ（獅子の尾）が、休息している猛獣に似た明るいパターンを形成しています。", latin: "Leo", myth: "ヘラクレスが12の功業の最初として打ち倒した、不死身の毛皮を持つネメアの獅子。" },
+                Virgo: { date: "8月23日 - 9月22日", fact: "空で2番目に大きな星座です。私たちの天の川銀河が属するおとめ座超銀河団の中心は、この方向にあります。", starsTitle: "15の主要な星", stars: "最も明るい星は青白い巨星スピカで、地球から約250光年離れています。", latin: "Virgo", myth: "正義の女神ディケと結びついています。人類が戦争を始めたとき、彼女は失望して地球を去りました。" },
+                Libra: { date: "9月23日 - 10月22日", fact: "天秤座は生き物を表していない唯一の黄道十二星座です。古代ギリシャでは、これらの星はさそり座のハサミを形成していました。", starsTitle: "4つの主要な星", stars: "ズベン・エル・ゲヌビとズベン・エス・カマリという星はアラビア語の名前を持ち、今でも「南のハサミ」と「北のハサミ」を意味します。", latin: "Libra", myth: "隣接するおとめ座（女神ディケ）が手に持つ正義の天秤。" },
+                Scorpio: { date: "10月23日 - 11月21日", fact: "天文学において、太陽はここをわずか7日間しか通過しません！その「心臓」であるアンタレスは巨大で、火星までのすべての惑星を飲み込んでしまいます。", starsTitle: "18の主要な星", stars: "星座の形は、尾と毒針（シャウラ）を持つサソリに完全に見えます。", latin: "Scorpius", myth: "伝説の狩人オリオンを刺し殺した巨大なサソリ。彼らが決して出会わないように、空では正反対に配置されています。" },
+                Sagittarius: { date: "11月22日 - 12月21日", fact: "射手座を見ているとき、あなたは私たちの天の川銀河の中心、超大質量ブラックホール「いて座A*」を直接見ています。", starsTitle: "22の主要な星", stars: "最も明るいのはカウス・アウストラリスです。星座の中心はクラシックなティーポットに似ています。", latin: "Sagittarius", myth: "多くのギリシャの英雄（ヘラクレスやアキレウスなど）の教師である賢明なケンタウロスのケイロンが、さそりに弓を向けています。" },
+                Capricorn: { date: "12月22日 - 1月19日", fact: "1846年、数学的計算に基づいて海王星が初めて発見されたのは、まさにこの星座の領域でした。", starsTitle: "10の主要な星", stars: "最も明るい星はデネブ・アルゲディです。星座全体が大きな三角形の形をしています。", latin: "Capricornus", myth: "怪物テュポンから逃れる際に川に飛び込んだ森の神パン。下半身は魚に変わり、上半身はヤギのままでした。" },
+                Aquarius: { date: "1月20日 - 2月18日", fact: "ここにはTRAPPIST-1星系があり、地球サイズの惑星が7つ公転しており、水が存在する可能性があります。", starsTitle: "22の主要な星", stars: "最も明るい星はサダルスウドです。この星座には美しいらせん星雲（神の目）も含まれています。", latin: "Aquarius", myth: "ゼウスが神々の給仕係にするためにオリンポス山に誘拐した、地球上で最も美しい少年ガニュメデスを表しています。" },
+                Pisces: { date: "2月19日 - 3月20日", fact: "実際の天文学では、太陽はここに非常に長く滞在します。3月12日から4月18日までの期間です。", starsTitle: "21の主要な星", stars: "リボンで結ばれた2匹の魚です。最も明るい星はアルフェルグですが、星座は非常に暗いです。", latin: "Pisces", myth: "怪物テュポンから逃れる際に、お互いを見失わないように魚に変身し、リボンで自分たちを結びつけた女神アフロディーテとその息子エロス。" }
+            }
+        });
+
+        // --- PREKLADY PRE ZNAMENIA (KÓREJČINA) ---
+        Object.assign(translations.ko, {
+            zodiacUI: { title: "별자리: ", duration: "기간 (탭하여 재미있는 사실 보기)", constellation: "별자리 (탭하여 정보 보기)", mythology: "이름 및 신화 (이야기)" },
+            zodiacDetails: {
+                Aries: { date: "3월 21일 - 4월 19일", fact: "춘분점은 2000년 넘게 이곳에 없었습니다. 지구의 자전축이 이동하여, 현재 봄의 첫날 태양은 물고기자리에 있습니다.", starsTitle: "4개의 주요 별", stars: "가장 밝은 별은 하말(Hamal)입니다. 이 별자리는 하늘에서 비교적 작고 희미합니다.", latin: "Aries", myth: "그리스 신화에서 프릭소스와 헬레를 구한 황금 숫양을 나타냅니다. 그 황금 양털은 나중에 이아손과 아르고호의 영웅들이 찾게 됩니다." },
+                Taurus: { date: "4월 20일 - 5월 20일", fact: "게성운(Crab Nebula)이 이 별자리에 위치해 있습니다. 이는 1054년에 낮에도 보였던 초신성 폭발의 잔해입니다.", starsTitle: "19개의 주요 별", stars: "가장 밝은 별은 적색 거성 알데바란(황소의 눈)입니다. 플레이아데스와 히아데스 성단도 이곳에 있습니다.", latin: "Taurus", myth: "페니키아의 공주 에우로파를 크레타 섬으로 납치하기 위해 제우스가 직접 변신한 눈처럼 흰 황소를 나타냅니다." },
+                Gemini: { date: "5월 21일 - 6월 20일", fact: "카스토르(Castor)는 맨눈으로 보면 하나의 별처럼 보이지만, 실제로는 서로의 궤도를 도는 6개의 별로 이루어진 시스템입니다.", starsTitle: "17개의 주요 별", stars: "가장 유명한 것은 쌍둥이 별 카스토르와 폴룩스입니다. 산개 성단 M35도 이곳에 위치해 있습니다.", latin: "Gemini", myth: "카스토르와 폴룩스 형제, 한 명은 필멸자이고 다른 한 명은 불멸자였습니다. 카스토르가 죽은 후, 폴룩스는 영원히 함께할 수 있게 해달라고 제우스에게 간청했습니다." },
+                Cancer: { date: "6월 21일 - 7월 22일", fact: "황도 12궁 중 가장 희미한 별자리지만, 수백 개의 새로운 별이 태어나고 있는 아름다운 프레세페 성단(Beehive Cluster)을 숨기고 있습니다.", starsTitle: "5개의 주요 별", stars: "가장 밝은 별은 알 타르프(Al Tarf)입니다. 별들이 희미해서 빛 공해가 있는 도시에서는 찾기 어렵습니다.", latin: "Cancer", myth: "헤라클레스가 히드라와 싸울 때 그를 방해하기 위해 여신 헤라가 보낸 거대한 게. 하지만 헤라클레스의 발에 밟혀 죽었습니다." },
+                Leo: { date: "7월 23일 - 8월 22일", fact: "가장 밝은 별인 레굴루스(Regulus)는 너무 빨리 회전하여(시속 100만 km 이상) 납작한 달걀 모양을 하고 있습니다.", starsTitle: "15개의 주요 별", stars: "레굴루스(사자의 심장)와 데네볼라(사자의 꼬리)가 휴식을 취하는 맹수와 닮은 밝은 패턴을 형성합니다.", latin: "Leo", myth: "헤라클레스가 자신의 12가지 과업 중 첫 번째로 물리친, 무적의 가죽을 가진 네메아의 사자." },
+                Virgo: { date: "8월 23일 - 9월 22일", fact: "하늘에서 두 번째로 큰 별자리입니다. 우리 은하가 속한 처녀자리 초은하단의 중심이 이 방향에 있습니다.", starsTitle: "15개의 주요 별", stars: "가장 밝은 별은 지구에서 약 250광년 떨어진 청백색 거성 스피카(Spica)입니다.", latin: "Virgo", myth: "정의의 여신 디케(Dike)와 연관이 있으며, 그녀는 인류가 전쟁을 시작하자 실망하여 지구를 떠났습니다." },
+                Libra: { date: "9월 23일 - 10월 22일", fact: "천칭자리는 살아있는 생명체를 나타내지 않는 유일한 황도 별자리입니다. 고대 그리스에서 이 별들은 전갈자리의 집게발을 형성했습니다.", starsTitle: "4개의 주요 별", stars: "주벤엘게누비와 주벤에스카말리라는 별은 여전히 '남쪽 집게'와 '북쪽 집게'를 의미하는 아랍어 이름을 가지고 있습니다.", latin: "Libra", myth: "이웃한 처녀자리(여신 디케)가 들고 있는 정의의 저울." },
+                Scorpio: { date: "10월 23일 - 11월 21일", fact: "천문학적으로 태양은 단 7일 동안만 이곳을 통과합니다! 그 '심장'인 안타레스(Antares)는 너무 거대해서 화성까지의 모든 행성을 집어삼킬 것입니다.", starsTitle: "18개의 주요 별", stars: "별자리의 패턴은 꼬리와 독침(샤울라 별)을 가진 전갈과 완벽하게 닮았습니다.", latin: "Scorpius", myth: "전설적인 사냥꾼 오리온을 찔러 죽인 거대한 전갈. 그들이 절대 마주치지 않도록 하늘의 정반대 편에 배치되었습니다." },
+                Sagittarius: { date: "11월 22일 - 12월 21일", fact: "궁수자리를 볼 때, 당신은 우리 은하계의 중심에 있는 초거대 질량 블랙홀인 궁수자리 A*를 직접 보고 있는 것입니다.", starsTitle: "22개의 주요 별", stars: "가장 밝은 별은 카우스 아우스트랄리스입니다. 별자리의 중심은 전형적인 찻주전자 모양을 하고 있습니다.", latin: "Sagittarius", myth: "많은 그리스 영웅들(헤라클레스와 아킬레스 포함)의 스승이었던 현명한 켄타우로스 케이론이 전갈을 향해 활을 겨누고 있습니다." },
+                Capricorn: { date: "12월 22일 - 1월 19일", fact: "1846년, 수학적 계산을 바탕으로 해왕성이 처음 발견된 곳이 바로 이 별자리 영역입니다.", starsTitle: "10개의 주요 별", stars: "가장 밝은 별은 데네브 알게디입니다. 전체 별자리는 커다란 삼각형 모양입니다.", latin: "Capricornus", myth: "괴물 티폰을 피해 도망치다 강에 뛰어든 숲의 신 판(Pan). 그의 하반신은 물고기로 변했고 상반신은 염소로 남았습니다." },
+                Aquarius: { date: "1월 20일 - 2월 18일", fact: "이곳에는 물이 존재할 가능성이 있는 7개의 지구 크기 행성이 공전하는 TRAPPIST-1 별 시스템이 있습니다.", starsTitle: "22개의 주요 별", stars: "가장 밝은 별은 사달수드입니다. 이 별자리에는 아름다운 나선 성운(신의 눈)도 포함되어 있습니다.", latin: "Aquarius", myth: "제우스가 신들에게 넥타르를 따르게 하려고 올림푸스 산으로 납치한, 지구상에서 가장 아름다운 소년 가니메데스를 나타냅니다." },
+                Pisces: { date: "2월 19일 - 3월 20일", fact: "실제 천문학에서 태양은 이곳에 매우 오랫동안 머뭅니다. 3월 12일부터 4월 18일까지입니다.", starsTitle: "21개의 주요 별", stars: "리본으로 묶인 두 마리의 물고기입니다. 가장 밝은 별은 알페르그(Alpherg)이지만, 별자리는 매우 희미합니다.", latin: "Pisces", myth: "괴물 티폰을 피해 도망칠 때 서로를 잃어버리지 않기 위해 물고기로 변신하고 리본으로 서로를 묶은 여신 아프로디테와 그녀의 아들 에로스." }
+            }
+        });
 
         const zodiacSigns = [
             { id: "Aries", sym: "♈", angle: 0 }, { id: "Taurus", sym: "♉", angle: 30 },
@@ -1064,6 +1261,8 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         }
 
         let startupPlanet = localStorage.getItem('solaris_startup_planet') || 'Sun';
+        let currentPanelMode = 'planet'; 
+        let currentZodiacKey = null;
 
         function changeStartupPlanet(val) {
             startupPlanet = val;
@@ -1161,13 +1360,21 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 dropdown.appendChild(div);
             });
             
-            document.getElementById('planet-select-btn').innerText = t.planets[currentPlanetKey];
-            document.getElementById('selected-planet-name').innerText = t.planets[currentPlanetKey];
-            document.getElementById('radar-planet-title').innerText = t.radarTracking + t.planets[currentPlanetKey];
-            
-            let p = planetData[currentPlanetKey].period;
-            let pText = p > 365 ? (p/365.25).toFixed(1) + t.periodY : p.toFixed(0) + t.periodD;
-            document.getElementById('stat-period').innerText = pText;
+            if (currentPanelMode === 'planet') {
+                document.getElementById('lbl-stat-dist').innerText = t.statDist;
+                document.getElementById('lbl-stat-speed').innerText = t.statSpeed;
+                document.getElementById('lbl-stat-period').innerText = t.statPeriod;
+
+                document.getElementById('planet-select-btn').innerText = t.planets[currentPlanetKey];
+                document.getElementById('selected-planet-name').innerText = t.planets[currentPlanetKey];
+                document.getElementById('radar-planet-title').innerText = t.radarTracking + t.planets[currentPlanetKey];
+                
+                let p = planetData[currentPlanetKey].period;
+                let pText = p > 365 ? (p/365.25).toFixed(1) + t.periodY : p.toFixed(0) + t.periodD;
+                document.getElementById('stat-period').innerText = pText;
+            } else if (currentPanelMode === 'zodiac') {
+                selectZodiac(currentZodiacKey); // Prekresli panel znamenia do nového jazyka
+            }
 // Naplnenie planét v nastaveniach podľa zvoleného jazyka
             let stSel = document.getElementById('setting-startup-select');
             if (stSel) {
@@ -1287,6 +1494,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         let lastX = 0; 
         let initialPinchDistance = null;
         let horizonPositions = {}; 
+        let zodiacHitboxes = {}; // Pridaná oficiálna globálna pamäť pre znamenia
         let toastTimeout;
 
         function showToast(msg) {
@@ -1325,6 +1533,17 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     let inRect = hoverX >= hp.rx1 && hoverX <= hp.rx2 && hoverY >= hp.ry1 && hoverY <= hp.ry2;
                     if (inCircle || inRect) { isHovering = true; break; }
                 }
+                
+                // OPRAVA: Pridáme aj znamenia, aby sa myš zmenila na ručičku!
+                if (!isHovering && typeof zodiacHitboxes !== 'undefined') {
+                    for (let zKey in zodiacHitboxes) {
+                        let zh = zodiacHitboxes[zKey];
+                        let inCircle = Math.hypot(hoverX - zh.cx, hoverY - zh.cy) <= zh.cr;
+                        let inRect = hoverX >= zh.rx1 && hoverX <= zh.rx2 && hoverY >= zh.ry1 && hoverY <= zh.ry2;
+                        if (inCircle || inRect) { isHovering = true; break; }
+                    }
+                }
+                
                 container.style.cursor = isHovering ? 'pointer' : 'default';
             } else {
                 container.style.cursor = 'grabbing';
@@ -1662,12 +1881,36 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 panOffsetWorldY = 0;
             }
 
+            currentPanelMode = 'planet';
             currentPlanetKey = key;
             let dp = document.getElementById('planet-dropdown');
+            
+            // RESET VZHĽADU BOXOV PRE PLANÉTU (Stanú sa neklikateľnými)
+            for(let i=1; i<=3; i++) {
+                let box = document.getElementById('stat-box-' + i);
+                if (box) {
+                    box.style.cursor = 'default';
+                    box.style.border = '1px solid rgba(51, 65, 85, 0.3)';
+                    box.style.background = 'rgba(30, 41, 59, 0.4)';
+                    box.onmouseover = null;
+                    box.onmouseout = null;
+                }
+            }
+            
+            // OBNOVENIE ORIGINÁLNYCH NADPISOV PRE PLANÉTY
+            document.getElementById('lbl-stat-dist').innerText = t.statDist;
+            document.getElementById('lbl-stat-speed').innerText = t.statSpeed;
+            document.getElementById('lbl-stat-period').innerText = t.statPeriod;
+            
             if (dp) dp.style.display = 'none';
             document.getElementById('planet-select-btn').innerText = t.planets[key];
 
             document.getElementById('selected-planet-name').innerText = t.planets[key];
+            
+            // OPRAVA: Vrátime späť malú grafickú ikonku planéty
+            let iconCvs = document.getElementById('title-icon-canvas');
+            if (iconCvs) iconCvs.style.display = 'block';
+            
             drawTitleIcon(key);
             document.getElementById('stat-dist').innerText = planetData[key].dist;
             document.getElementById('stat-speed').innerText = planetData[key].speed + " km/s";
@@ -2035,13 +2278,13 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             `${pad(displayDate.getDate())}.${pad(displayDate.getMonth()+1)}.${displayYear.toString().padStart(4, '0')}&nbsp;${eraStr}<br>${pad(displayDate.getHours())}:${pad(displayDate.getMinutes())}:${pad(displayDate.getSeconds())}`;
 
         // --- DYNAMICKÉ ZNAMENIE SLNKA ---
-        if (currentPlanetKey === "Sun") {
+        if (currentPlanetKey === "Sun" && currentPanelMode === 'planet') {
             let ePosR = getPlanetPos("Earth", days, 1);
             let sunDeg = (Math.atan2(-ePosR.y, -ePosR.x) * 180 / Math.PI + 360) % 360;
             let cSign = zodiacSigns[Math.floor(sunDeg / 30) % 12];
             let t = translations[currentLang];
             document.getElementById('selected-planet-name').innerHTML = t.planets["Sun"] + " <span style='font-size: 0.85rem; font-weight: normal; color: #cbd5e1; margin-left: 6px;'>• " + cSign.sym + " " + t.zodiac[cSign.id] + "</span>";
-        } else if (currentPlanetKey === "Moon") {
+        } else if (currentPlanetKey === "Moon" && currentPanelMode === 'planet') {
             // 1. Live aktualizácia samotnej obrázkovej ikonky
             drawTitleIcon("Moon");
             
@@ -2063,6 +2306,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
 
             horizonPositions = {}; 
             occupiedBoxes = []; // Vyčistíme plochu pred novým kreslením
+            zodiacHitboxes = {}; // Vyčistíme staré pozície znamení
             const t = translations[currentLang];
 
             // --- ZAČIATOK: OCHRANA UI PRVKOV A OKRAJOV OBRAZOVKY ---
@@ -2139,8 +2383,9 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     ctx.font = '18px sans-serif'; 
                     ctx.fillText(z.sym, symX, symY);
                     
-                    // 1. Zaregistrujeme ochranný box okolo SYMBOLU zverokruhu
+                    // 1. Zaregistrujeme ochranný box a TIEŽ dotykovú zónu (hitbox) pre kliknutie!
                     occupiedBoxes.push({ x: symX - 12, y: symY - 12, w: 24, h: 24 });
+                    
                     
                     if (cosR > 0.1) ctx.textAlign = 'left';
                     else if (cosR < -0.1) ctx.textAlign = 'right';
@@ -2169,6 +2414,13 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     else if (ctx.textBaseline === 'bottom') boxY -= 15;
 
                     occupiedBoxes.push({ x: boxX - 4, y: boxY - 4, w: textW + 8, h: 20 });
+                    
+                    // OPRAVA: Vytvoríme obrovskú dotykovú zónu, ktorá chytí symbol aj samotný nápis!
+                    zodiacHitboxes[z.id] = { 
+                        cx: symX, cy: symY, cr: 35, // Veľký kruh okolo symbolu
+                        rx1: boxX - 10, rx2: boxX + textW + 10, // Široký obdĺžnik okolo textu
+                        ry1: boxY - 10, ry2: boxY + 30
+                    };
                 });
                 
                 ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
@@ -2818,6 +3070,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             let rect = canvas.getBoundingClientRect();
             let clickX = e.clientX - rect.left; let clickY = e.clientY - rect.top;
             
+            // 1. Najprv skontrolujeme, či sme neklikli na Planétu
             let keys = Object.keys(horizonPositions).reverse();
             for (let key of keys) {
                 let hp = horizonPositions[key];
@@ -2827,6 +3080,21 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 if (inCircle || inRect) { 
                     selectPlanet(key); 
                     return; 
+                }
+            }
+            
+            // 2. Ak sme netrafili planétu, skontrolujeme Znamenia Zverokruhu!
+            if (typeof zodiacHitboxes !== 'undefined') {
+                for (let zKey in zodiacHitboxes) {
+                    let zh = zodiacHitboxes[zKey];
+                    // Skontrolujeme, či sme trafili kruh okolo symbolu ALEBO obdĺžnik okolo textu
+                    let inCircle = Math.hypot(clickX - zh.cx, clickY - zh.cy) <= zh.cr;
+                    let inRect = clickX >= zh.rx1 && clickX <= zh.rx2 && clickY >= zh.ry1 && clickY <= zh.ry2;
+                    
+                    if (inCircle || inRect) {
+                        selectZodiac(zKey); // Po kliknutí na znamenie aktivujeme panel
+                        return;
+                    }
                 }
             }
         });
@@ -3056,6 +3324,108 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         
         // Nastavenie UI s názvom miesta pri načítaní okna
         setTimeout(updateStartupLocationUI, 100);
+        
+            
+            // FUNKCIA PRE ZOBRAZENIE ZNAMENIA V SPODNOM PANELI
+        function selectZodiac(zKey) {
+            currentPanelMode = 'zodiac';
+            currentZodiacKey = zKey;
+            
+            let t = translations[currentLang];
+            let zData = (t.zodiacDetails || translations['en'].zodiacDetails)[zKey];
+            let zUI = t.zodiacUI || translations['en'].zodiacUI;
+            let cSign = zodiacSigns.find(s => s.id === zKey);
+
+            // 1. Zmeníme hlavičku panela na znamenie
+            document.getElementById('selected-planet-name').innerHTML = `<span style="color:#facc15; margin-right:6px; font-size:1.4rem;">${cSign.sym}</span> ${t.zodiac[zKey]}`;
+            
+            // OPRAVA: Skryjeme malú grafickú ikonku planéty, aby nezavadzala pri znamení
+            let iconCvs = document.getElementById('title-icon-canvas');
+            if (iconCvs) iconCvs.style.display = 'none';
+            
+            // 2. Prepíšeme prvé okno (odrežeme z inštrukcie to, čo je v zátvorke)
+            document.getElementById('lbl-stat-dist').innerText = zUI.duration.split(" (")[0];
+            document.getElementById('stat-dist').innerText = zData.date;
+            
+            // 3. Prepíšeme druhé okno (Hviezdy)
+            document.getElementById('lbl-stat-speed').innerText = zUI.constellation.split(" (")[0];
+            document.getElementById('stat-speed').innerText = zData.starsTitle;
+            
+            // 4. Prepíšeme tretie okno (Latinský Názov - preložené podľa zvoleného jazyka)
+            let latinTitle = "Latin Name";
+            if (currentLang === 'sk') latinTitle = "Latinský názov";
+            if (currentLang === 'cs') latinTitle = "Latinský název";
+            if (currentLang === 'de') latinTitle = "Lateinischer Name";
+            if (currentLang === 'es') latinTitle = "Nombre latino";
+            if (currentLang === 'fr') latinTitle = "Nom latin";
+            document.getElementById('lbl-stat-period').innerText = latinTitle;
+            document.getElementById('stat-period').innerText = zData.latin;
+
+            // 5. Zmeníme vizuál boxov na svietiace, klikacie tlačidlá
+            for(let i=1; i<=3; i++) {
+                let box = document.getElementById('stat-box-' + i);
+                if (box) {
+                    box.style.cursor = 'pointer';
+                    box.style.border = '1px solid #38bdf8';
+                    box.style.background = 'rgba(15, 23, 42, 0.8)';
+                    box.onmouseover = () => box.style.background = 'rgba(56, 189, 248, 0.2)';
+                    box.onmouseout = () => box.style.background = 'rgba(15, 23, 42, 0.8)';
+                }
+            }
+        }
+
+        // HISTORICKÉ MAPY SÚHVEZDÍ (Urania's Mirror - 1825)
+        const zodiacImages = {
+            Aries: "Urania's_Mirror_-_Aries_and_Musca_Borealis.jpg",
+            Taurus: "Urania's_Mirror_-_Taurus.jpg",
+            Gemini: "Urania's_Mirror_-_Gemini.jpg",
+            Cancer: "Urania's_Mirror_-_Cancer.jpg",
+            Leo: "Urania's_Mirror_-_Leo_Major_and_Leo_Minor.jpg",
+            Virgo: "Urania's_Mirror_-_Virgo.jpg",
+            Libra: "Urania's_Mirror_-_Libra.jpg",
+            Scorpio: "Urania's_Mirror_-_Scorpio.jpg",
+            Sagittarius: "Urania's_Mirror_-_Corona_Australis,_Scutum,_and_Sagittarius.jpg",
+            Capricorn: "Urania's_Mirror_-_Capricornus.jpg",
+            Aquarius: "Urania's_Mirror_-_Aquarius,_Piscis_Australis_&_Ballon_Aerostatique.jpg",
+            Pisces: "Urania's_Mirror_-_Pisces.jpg"
+        };
+
+        // FUNKCIA PO KLIKNUTÍ NA BOX ZNAMENIA (Otvorí popup okno s textom a obrázkom)
+        function handleStatClick(boxIndex) {
+            if (currentPanelMode !== 'zodiac') return; // Ak je tam planéta, boxy nie sú klikateľné
+            
+            let t = translations[currentLang];
+            let zData = (t.zodiacDetails || translations['en'].zodiacDetails)[currentZodiacKey];
+            let zUI = t.zodiacUI || translations['en'].zodiacUI;
+            
+            let title = "";
+            let content = "";
+            
+            if (boxIndex === 1) {
+                title = zUI.duration.split(" (")[0] + " - Fun Fact";
+                content = zData.fact;
+            } else if (boxIndex === 2) {
+                title = zData.starsTitle;
+                
+                // Načítame presný historický obrázok z nášho zoznamu
+                let imgName = zodiacImages[currentZodiacKey];
+                let imgUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${imgName}`;
+                
+                // Magický filter: invertuje farby a posunie odtieň, aby papier vyzeral ako nočná obloha!
+                content = zData.stars + `<br><br>
+                <div style="border-radius: 12px; overflow: hidden; border: 1px solid #38bdf8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); background: #0f172a; margin-top: 10px;">
+                    <img src="${imgUrl}" alt="${zData.latin}" style="width: 100%; display: block; filter: invert(0.9) hue-rotate(200deg) contrast(1.3) saturate(1.2);">
+                </div>`;
+                
+            } else if (boxIndex === 3) {
+                title = zData.latin + " - " + zUI.mythology.split(" (")[0];
+                content = zData.myth;
+            }
+
+            document.getElementById('zodiac-simple-title').innerText = title;
+            document.getElementById('zodiac-simple-content').innerHTML = content;
+            document.getElementById('zodiac-overlay').style.display = 'flex';
+        }
     </script>
 </body>
 </html>
