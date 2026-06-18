@@ -955,6 +955,20 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         let lastFrameTime = Date.now();
         const planetVisuals = {};
 
+        // --- PREMENNÉ PRE INTELIGENTNÉ NÁPISY ---
+        let labelTargets = {}; 
+        let occupiedBoxes = []; 
+
+        function checkCollision(box1, box2) {
+            const padding = 4; // Bezpečná zóna, aby sa texty nelepili úplne na seba
+            return !(
+                box1.x + box1.w + padding < box2.x - padding ||
+                box1.x - padding > box2.x + box2.w + padding ||
+                box1.y + box1.h + padding < box2.y - padding ||
+                box1.y - padding > box2.y + box2.h + padding
+            );
+        }
+
         function lerpAngleDeg(current, target, factor) {
             let diff = target - current;
             diff = ((diff % 360) + 360) % 360; 
@@ -2043,6 +2057,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
             horizonPositions = {}; 
+            occupiedBoxes = []; // Vyčistíme plochu pred novým kreslením
             const t = translations[currentLang];
             
             updateSunTimes();
@@ -2102,6 +2117,10 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 ctx.font = currentPlanetKey === "Sun" ? 'bold 14px sans-serif' : '14px sans-serif'; 
                 let textWidth = ctx.measureText(t.planets["Sun"]).width;
                 ctx.fillText(t.planets["Sun"], cx - textWidth/2, cy - 20 * zoom - 5);
+                
+                // Povieme systému, že tu je Slnko
+                occupiedBoxes.push({ x: cx - textWidth/2, y: cy - 20 * zoom - 19, w: textWidth, h: 14 });
+
                 horizonPositions["Sun"] = { 
                     cx: cx, cy: cy, cr: Math.max(20, 25 * zoom), 
                     rx1: cx - textWidth/2 - 5, rx2: cx + textWidth/2 + 5, 
@@ -2591,16 +2610,103 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 }
             }
             
-            ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#cbd5e1'; 
+            // --- ZAČIATOK: INTELIGENTNÉ UMIESTŇOVANIE NÁPISOV ---
             ctx.font = currentPlanetKey === key ? 'bold 14px sans-serif' : '14px sans-serif'; 
             let textWidth = ctx.measureText(t.planets[key]).width;
-            ctx.fillText(t.planets[key], px + pRadius + 8, py + 5);
+            let textHeight = 14; 
+            
+            // 1. Záchranné kruhy: namiesto 8 pozícií ich vygenerujeme 40 (stále ďalej od planéty)
+            let possiblePositions = [];
+            for (let ring = 0; ring < 5; ring++) {
+                let g = pRadius + 12 + (ring * 22); // Každý ďalší kruh je o 22px ďalej
+                possiblePositions.push(
+                    { x: px + g, y: py + 5 },                     // Vpravo
+                    { x: px - textWidth/2, y: py - g - 5 },       // Hore
+                    { x: px - textWidth - g, y: py + 5 },         // Vľavo
+                    { x: px - textWidth/2, y: py + g + 15 },      // Dole
+                    { x: px + g, y: py - g },                     // Vpravo Hore
+                    { x: px - textWidth - g, y: py - g },         // Vľavo Hore
+                    { x: px + g, y: py + g + 10 },                // Vpravo Dole
+                    { x: px - textWidth - g, y: py + g + 10 }     // Vľavo Dole
+                );
+            }
+
+            if (!labelTargets[key]) {
+                labelTargets[key] = { actualX: possiblePositions[0].x, actualY: possiblePositions[0].y, prefIdx: 0 };
+            }
+
+            let checkPosValid = (pos) => {
+                let testBox = { x: pos.x, y: pos.y - textHeight, w: textWidth, h: textHeight };
+                for (let ob of occupiedBoxes) {
+                    if (checkCollision(testBox, ob)) return false;
+                }
+                for (let pKey in planetData) {
+                    let p2Pos = getPlanetPos(pKey, days, zoom);
+                    let p2Rad = planetData[pKey].size * zoom;
+                    if (pKey === "Sun") p2Rad = 20 * zoom; 
+                    let planetBox = { x: cx + p2Pos.x - p2Rad - 2, y: cy + p2Pos.y - p2Rad - 2, w: p2Rad*2 + 4, h: p2Rad*2 + 4 };
+                    if (checkCollision(testBox, planetBox)) return false;
+                }
+                return true;
+            };
+
+            let targetPos = possiblePositions[0];
+            let bestIdx = labelTargets[key].prefIdx;
+            let found = false;
+
+            // 2. Logika Návratu: Neustále pokukujeme, či sa náhodou neuvoľnila najlepšia pozícia (0)
+            if (bestIdx !== 0 && checkPosValid(possiblePositions[0])) {
+                targetPos = possiblePositions[0];
+                labelTargets[key].prefIdx = 0;
+                found = true;
+            } else if (checkPosValid(possiblePositions[bestIdx])) {
+                targetPos = possiblePositions[bestIdx];
+                found = true;
+            } else {
+                // 3. Hľadanie miesta: Prejdeme všetkých 40 možností (od najbližších po najvzdialenejšie)
+                for (let i = 0; i < possiblePositions.length; i++) {
+                    if (checkPosValid(possiblePositions[i])) {
+                        targetPos = possiblePositions[i];
+                        labelTargets[key].prefIdx = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) targetPos = possiblePositions[bestIdx]; // Totálny fallback
+            }
+
+            occupiedBoxes.push({ x: targetPos.x, y: targetPos.y - textHeight, w: textWidth, h: textHeight });
+
+            // 4. LERP (Znížená rýchlosť pre maslový pohyb)
+            labelTargets[key].actualX += (targetPos.x - labelTargets[key].actualX) * 0.05;
+            labelTargets[key].actualY += (targetPos.y - labelTargets[key].actualY) * 0.05;
+
+            let actX = labelTargets[key].actualX;
+            let actY = labelTargets[key].actualY;
+
+            // 5. Vodiaca čiara
+            let distFromPlanet = Math.hypot(actX + textWidth/2 - px, actY - textHeight/2 - py);
+            if (distFromPlanet > pRadius + 15) {
+                ctx.beginPath();
+                ctx.strokeStyle = currentPlanetKey === key ? 'rgba(56, 189, 248, 0.8)' : 'rgba(203, 213, 225, 0.6)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.moveTo(px, py);
+                ctx.lineTo(actX + textWidth/2, actY - textHeight/2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // 6. Kreslenie textu a aktívnych zón
+            ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#cbd5e1'; 
+            ctx.fillText(t.planets[key], actX, actY);
             
             horizonPositions[key] = { 
                 cx: px, cy: py, cr: Math.max(10, pRadius + 6),
-                rx1: px + pRadius + 5, rx2: px + pRadius + 12 + textWidth, 
-                ry1: py - 10, ry2: py + 10 
+                rx1: actX - 5, rx2: actX + textWidth + 5, 
+                ry1: actY - textHeight - 4, ry2: actY + 4 
             };
+            // --- KONIEC: INTELIGENTNÉ UMIESTŇOVANIE ---
         }
 
         canvas.addEventListener('click', (e) => {
