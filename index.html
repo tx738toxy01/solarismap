@@ -673,7 +673,8 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
 
         let currentLang = localStorage.getItem('solaris_lang') || 'en';
         let currentEra = 'AD'; 
-        let currentPlanetKey = "Halley";
+        // OPRAVA: Okamžite načítame uloženú planétu (alebo Slnko), aby nevznikal preblik s kométou
+        let currentPlanetKey = localStorage.getItem('solaris_startup_planet') || 'Sun';
         let activeTab = "system";
 
         // ---- GLOBÁLNE PREMENNÉ PRE LOKÁCIU ---- //
@@ -1002,7 +1003,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             Moon:    { color: "#e2e8f0", size: 4,  radius: 18,  period: 27.32,  speed: "1.0",  dist: "0.002 AU", baseAngle: 0,   altOffset: 5,  H: -12.7, isVisibleNakedEye: true },
             Mercury: { color: "#9ca3af", size: 4,  radius: 45,  period: 87.97,  speed: "47.4", dist: "0.39 AU",  baseAngle: 1.2, altOffset: 2,  H: -0.6,  isVisibleNakedEye: true },
             Venus:   { color: "#fbbf24", size: 7,  radius: 65,  period: 224.7,  speed: "35.0", dist: "0.72 AU",  baseAngle: 2.5, altOffset: 8,  H: -4.4,  isVisibleNakedEye: true },
-            Earth:   { color: "#3b82f6", size: 8,  radius: 90,  period: 365.26, speed: "29.8", dist: "1.00 AU",  baseAngle: 0,   altOffset: 0,  H: -3.8,  isVisibleNakedEye: false },
+            Earth:   { color: "#3b82f6", size: 8,  radius: 90,  period: 365.26, speed: "29.8", dist: "1.00 AU",  baseAngle: 0,   altOffset: 0,  H: -3.8,  isVisibleNakedEye: true },
             Mars:    { color: "#ef4444", size: 6,  radius: 120, period: 686.98, speed: "24.1", dist: "1.52 AU",  baseAngle: 4.1, altOffset: 4,  H: -1.5,  isVisibleNakedEye: true },
             Jupiter: { color: "#f59e0b", size: 16, radius: 170, period: 4332.59, speed: "13.1", dist: "5.20 AU",  baseAngle: 0.8, altOffset: 6,  H: -9.4,  isVisibleNakedEye: true },
             Saturn:  { color: "#eab308", size: 13, radius: 220, period: 10759.22, speed: "9.7",  dist: "9.58 AU",  baseAngle: 5.3, altOffset: 2,  H: -8.9,  isVisibleNakedEye: true, hasRings: true },
@@ -1270,6 +1271,8 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         resizeCanvas();
 
         let zoom = 1.0, targetZoom = 1.0;
+        let animSpeedZoom = 0.08; // Normálna svižná rýchlosť (približovanie)
+        let animSpeedPan = 0.05;  // Normálna svižná rýchlosť (posúvanie kamery)
         let zoomStack = []; 
         let offsetX = 0, targetOffsetX = 0;
         let offsetY = 0, targetOffsetY = 0;
@@ -1983,8 +1986,9 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 }
             }
 
-            zoom += (targetZoom - zoom) * 0.08;
-            trackingWeight += (targetTrackingWeight - trackingWeight) * 0.08;
+            // OPRAVA: Použitie premenlivej rýchlosti animácie
+            zoom += (targetZoom - zoom) * animSpeedZoom;
+            trackingWeight += (targetTrackingWeight - trackingWeight) * animSpeedZoom;
 
             if (isTrackingPlanet && activeTab === "system") {
                 let pPosRaw = getPlanetPos(currentPlanetKey, days, 1);
@@ -1993,8 +1997,8 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 let exactTargetWorldX = oPosRaw.x + (pPosRaw.x - oPosRaw.x) * trackingWeight;
                 let exactTargetWorldY = oPosRaw.y + (pPosRaw.y - oPosRaw.y) * trackingWeight;
 
-                panOffsetWorldX += (0 - panOffsetWorldX) * 0.05;
-                panOffsetWorldY += (0 - panOffsetWorldY) * 0.05;
+                panOffsetWorldX += (0 - panOffsetWorldX) * animSpeedPan;
+                panOffsetWorldY += (0 - panOffsetWorldY) * animSpeedPan;
 
                 camWorldX = exactTargetWorldX + panOffsetWorldX;
                 camWorldY = exactTargetWorldY + panOffsetWorldY;
@@ -2005,8 +2009,8 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 targetOffsetX = offsetX;
                 targetOffsetY = offsetY;
             } else if (activeTab === "system") {
-                offsetX += (targetOffsetX - offsetX) * 0.08;
-                offsetY += (targetOffsetY - offsetY) * 0.08;
+                offsetX += (targetOffsetX - offsetX) * animSpeedZoom;
+                offsetY += (targetOffsetY - offsetY) * animSpeedZoom;
                 camWorldX = -offsetX / zoom;
                 camWorldY = -offsetY / zoom;
             }
@@ -2060,6 +2064,44 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             horizonPositions = {}; 
             occupiedBoxes = []; // Vyčistíme plochu pred novým kreslením
             const t = translations[currentLang];
+
+            // --- ZAČIATOK: OCHRANA UI PRVKOV A OKRAJOV OBRAZOVKY ---
+            let cw = canvas.clientWidth;
+            let ch = canvas.clientHeight;
+            
+            // 1. Ochrana okrajov (neviditeľné steny, isEdge značka)
+            occupiedBoxes.push({ x: -2000, y: -2000, w: cw + 4000, h: 2000, isEdge: true }); 
+            occupiedBoxes.push({ x: -2000, y: ch, w: cw + 4000, h: 2000, isEdge: true });    
+            occupiedBoxes.push({ x: -2000, y: -2000, w: 2000, h: ch + 4000, isEdge: true }); 
+            occupiedBoxes.push({ x: cw, y: -2000, w: 2000, h: ch + 4000, isEdge: true });    
+
+            // 2. Ochrana fyzických tlačidiel
+            let uiElements = [
+                document.querySelector('header'),
+                document.getElementById('main-controls-panel'),
+                document.getElementById('zoom-ctrl-wrapper'),
+                document.querySelector('.tab-menu'),
+                document.getElementById('sun-times-panel'),
+                document.getElementById('jupiter-radar-panel')
+            ];
+
+            // OPRAVA: Zistíme presnú pozíciu plátna, aby sme vyrovnali posun (napríklad kvôli hlavičke)
+            let cvsRect = canvas.getBoundingClientRect();
+
+            for (let el of uiElements) {
+                if (el && window.getComputedStyle(el).display !== 'none') {
+                    let rect = el.getBoundingClientRect();
+                    occupiedBoxes.push({ 
+                        // Odpočítame offset plátna, aby sa súradnice UI zhodovali so súradnicami kreslenia
+                        x: rect.left - cvsRect.left - 10, 
+                        y: rect.top - cvsRect.top - 10, 
+                        w: rect.width + 20, 
+                        h: rect.height + 20,
+                        isUI: true 
+                    });
+                }
+            }
+            // --- KONIEC: OCHRANA UI PRVKOV ---
             
             updateSunTimes();
 
@@ -2088,11 +2130,17 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     let cosR = Math.cos(r);
                     let sinR = Math.sin(r);
                     
+                    let symX = zx + ringRad * cosR;
+                    let symY = zy + ringRad * sinR;
+
                     ctx.textAlign = 'center'; 
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
                     ctx.font = '18px sans-serif'; 
-                    ctx.fillText(z.sym, zx + ringRad * cosR, zy + ringRad * sinR);
+                    ctx.fillText(z.sym, symX, symY);
+                    
+                    // 1. Zaregistrujeme ochranný box okolo SYMBOLU zverokruhu
+                    occupiedBoxes.push({ x: symX - 12, y: symY - 12, w: 24, h: 24 });
                     
                     if (cosR > 0.1) ctx.textAlign = 'left';
                     else if (cosR < -0.1) ctx.textAlign = 'right';
@@ -2102,9 +2150,25 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     else if (sinR < -0.1) ctx.textBaseline = 'bottom';
                     else ctx.textBaseline = 'middle';
 
+                    let textX = zx + (ringRad + 16) * cosR;
+                    let textY = zy + (ringRad + 16) * sinR;
+
                     ctx.fillStyle = 'rgba(148, 163, 184, 0.85)';
                     ctx.font = '15px sans-serif'; 
-                    ctx.fillText(t.zodiac[z.id], zx + (ringRad + 16) * cosR, zy + (ringRad + 16) * sinR);
+                    let zodText = t.zodiac[z.id];
+                    ctx.fillText(zodText, textX, textY);
+
+                    // 2. Vypočítame a zaregistrujeme ochranný box okolo TEXTU zverokruhu
+                    let textW = ctx.measureText(zodText).width;
+                    let boxX = textX;
+                    if (ctx.textAlign === 'center') boxX -= textW / 2;
+                    else if (ctx.textAlign === 'right') boxX -= textW;
+
+                    let boxY = textY;
+                    if (ctx.textBaseline === 'middle') boxY -= 8;
+                    else if (ctx.textBaseline === 'bottom') boxY -= 15;
+
+                    occupiedBoxes.push({ x: boxX - 4, y: boxY - 4, w: textW + 8, h: 20 });
                 });
                 
                 ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
@@ -2612,13 +2676,21 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             }
             
             // --- ZAČIATOK: INTELIGENTNÉ UMIESTŇOVANIE NÁPISOV ---
+            // 0. Kontrola viditeľnosti: Nápis zmizne IBA ak je planéta na 100% mimo obrazovky
+            let isHidden = false;
+
+            if (px + pRadius < 0 || px - pRadius > canvas.clientWidth || py + pRadius < 0 || py - pRadius > canvas.clientHeight) {
+                isHidden = true; 
+            } 
+            if (isHidden) return; // Ukončíme kreslenie nápisu, len ak je planéta úplne preč
+
             ctx.font = currentPlanetKey === key ? 'bold 14px sans-serif' : '14px sans-serif'; 
             let textWidth = ctx.measureText(t.planets[key]).width;
             let textHeight = 14; 
             
-            // 1. Záchranné kruhy: namiesto 8 pozícií ich vygenerujeme 40 (stále ďalej od planéty)
+            // 1. Záchranné kruhy: vygenerujeme až 64 pozícií (8 prstencov)
             let possiblePositions = [];
-            for (let ring = 0; ring < 5; ring++) {
+            for (let ring = 0; ring < 8; ring++) {
                 let g = pRadius + 12 + (ring * 22); // Každý ďalší kruh je o 22px ďalej
                 possiblePositions.push(
                     { x: px + g, y: py + 5 },                     // Vpravo
@@ -2636,17 +2708,22 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 labelTargets[key] = { actualX: possiblePositions[0].x, actualY: possiblePositions[0].y, prefIdx: 0 };
             }
 
-            let checkPosValid = (pos) => {
+            // Test kolízií s funkciou "núdzového režimu"
+            let checkPosValid = (pos, emergencyMode = false) => {
                 let testBox = { x: pos.x, y: pos.y - textHeight, w: textWidth, h: textHeight };
                 for (let ob of occupiedBoxes) {
+                    // V núdzovom režime ignorujeme všetko OKREM tvrdých stien (tlačidiel a okrajov obrazovky)
+                    if (emergencyMode && !ob.isUI && !ob.isEdge) continue; 
                     if (checkCollision(testBox, ob)) return false;
                 }
-                for (let pKey in planetData) {
-                    let p2Pos = getPlanetPos(pKey, days, zoom);
-                    let p2Rad = planetData[pKey].size * zoom;
-                    if (pKey === "Sun") p2Rad = 20 * zoom; 
-                    let planetBox = { x: cx + p2Pos.x - p2Rad - 2, y: cy + p2Pos.y - p2Rad - 2, w: p2Rad*2 + 4, h: p2Rad*2 + 4 };
-                    if (checkCollision(testBox, planetBox)) return false;
+                if (!emergencyMode) {
+                    for (let pKey in planetData) {
+                        let p2Pos = getPlanetPos(pKey, days, zoom);
+                        let p2Rad = planetData[pKey].size * zoom;
+                        if (pKey === "Sun") p2Rad = 20 * zoom; 
+                        let planetBox = { x: cx + p2Pos.x - p2Rad - 2, y: cy + p2Pos.y - p2Rad - 2, w: p2Rad*2 + 4, h: p2Rad*2 + 4 };
+                        if (checkCollision(testBox, planetBox)) return false;
+                    }
                 }
                 return true;
             };
@@ -2655,7 +2732,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             let bestIdx = labelTargets[key].prefIdx;
             let found = false;
 
-            // 2. Logika Návratu: Neustále pokukujeme, či sa náhodou neuvoľnila najlepšia pozícia (0)
+            // 2. Bežná logika hľadania (snažíme sa vyhnúť všetkému)
             if (bestIdx !== 0 && checkPosValid(possiblePositions[0])) {
                 targetPos = possiblePositions[0];
                 labelTargets[key].prefIdx = 0;
@@ -2664,7 +2741,6 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 targetPos = possiblePositions[bestIdx];
                 found = true;
             } else {
-                // 3. Hľadanie miesta: Prejdeme všetkých 40 možností (od najbližších po najvzdialenejšie)
                 for (let i = 0; i < possiblePositions.length; i++) {
                     if (checkPosValid(possiblePositions[i])) {
                         targetPos = possiblePositions[i];
@@ -2673,12 +2749,40 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                         break;
                     }
                 }
-                if (!found) targetPos = possiblePositions[bestIdx]; // Totálny fallback
+                
+                // 3. NÚDZOVÝ REŽIM: Ak je úplne plno, nájdeme aspoň miesto, ktoré nezasahuje do UI alebo okrajov
+                if (!found) {
+                    for (let i = 0; i < possiblePositions.length; i++) {
+                        let pos = possiblePositions[i];
+                        let testBox = { x: pos.x, y: pos.y - textHeight, w: textWidth, h: textHeight };
+                        let hitUI = false;
+
+                        // Skontrolujeme, či táto pozícia nezasahuje do UI prvkov alebo okrajov (aj za cenu prekrytia planét)
+                        for (let ob of occupiedBoxes) {
+                            if ((ob.isUI || ob.isEdge) && checkCollision(testBox, ob)) {
+                                hitUI = true;
+                                break;
+                            }
+                        }
+
+                        if (!hitUI) {
+                            targetPos = pos;
+                            labelTargets[key].prefIdx = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Ak sa ani v núdzovom režime nenašlo miesto (čiže každá možná pozícia zasahuje do UI/okraja), nevykresľuj
+                if (!found) {
+                    return; 
+                } 
             }
 
             occupiedBoxes.push({ x: targetPos.x, y: targetPos.y - textHeight, w: textWidth, h: textHeight });
 
-            // 4. LERP (Znížená rýchlosť pre maslový pohyb)
+            // 4. LERP
             labelTargets[key].actualX += (targetPos.x - labelTargets[key].actualX) * 0.05;
             labelTargets[key].actualY += (targetPos.y - labelTargets[key].actualY) * 0.05;
 
@@ -2777,15 +2881,39 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         populateSettings();
         applyTranslations();
         setMode('real'); 
+
+        // 1. Okamžite nastavíme UI aj pamäť aplikácie (bez blikania nápisov)
+        selectPlanet(startupPlanet, true);
+
+        // 2. Vypočítame počiatočný zoom tak, aby ukázal presne prstenec zverokruhu (priemer 850)
+        let minDim = Math.min(window.innerWidth, window.innerHeight);
+        let zodiacZoom = (minDim - 40) / 850; 
         
+        // Nastavíme kameru na Slnko so záberom na zverokruh
+        zoom = zodiacZoom; 
+        targetZoom = zodiacZoom;
+        offsetX = 0; 
+        offsetY = 0;
+        isTrackingPlanet = false;
+
+        // Umelo spomalíme rýchlosť LEN pre prvý nálet
+        animSpeedZoom = 0.02; 
+        animSpeedPan = 0.02;
+
+        // 3. Spustíme majestátny prelet na planétu
         setTimeout(() => {
             resizeCanvas();
-            // Aplikácia si po štarte načíta planétu z tvojich nastavení
-            selectPlanet(startupPlanet, true);
-            
-            // Zobrazí inštruktážny toast v aktuálnom jazyku
+            selectPlanet(startupPlanet); 
             showToast(translations[currentLang].toastTapObject);
-        }, 800);
+            
+            // Po 3.5 sekundách (keď kamera plynulo doletí do cieľa) prepneme rýchlosť späť na bežnú
+            setTimeout(() => {
+                animSpeedZoom = 0.08;
+                animSpeedPan = 0.05;
+            }, 3500);
+
+        }, 500); 
+
         requestAnimationFrame(updateAndRender);
 
         // Funkcia pre otváranie a zatváranie okna sledovania cez ℹ️ ikonku
