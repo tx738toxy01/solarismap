@@ -98,12 +98,15 @@
             z-index: 2000; 
         }
         
-        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 240px; z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 350px; max-width: 90vw; z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .radar-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
         .radar-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
         .radar-row span:last-child { font-family: monospace; font-weight: bold; color: #fff; }
 
-        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(2, 132, 199, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; }
+        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #ef4444; color: #ffffff; padding: 14px 24px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.6); white-space: nowrap; }
+        
+        .radar-action-btn { transition: all 0.15s ease-in-out; }
+        .radar-action-btn:active { transform: scale(0.85) !important; filter: brightness(1.2); }
 
         /* ČISTÝ ZADÁVAČ DÁTUMU (Bez rolovania) */
         .picker-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
@@ -196,16 +199,28 @@
             </div>
         </div>
     </div>
-        <div id="jupiter-radar-panel" style="position: absolute;">
+        <div id="jupiter-radar-panel">
             <button onclick="toggleRadarPanel(event)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
             <div class="radar-title" id="radar-planet-title" style="padding-right: 20px;">📡 Sledovanie: Zem</div>
             <div class="radar-row"><span id="lbl-az">Azimut (Smer):</span><span id="jup-az">---.-°</span></div>
             <div class="radar-row"><span id="lbl-alt">Výška nad obzorom:</span><span id="jup-alt">---.-°</span></div>
             
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; flex-direction: column; gap: 4px;">
-                <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
-                <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold;">---</span>
-                <span id="weather-link" onclick="openWeatherModal()" style="font-size: 0.85rem; color: #38bdf8; cursor: pointer; text-decoration: underline; margin-top: 2px; display: none;">(aktuálne podmienky)</span>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; justify-content: space-between; align-items: stretch; gap: 10px;">
+                <div style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
+                    <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
+                    <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold; line-height: 1.2;">---</span>
+                </div>
+                
+                <div style="display: flex; gap: 6px; align-items: stretch;">
+                    <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 65px; opacity: 0.4;">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-bottom: 3px;"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                        <span id="lbl-radar-weather">Počasie</span>
+                    </button>
+                    <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid #0284c7; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 65px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-bottom: 3px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span id="lbl-radar-now">Teraz</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -228,8 +243,6 @@
                 <span id="val-sunset">--:--</span>
             </div>
         </div>
-
-        <button class="btn-teraz" id="btn-today-horizon" onclick="resetToToday()" style="position: absolute; top: 100px; right: 20px; width: auto; padding: 6px 16px; font-size: 0.8rem; display: none; z-index: 5;">Teraz</button>
 
         <div id="canvas-container">
             <canvas id="solarCanvas"></canvas>
@@ -340,11 +353,23 @@
                     <select id="setting-lang-select" onchange="changeLanguage(this.value)" class="num-input" style="text-align: left; padding: 8px 12px; cursor: pointer;">
                         </select>
                 </div>
-
+                
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <span class="input-label" id="lbl-settings-startup" style="text-align: left;">Objekt po štarte</span>
                     <select id="setting-startup-select" onchange="changeStartupPlanet(this.value)" class="num-input" style="text-align: left; padding: 8px 12px; cursor: pointer;">
                         </select>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <span class="input-label" id="lbl-settings-location" style="text-align: left;">Počiatočné miesto</span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="btn-set-startup" class="num-input" style="flex-grow: 1; text-align: left; padding: 8px 12px; cursor: pointer; font-size: 0.9rem; border: 1px solid #475569;">
+                            📍 <span id="startup-location-name">Predvolené (Podľa GPS)</span>
+                        </button>
+                        <button id="btn-clear-startup" style="display: none; background: #ef4444; border: 1px solid #ef4444; color: white; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;" title="Vymazať">
+                            ✖
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -356,7 +381,13 @@
             <div class="picker-close-wrapper">
                 <button class="picker-close" onclick="closeLocPicker()">×</button>
             </div>
-
+            
+            <div id="search-current-location-wrapper" style="margin-bottom: 12px; width: 100%;">
+                <button id="btn-search-current" class="num-input" style="width: 100%; background: #0284c7; color: white; border: none; font-weight: bold; cursor: pointer; padding: 10px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    📍 <span id="lbl-use-current">Použiť moju aktuálnu polohu</span>
+                </button>
+            </div>
+            
             <div class="search-box">
                 <input type="text" id="loc-search-inp" class="search-input" placeholder="Hľadať miesto..." oninput="onSearchInput()">
                 <button class="btn-gps-inline" onclick="requestGPS()" title="Zistiť moju presnú polohu">📍</button>
@@ -396,7 +427,7 @@
             if (qm && qm.style.display === 'block') qm.style.display = 'none';
         });
 
-        const langNames = { en: "English", de: "Deutsch", fr: "Français", es: "Español", sk: "Slovenčina", cs: "Čeština", zh: "中文", hi: "हिन्दी" };
+        const langNames = { en: "English", de: "Deutsch", fr: "Français", es: "Español", sk: "Slovenčina", cs: "Čeština", zh: "中文", hi: "हिन्दी", ja: "日本語", ko: "한국어" };
 
         const translations = {
             sk: {
@@ -566,8 +597,58 @@
                 weatherVerdicts: ["⚠️ चरम मौसम। अंदर रहें।", "🌌 खगोलीय स्वर्ग। बिल्कुल सही।", "✨ क्रिस्टल साफ़ हवा। उत्कृष्ट।", "🔭 शानदार रात। मामूली बादल।", "🪐 आशाजनक शाम। कभी-कभी बादल।", "🌓 बदलता आसमान। लुका-छिपी।", "🌥️ कठिन परिस्थितियां। केवल चमकीली वस्तुएं।", "🛑 खराब दृष्टिकोण। निराशाजनक।", "🌫️ गंभीर बादल। कोई चांस नहीं।", "⬛ पूरी तरह से घने बादल। शून्य दृश्यता।"],
                 searchPlaceholder: "स्थान खोजें...", searchSats: "उपग्रहों की खोज...", searchWait: "खोज रहे हैं...", searchTime: "स्थानीय समय प्राप्त कर रहा है...", searchError: "कनेक्शन त्रुटि.", searchNoRes: "कुछ नहीं मिला.", searchAlert: "स्थान प्राप्त करने में विफल.", searchMyLoc: "मेरा स्थान",
                 locPresets: [ { t: "ब्रातिस्लावा", s: "स्लोवाकिया" }, { t: "सिडनी", s: "ऑस्ट्रेलिया (जून में सर्दी)" }, { t: "न्यूयॉर्क", s: "अमेरीका" }, { t: "टोक्यो", s: "जापान" }, { t: "ट्रोम्सो", s: "नॉर्वे (मध्यरात्रि का सूर्य)" }, { t: "क्विटो", s: "इक्वाडोर (भूमध्य रेखा)" } ]
+            },
+            ja: {
+                tabSystem: "太陽系マップ", tabHorizon: "地平線", radarTracking: "📡 追跡中: ", radarAz: "方位角 (方向):", radarAlt: "高度:", radarVis: "肉眼での見え方:",
+                visNoHor: "いいえ (地平線下)", visNoSun: "いいえ (太陽の光が強すぎる)", visNoFar: "いいえ (遠すぎる)", visNoMoonPhase: "いいえ (新月)", visNoHubble: "いいえ (ハッブル望遠鏡が必要)",
+                visYesBright: "はい (空で輝いている)", visYesNormal: "はい (はっきりと見える)", visYesFaint: "はい (かろうじて見える)", visYesDayMoon: "はい (昼間でも見える)",
+                statDist: "距離", statSpeed: "速度", statPeriod: "公転周期", btnToday: "現在", swipeTip: "スワイプして時間を変更 (← 過去 | 未来 →)",
+                periodY: " 年", periodD: " 日", pickerTitle: "日時 <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(年 -9999 から +9999)</small>", pickerCancel: "キャンセル", pickerConfirm: "確認",
+                pickerDay: "日", pickerMonth: "月", pickerYear: "年", pickerHour: "時", pickerMinute: "分",
+                settingsTitle: "⚙️ 設定", settingsLang: "言語", settingsStartup: "起動時の天体", quickSelect: "クイック選択",
+                weatherLink: "(観測条件)", homePlanet: "母星 (現在地)", cometDay: "すごい！昼間でも見える！", cometBright: "はい (非常に明るい)", cometFaint: "はい (かすかに見える)",
+                toastMaxZoom: "おめでとうございます、着陸しました！", toastMinZoom: "おめでとうございます、神の視点です！",
+                cardinals: ["北 (0°)", "東 (90°)", "南 (180°)", "西 (270°)", "北 (360°)"],
+                planets: { Sun: "太陽", Moon: "月", Mercury: "水星", Venus: "金星", Earth: "地球", Mars: "火星", Jupiter: "木星", Saturn: "土星", Uranus: "天王星", Neptune: "海王星", Pluto: "冥王星", Halley: "ハレー彗星" },
+                zodiac: { Aries: "牡羊座", Taurus: "牡牛座", Gemini: "双子座", Cancer: "蟹座", Leo: "獅子座", Virgo: "乙女座", Libra: "天秤座", Scorpio: "蠍座", Sagittarius: "射手座", Capricorn: "山羊座", Aquarius: "水瓶座", Pisces: "魚座" },
+                moonPhases: ["新月", "三日月", "上弦の月", "十三夜月", "満月", "寝待月", "下弦の月", "二十六夜月"],
+                weatherTitle: "📡 大気条件", weatherLoading: "衛星データを読み込み中... ⏳", weatherLoc: "場所", weatherTemp: "気温", weatherWind: "風", weatherHum: "湿度", weatherEval: "天文評価", weatherError: "接続に失敗しました。❌",
+                weatherVerdicts: ["⚠️ 異常気象。屋内にいてください。", "🌌 天文の楽園。完璧です。", "✨ 澄み切った空気。素晴らしい。", "🔭 素晴らしい夜。少し雲があります。", "🪐 有望な夜。時々曇り。", "🌓 変わりやすい空。かくれんぼ。", "🌥️ 困難な条件。明るい天体のみ。", "🛑 絶望的。フラストレーション。", "🌫️ 厚い雲。チャンスなし。", "⬛ 完全な曇り。視界ゼロ。"],
+                searchPlaceholder: "場所を検索...", searchSats: "衛星を検索中...", searchWait: "検索中...", searchTime: "現地時間を取得中...", searchError: "接続エラー。", searchNoRes: "見つかりませんでした。", searchAlert: "位置情報の取得に失敗しました。", searchMyLoc: "現在地",
+                locPresets: [ { t: "ブラチスラヴァ", s: "スロバキア" }, { t: "シドニー", s: "オーストラリア (6月の冬)" }, { t: "ニューヨーク", s: "アメリカ" }, { t: "東京", s: "日本" }, { t: "トロムソ", s: "ノルウェー (白夜)" }, { t: "キト", s: "エクアドル (赤道)" } ]
+            },
+            ko: {
+                tabSystem: "태양계 지도", tabHorizon: "지평선", radarTracking: "📡 추적 중: ", radarAz: "방위각 (방향):", radarAlt: "고도:", radarVis: "육안 가시성:",
+                visNoHor: "아니요 (지평선 아래)", visNoSun: "아니요 (강한 햇빛)", visNoFar: "아니요 (너무 멉니다)", visNoMoonPhase: "아니요 (초승달 단계)", visNoHubble: "아니요 (허블 망원경 필요)",
+                visYesBright: "예 (하늘에서 밝게 빛남)", visYesNormal: "예 (선명하게 보임)", visYesFaint: "예 (희미하게 보임)", visYesDayMoon: "예 (낮에도 보임)",
+                statDist: "거리", statSpeed: "속도", statPeriod: "공전 주기", btnToday: "현재", swipeTip: "스와이프하여 시간 변경 (← 과거 | 미래 →)",
+                periodY: " 년", periodD: " 일", pickerTitle: "날짜 및 시간 <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(연도 -9999 ~ +9999)</small>", pickerCancel: "취소", pickerConfirm: "확인",
+                pickerDay: "일", pickerMonth: "월", pickerYear: "년", pickerHour: "시", pickerMinute: "분",
+                settingsTitle: "⚙️ 설정", settingsLang: "언어", settingsStartup: "시작 천체", quickSelect: "빠른 선택",
+                weatherLink: "(관측 조건)", homePlanet: "모행성 (현재 위치)", cometDay: "와우! 낮에도 보입니다!", cometBright: "예 (매우 밝음)", cometFaint: "예 (희미하게 보임)",
+                toastMaxZoom: "축하합니다, 착륙했습니다!", toastMinZoom: "축하합니다, 신의 시점입니다!",
+                cardinals: ["북 (0°)", "동 (90°)", "남 (180°)", "서 (270°)", "북 (360°)"],
+                planets: { Sun: "태양", Moon: "달", Mercury: "수성", Venus: "금성", Earth: "지구", Mars: "화성", Jupiter: "목성", Saturn: "토성", Uranus: "천왕성", Neptune: "해왕성", Pluto: "명왕성", Halley: "핼리 혜성" },
+                zodiac: { Aries: "양자리", Taurus: "황소자리", Gemini: "쌍둥이자리", Cancer: "게자리", Leo: "사자자리", Virgo: "처녀자리", Libra: "천칭자리", Scorpio: "전갈자리", Sagittarius: "궁수자리", Capricorn: "염소자리", Aquarius: "물병자리", Pisces: "물고기자리" },
+                moonPhases: ["초승달", "초승달", "상현달", "상현 망월", "보름달", "하현 망월", "하현달", "그믐달"],
+                weatherTitle: "📡 대기 조건", weatherLoading: "위성 데이터 불러오는 중... ⏳", weatherLoc: "위치", weatherTemp: "온도", weatherWind: "바람", weatherHum: "습도", weatherEval: "천문학적 평가", weatherError: "연결 실패. ❌",
+                weatherVerdicts: ["⚠️ 극한 날씨. 실내에 머무르세요.", "🌌 천문학적 낙원. 완벽합니다.", "✨ 맑은 공기. 아주 좋습니다.", "🔭 멋진 밤. 약간의 구름.", "🪐 유망한 저녁. 가끔 흐림.", "🌓 변화하는 하늘. 숨바꼭질.", "🌥️ 어려운 조건. 밝은 천체만.", "🛑 절망적. 좌절.", "🌫️ 두꺼운 구름. 기회 없음.", "⬛ 완전히 흐림. 가시성 제로."],
+                searchPlaceholder: "위치 검색...", searchSats: "위성 검색 중...", searchWait: "검색 중...", searchTime: "현지 시간 가져오는 중...", searchError: "연결 오류.", searchNoRes: "결과 없음.", searchAlert: "위치를 가져올 수 없습니다.", searchMyLoc: "내 위치",
+                locPresets: [ { t: "브라티슬라바", s: "슬로바키아" }, { t: "시드니", s: "호주 (6월의 겨울)" }, { t: "뉴욕", s: "미국" }, { t: "도쿄", s: "일본" }, { t: "트롬쇠", s: "노르웨이 (백야)" }, { t: "키토", s: "에콰도르 (적도)" } ]
             }
         };
+
+        // Pridanie nových prekladov (Krok 3)
+        Object.assign(translations.sk, { settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie" });
+        Object.assign(translations.cs, { settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontem, vyber jiný objekt.", radarWeatherBtn: "Počasí" });
+        Object.assign(translations.en, { settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather" });
+        Object.assign(translations.de, { settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter" });
+        Object.assign(translations.fr, { settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo" });
+        Object.assign(translations.es, { settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima" });
+        Object.assign(translations.zh, { settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气" });
+        Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम" });
+        Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気" });
+        Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨" });
 
         const zodiacSigns = [
             { id: "Aries", sym: "♈", angle: 0 }, { id: "Taurus", sym: "♉", angle: 30 },
@@ -584,6 +665,9 @@
         let activeTab = "system";
 
         // ---- GLOBÁLNE PREMENNÉ PRE LOKÁCIU ---- //
+        let savedStartupLocation = JSON.parse(localStorage.getItem('solaris_startup_location')) || null;
+        let isSelectingStartup = false;
+
         const presetCitiesData = [
             { lat: 48.1486, lon: 17.1077, tz: "Europe/Bratislava", title: "Bratislava", sub: "Slovensko", isShort: "Bratislava" },
             { lat: -33.8688, lon: 151.2093, tz: "Australia/Sydney", title: "Sydney", sub: "Austrália (Zima v júni)", isShort: "Sydney" },
@@ -593,12 +677,34 @@
             { lat: -0.1807, lon: -78.4678, tz: "America/Guayaquil", title: "Quito", sub: "Ekvádor (Rovník)", isShort: "Quito" }
         ];
 
-        let myLat = presetCitiesData[0].lat;
-        let myLon = presetCitiesData[0].lon;
-        let myLocName = presetCitiesData[0].isShort;
-        let myTimezone = presetCitiesData[0].tz;
+        let myLat = savedStartupLocation ? savedStartupLocation.lat : presetCitiesData[0].lat;
+        let myLon = savedStartupLocation ? savedStartupLocation.lon : presetCitiesData[0].lon;
+        let myLocName = savedStartupLocation ? savedStartupLocation.shortName : presetCitiesData[0].isShort;
+        let myTimezone = savedStartupLocation ? savedStartupLocation.tz : presetCitiesData[0].tz;
+
+        function updateStartupLocationUI() {
+            let btnClear = document.getElementById('btn-clear-startup');
+            let nameSpan = document.getElementById('startup-location-name');
+            if (savedStartupLocation) {
+                nameSpan.innerText = savedStartupLocation.shortName;
+                if (btnClear) btnClear.style.display = 'block';
+            } else {
+                const t = translations[currentLang];
+                if (nameSpan) nameSpan.innerText = t ? t.defaultCurrent : "Predvolené (Podľa GPS)";
+                if (btnClear) btnClear.style.display = 'none';
+            }
+        }
 
         function setCity(lat, lon, tz, shortName) {
+            if (isSelectingStartup) {
+                savedStartupLocation = { lat: parseFloat(lat), lon: parseFloat(lon), tz: tz, shortName: shortName };
+                localStorage.setItem('solaris_startup_location', JSON.stringify(savedStartupLocation));
+                updateStartupLocationUI();
+                closeLocPicker();
+                document.getElementById('settings-overlay').style.display = 'flex';
+                return;
+            }
+            
             myLat = parseFloat(lat);
             myLon = parseFloat(lon);
             myTimezone = tz;
@@ -624,6 +730,7 @@
 
         // --- VYHĽADÁVACÍ LOKÁCIA MODAL LOGIKA ---
         function onHorizonTabClick(event) {
+            isSelectingStartup = false; // Toto je bežné vyhľadávanie miesta na mape
             if (activeTab === 'system') {
                 switchView('horizon');
             } else {
@@ -988,8 +1095,18 @@
             let stTitle = document.getElementById('lbl-settings-title'); if (stTitle) stTitle.innerText = t.settingsTitle;
             let stLang = document.getElementById('lbl-settings-lang'); if (stLang) stLang.innerText = t.settingsLang;
             let stStartup = document.getElementById('lbl-settings-startup'); if (stStartup) stStartup.innerText = t.settingsStartup;
+            
+            let stLoc = document.getElementById('lbl-settings-location'); if (stLoc) stLoc.innerText = t.settingsLocation;
+            let useCur = document.getElementById('lbl-use-current'); if (useCur) useCur.innerText = t.useCurrentLoc;
+            if (!savedStartupLocation) {
+                let stLocName = document.getElementById('startup-location-name');
+                if (stLocName) stLocName.innerText = t.defaultCurrent;
+            }
+
             // Preklad nadpisu okna s počasím
             let wTitle = document.getElementById('lbl-weather-title'); if (wTitle) wTitle.innerText = t.weatherTitle;
+            let rWeather = document.getElementById('lbl-radar-weather'); if (rWeather) rWeather.innerText = t.radarWeatherBtn;
+            let rNow = document.getElementById('lbl-radar-now'); if (rNow) rNow.innerText = t.btnToday;
 
             document.getElementById('lbl-day').innerText = t.pickerDay;
             document.getElementById('lbl-month').innerText = t.pickerMonth;
@@ -2290,16 +2407,23 @@
                         document.getElementById('jup-alt').innerText = (alt > 0 ? "+" : "") + alt.toFixed(1) + "°";
                         document.getElementById('jup-vis').innerText = visText;
                         document.getElementById('jup-vis').style.color = visColor;
-                        
-                        // Zobrazenie alebo skrytie odkazu na počasie
-                        let weatherLink = document.getElementById('weather-link');
-                        if (weatherLink) {
+
+                        // Inteligentné nasvietenie tlačidla Počasie
+                        let weatherBtn = document.getElementById('btn-radar-weather');
+                        if (weatherBtn) {
                             let diffMinutes = Math.abs(simDate.getTime() - new Date().getTime()) / 60000;
-                            // Ukážeme ho len ak to NIE JE Zem, sme v prítomnosti a objekt je NAD obzorom (alt > 0)
                             if (key !== "Earth" && diffMinutes < 5 && alt > 0) {
-                                weatherLink.style.display = 'inline';
+                                weatherBtn.style.opacity = "1";
+                                weatherBtn.style.background = "#0284c7"; // Rovnaká farba ako Teraz
+                                weatherBtn.style.borderColor = "#0284c7";
+                                weatherBtn.style.color = "white";
+                                weatherBtn.style.boxShadow = "0 4px 10px rgba(2, 132, 199, 0.4)";
                             } else {
-                                weatherLink.style.display = 'none';
+                                weatherBtn.style.opacity = "0.4";
+                                weatherBtn.style.background = "rgba(15, 23, 42, 0.8)"; // Pôvodná tmavá
+                                weatherBtn.style.borderColor = "rgba(148, 163, 184, 0.4)";
+                                weatherBtn.style.color = "#94a3b8";
+                                weatherBtn.style.boxShadow = "none";
                             }
                         }
                     }
@@ -2559,6 +2683,31 @@
                 if (infoBtn) infoBtn.style.display = 'none';
             }
         }
+
+// INTEGROVANÁ LOGIKA PRE KLIKNUTIE NA TLAČIDLO POČASIA
+        function handleWeatherClick() {
+            const t = translations[currentLang];
+            let diffMinutes = Math.abs(simDate.getTime() - new Date().getTime()) / 60000;
+
+            // 1. Kontrola, či sme v prítomnosti (max 5 minút odchýlka)
+            if (diffMinutes > 5) {
+                showToast(t.weatherToastTime);
+                return;
+            }
+
+            // 2. Kontrola, či je objekt pod horizontom (číta mínus z textu Výšky)
+            let altText = document.getElementById('jup-alt').innerText;
+            let isBelowHorizon = altText.includes("-");
+
+            if (currentPlanetKey !== "Earth" && isBelowHorizon) {
+                showToast(t.weatherToastHorizon);
+                return;
+            }
+
+            // 3. Ak všetko sedí, otvor modal
+            openWeatherModal();
+        }
+
     // FUNKCIA PRE ZISTENIE POČASIA Z OPEN-METEO API (PRELOŽENÁ)
         async function openWeatherModal() {
             let overlay = document.getElementById('weather-overlay');
@@ -2637,6 +2786,27 @@
                 content.innerHTML = `<div style="color: #ef4444; padding: 20px;">${t.weatherError}</div>`;
             }
         }
+
+        // --- EVENT LISTENER PRE NOVÉ TLAČIDLÁ ---
+        document.getElementById('btn-set-startup').addEventListener('click', () => {
+            isSelectingStartup = true;
+            document.getElementById('settings-overlay').style.display = 'none'; 
+            openLocPicker(); 
+        });
+
+        document.getElementById('btn-clear-startup').addEventListener('click', (e) => {
+            e.stopPropagation();
+            savedStartupLocation = null;
+            localStorage.removeItem('solaris_startup_location');
+            updateStartupLocationUI();
+        });
+
+        document.getElementById('btn-search-current').addEventListener('click', () => {
+            requestGPS();
+        });
+        
+        // Nastavenie UI s názvom miesta pri načítaní okna
+        setTimeout(updateStartupLocationUI, 100);
     </script>
 </body>
 </html>
