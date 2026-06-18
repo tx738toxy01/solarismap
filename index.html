@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Solaris Map</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌞</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='30' fill='%231e293b'/><g transform='rotate(-20 50 50)'><ellipse cx='50' cy='50' rx='45' ry='14' fill='none' stroke='%2338bdf8' stroke-width='5'/><circle cx='5' cy='50' r='8' fill='%2338bdf8'/></g></svg>">
     
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -650,16 +650,16 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         };
 
         // Pridanie nových prekladov (Krok 3)
-        Object.assign(translations.sk, { settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie" });
-        Object.assign(translations.cs, { settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontem, vyber jiný objekt.", radarWeatherBtn: "Počasí" });
-        Object.assign(translations.en, { settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather" });
-        Object.assign(translations.de, { settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter" });
-        Object.assign(translations.fr, { settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo" });
-        Object.assign(translations.es, { settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima" });
-        Object.assign(translations.zh, { settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气" });
-        Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम" });
-        Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気" });
-        Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨" });
+        Object.assign(translations.sk, { settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie", toastTapObject: "Ťukni na objekt" });
+        Object.assign(translations.cs, { settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontem, vyber jiný objekt.", radarWeatherBtn: "Počasí", toastTapObject: "Klepni na objekt" });
+        Object.assign(translations.en, { settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather", toastTapObject: "Tap the object" });
+        Object.assign(translations.de, { settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter", toastTapObject: "Tippe auf das Objekt" });
+        Object.assign(translations.fr, { settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo", toastTapObject: "Touchez l'objet" });
+        Object.assign(translations.es, { settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima", toastTapObject: "Toca el objeto" });
+        Object.assign(translations.zh, { settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气", toastTapObject: "点击天体" });
+        Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम", toastTapObject: "वस्तु पर टैप करें" });
+        Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気", toastTapObject: "天体をタップ" });
+        Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨", toastTapObject: "천체를 탭하세요" });
 
         const zodiacSigns = [
             { id: "Aries", sym: "♈", angle: 0 }, { id: "Taurus", sym: "♉", angle: 30 },
@@ -2675,7 +2675,10 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             resizeCanvas();
             // Aplikácia si po štarte načíta planétu z tvojich nastavení
             selectPlanet(startupPlanet, true);
-        }, 50);
+            
+            // Zobrazí inštruktážny toast v aktuálnom jazyku
+            showToast(translations[currentLang].toastTapObject);
+        }, 800);
         requestAnimationFrame(updateAndRender);
 
         // Funkcia pre otváranie a zatváranie okna sledovania cez ℹ️ ikonku
