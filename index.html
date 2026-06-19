@@ -98,10 +98,14 @@
             z-index: 2000; 
         }
         
-        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 280px; max-width: calc(100vw - 90px); z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .radar-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
-        .radar-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 10px 14px; width: 280px; max-width: calc(100vw - 90px); z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); height: 118px; box-sizing: border-box; }
+        .btn-radar-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10; padding: 0; }
+        .radar-title { font-size: 0.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; padding-right: 20px; }
+        .radar-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; }
         .radar-row span:last-child { font-family: monospace; font-weight: bold; color: #fff; }
+        .radar-vis-box { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; flex-direction: column; justify-content: center; }
+        .radar-vis-lbl { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+        .radar-vis-val { font-size: 0.95rem; font-weight: bold; line-height: 1.2; margin-top: 2px; }
 
         .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #ef4444; color: #ffffff; padding: 14px 24px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.6); white-space: nowrap; }
         
@@ -160,6 +164,76 @@
         .loading-text { text-align: center; color: #38bdf8; font-size: 0.8rem; padding: 8px; display: none; font-weight: bold; }
 
         canvas { touch-action: none; }
+
+        /* AUTOMATICKÁ RESPOND_POISTKA PRE MOBILNÉ DISPLEJE (Displej pod 480px) */
+        @media (max-width: 480px) {
+            /* 1. Zmenšenie hlavnej horné lišty (Header) */
+            header { 
+                padding: 10px 12px !important; 
+            }
+            header h1 { 
+                font-size: 1rem !important; 
+                gap: 4px !important; 
+            }
+            .date-picker-btn { 
+                padding: 4px 8px !important; 
+                font-size: 0.75rem !important; 
+            }
+
+            /* 2. Zmenšenie a zabezpečenie panelu s vyhľadávaním / polohou */
+            .tab-menu {
+                left: 10px !important;
+                top: 15px !important;
+                gap: 4px !important;
+                max-width: 58% !important; /* Panel nepresiahne polovicu obrazovky */
+            }
+            .tab-btn {
+                padding: 6px 10px !important;
+                font-size: 0.72rem !important;
+                border-radius: 6px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important; /* Ak je text dlhý, skráti ho na "..." a nenaruší rozloženie */
+                max-width: 105px !important;
+            }
+            .tab-btn-location-mode {
+                padding: 6px 8px !important;
+                gap: 4px !important;
+                max-width: 135px !important;
+            }
+
+            /* 3. Zmenšenie panelu východu a západu slnka */
+            #sun-times-panel {
+                right: 10px !important;
+                top: 15px !important;
+                padding: 6px 8px !important;
+                gap: 4px !important;
+                max-width: 38% !important;
+                border-radius: 8px !important;
+            }
+            .sun-time-row {
+                font-size: 0.72rem !important;
+                gap: 4px !important;
+            } /* <-- TÁTO ZÁTVORKA CHÝBALA */
+
+            /* 4. Zmenšenie sledovacieho panela vľavo dole */
+            #jupiter-radar-panel {
+                padding: 8px 10px !important;
+                width: 220px !important;
+                height: 104px !important;
+            }
+            .btn-radar-close { top: 6px !important; right: 10px !important; font-size: 1rem !important; }
+            .radar-title { font-size: 0.75rem !important; margin-bottom: 4px !important; }
+            .radar-row { font-size: 0.7rem !important; margin-bottom: 3px !important; }
+            .radar-vis-box { margin-top: 4px !important; padding-top: 4px !important; }
+            .radar-vis-lbl { font-size: 0.6rem !important; }
+            .radar-vis-val { font-size: 0.85rem !important; margin-top: 1px !important; }
+            
+            .sun-icon svg {
+                width: 13px !important;
+                height: 13px !important;
+            }
+        }
     </style>
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4acb1e8606884ad08dd46b43d69a39ef"}'></script>
     </head>
@@ -226,14 +300,14 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
     </div>
 </div>
         <div id="jupiter-radar-panel">
-            <button onclick="toggleRadarPanel(event)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10;">✕</button>
-            <div class="radar-title" id="radar-planet-title" style="padding-right: 20px;">📡 Sledovanie: Zem</div>
+            <button onclick="toggleRadarPanel(event)" class="btn-radar-close">✕</button>
+            <div class="radar-title" id="radar-planet-title">📡 Sledovanie: Zem</div>
             <div class="radar-row"><span id="lbl-az">Azimut (Smer):</span><span id="jup-az">---.-°</span></div>
             <div class="radar-row"><span id="lbl-alt">Výška nad obzorom:</span><span id="jup-alt">---.-°</span></div>
             
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; flex-direction: column; justify-content: center;">
-                <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
-                <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold; line-height: 1.2;">---</span>
+            <div class="radar-vis-box">
+                <span id="lbl-vis" class="radar-vis-lbl">Viditeľnosť voľným okom:</span>
+                <span id="jup-vis" class="radar-vis-val">---</span>
             </div>
         </div>
 
@@ -907,6 +981,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         // ---- GLOBÁLNE PREMENNÉ PRE LOKÁCIU ---- //
         let savedStartupLocation = JSON.parse(localStorage.getItem('solaris_startup_location')) || null;
         let isSelectingStartup = false;
+        let hasFetchedGPSThisSession = false;
 
         const presetCitiesData = [
             { lat: 48.1486, lon: 17.1077, tz: "Europe/Bratislava", title: "Bratislava", sub: "Slovensko", isShort: "Bratislava" },
@@ -973,12 +1048,15 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             isSelectingStartup = false; // Toto je bežné vyhľadávanie miesta na mape
             if (activeTab === 'system') {
                 switchView('horizon');
+                // AKTUALIZÁCIA: GPS sa spustí iba ak nie je uložené mesto A ZÁROVEŇ sa v tejto relácii ešte nenačítalo GPS
+                if (!savedStartupLocation && !hasFetchedGPSThisSession) {
+                    requestSilentGPS();
+                }
             } else {
                 openLocPicker();
                 event.stopPropagation();
             }
         }
-
         function openLocPicker() {
             document.getElementById('loc-picker-overlay').style.display = 'flex';
             document.getElementById('loc-search-inp').value = '';
@@ -1051,6 +1129,24 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                         alert(t.searchAlert); // "Nepodarilo sa získať polohu..."
                         document.getElementById('loc-loading').style.display = 'none';
                     }
+                );
+            }
+        }
+
+// TICHÉ NAČÍTANIE GPS (na pozadí, bez chýb a loading okien)
+        function requestSilentGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        let lat = pos.coords.latitude;
+                        let lon = pos.coords.longitude;
+                        let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        const t = translations[currentLang];
+                        setCity(lat, lon, tz, t.searchMyLoc);
+                        hasFetchedGPSThisSession = true; // <-- PRIDANÉ: Poznačíme si, že GPS už v tejto relácii úspešne prebehlo
+                    },
+                    (err) => { /* Potichu ignorujeme, ak používateľ zamietne */ },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             }
         }
@@ -2872,7 +2968,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                         let weatherBtn = document.getElementById('btn-radar-weather');
                         if (weatherBtn) {
                             let diffMinutes = Math.abs(simDate.getTime() - new Date().getTime()) / 60000;
-                            if (key !== "Earth" && diffMinutes < 5 && alt > 0) {
+                            if (diffMinutes < 5) {
                                 weatherBtn.style.opacity = "1";
                                 weatherBtn.style.background = "#0284c7"; // Rovnaká farba ako Teraz
                                 weatherBtn.style.borderColor = "#0284c7";
@@ -3325,15 +3421,6 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 return;
             }
 
-            // 2. Kontrola, či je objekt pod horizontom (číta mínus z textu Výšky)
-            let altText = document.getElementById('jup-alt').innerText;
-            let isBelowHorizon = altText.includes("-");
-
-            if (currentPlanetKey !== "Earth" && isBelowHorizon) {
-                showToast(t.weatherToastHorizon);
-                return;
-            }
-
             // 3. Ak všetko sedí, otvor modal
             openWeatherModal();
         }
@@ -3437,7 +3524,6 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         
         // Nastavenie UI s názvom miesta pri načítaní okna
         setTimeout(updateStartupLocationUI, 100);
-        
             
             // FUNKCIA PRE ZOBRAZENIE ZNAMENIA V SPODNOM PANELI
         function selectZodiac(zKey) {
