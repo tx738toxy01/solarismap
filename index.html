@@ -71,10 +71,10 @@
         
         .planet-selector { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; outline: none; cursor: pointer; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 5px; }
-        .stat-card { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(51, 65, 85, 0.3); border-radius: 10px; padding: 10px; text-align: center; }
-        .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-        .stat-value { font-size: 0.95rem; font-weight: 600; color: #f8fafc; font-family: monospace; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 5px; }
+        .stat-card { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(51, 65, 85, 0.3); border-radius: 10px; padding: 8px 4px; text-align: center; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        .stat-label { font-size: clamp(0.5rem, 2.2vw, 0.75rem); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        .stat-value { font-size: clamp(0.75rem, 3.2vw, 1.1rem); font-weight: 600; color: #f8fafc; font-family: monospace; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; width: 100%; word-break: break-word; }
         
         .tab-menu { position: absolute; left: 20px; top: 20px; display: flex; gap: 8px; z-index: 5; }
         .tab-btn { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
@@ -98,7 +98,7 @@
             z-index: 2000; 
         }
         
-        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 350px; max-width: 90vw; z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 15px; width: 280px; max-width: calc(100vw - 90px); z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .radar-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
         .radar-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
         .radar-row span:last-child { font-family: monospace; font-weight: bold; color: #fff; }
@@ -213,9 +213,12 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
 
 <div id="zodiac-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; justify-content: center; align-items: center; backdrop-filter: blur(6px);">
     <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid #38bdf8; border-radius: 20px; padding: 24px; width: 90%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px;">
-            <div id="zodiac-simple-title" style="font-size: 1.25rem; font-weight: bold; color: #facc15;">Detail</div>
-            <button onclick="document.getElementById('zodiac-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1;">×</button>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px;">
+            <div>
+                <div id="zodiac-popup-sign-name" style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">--</div>
+                <div id="zodiac-simple-title" style="font-size: 1.25rem; font-weight: bold; color: #facc15;">Detail</div>
+            </div>
+            <button onclick="document.getElementById('zodiac-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; margin-top: -4px;">×</button>
         </div>
         <div id="zodiac-simple-content" style="color: #e2e8f0; font-size: 1rem; line-height: 1.5;">
             --
@@ -228,28 +231,20 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             <div class="radar-row"><span id="lbl-az">Azimut (Smer):</span><span id="jup-az">---.-°</span></div>
             <div class="radar-row"><span id="lbl-alt">Výška nad obzorom:</span><span id="jup-alt">---.-°</span></div>
             
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; justify-content: space-between; align-items: stretch; gap: 10px;">
-                <div style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
-                    <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
-                    <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold; line-height: 1.2;">---</span>
-                </div>
-                
-                <div style="display: flex; gap: 6px; align-items: stretch;">
-                    <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 65px; opacity: 0.4;">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-bottom: 3px;"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
-                        <span id="lbl-radar-weather">Počasie</span>
-                    </button>
-                    <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid #0284c7; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 65px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-bottom: 3px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        <span id="lbl-radar-now">Teraz</span>
-                    </button>
-                </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); display: flex; flex-direction: column; justify-content: center;">
+                <span id="lbl-vis" style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Viditeľnosť voľným okom:</span>
+                <span id="jup-vis" style="font-size: 1.05rem; font-weight: bold; line-height: 1.2;">---</span>
             </div>
         </div>
 
         <div class="zoom-controls" id="zoom-ctrl-wrapper">
             <button class="btn-zoom" onclick="buttonZoomIn()">+</button>
             <button class="btn-zoom" onclick="buttonZoomOut()">-</button>
+            <button class="btn-zoom" onclick="resetZoomToSystem()" title="Celkový pohľad" style="margin-top: 4px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            </button>
         </div>
 
         <div id="sun-times-panel">
@@ -293,7 +288,6 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             <div class="planet-title">
                 <canvas id="title-icon-canvas" width="32" height="32" style="position: static; width: 32px; height: 32px; margin-right: -2px; flex-shrink: 0;"></canvas>
                 <span id="selected-planet-name">Zem</span>
-                <span id="btn-radar-info" onclick="toggleRadarPanel(event)" style="cursor: pointer; margin-left: 8px; font-size: 1.1rem; filter: drop-shadow(0 0 2px #38bdf8); display: none;" title="Zobraziť sledovanie">ℹ️</span>
             </div>
             
             <div style="position: relative;">
@@ -439,6 +433,42 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
 
                     <iframe id="quick-map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
                 </div>
+
+    <button id="btn-toggle-labels" onclick="toggleLabels()" style="position: fixed; bottom: 20px; left: 16px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <svg id="icon-labels-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+            <line x1="9" y1="20" x2="15" y2="20"></line>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+        </svg>
+        <svg id="icon-labels-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; opacity: 0.5;">
+            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+            <line x1="9" y1="20" x2="15" y2="20"></line>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+            <line x1="4" y1="4" x2="20" y2="20" stroke="#ef4444" stroke-width="2"></line>
+        </svg>
+    </button>
+    
+    <button id="btn-radar-info-float" onclick="toggleRadarPanel(event)" style="position: fixed; bottom: 20px; left: 68px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 50%; width: 44px; height: 44px; display: none; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" title="Zobraziť sledovanie">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </button>
+
+    <div id="right-floating-btns" style="position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s;">
+        
+        <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 14px; font-size: 0.6rem; font-weight: bold; cursor: pointer; width: 54px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; opacity: 0.4; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+            <span id="lbl-radar-weather" style="letter-spacing: 0.05em;">Počasie</span>
+        </button>
+        
+        <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 14px; font-size: 0.6rem; font-weight: bold; cursor: pointer; width: 54px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.5);">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span id="lbl-radar-now" style="letter-spacing: 0.05em;">Teraz</span>
+        </button>
+
+    </div>
 
     <script>
         window.addEventListener('click', () => {
@@ -2065,7 +2095,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             let sunPnl = document.getElementById('sun-times-panel');
             let infoBtn = document.getElementById('btn-radar-info');
             let mainControls = document.getElementById('main-controls-panel');
-            let horizToday = document.getElementById('btn-today-horizon');
+            let rightBtns = document.getElementById('right-floating-btns');
             
             if (view === 'system') {
                 document.getElementById('tab-btn-system').classList.add('active');
@@ -2074,9 +2104,9 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 if (sunPnl) sunPnl.style.display = 'none';
                 if (infoBtn) infoBtn.style.display = 'none';
                 
-                // Zobrazíme veľký panel prehrávača a skryjeme malé tlačidlo
+                // Zobrazíme veľký panel prehrávača a skryjeme pravé plávajúce tlačidlá
                 if (mainControls) mainControls.style.display = 'flex';
-                if (horizToday) horizToday.style.display = 'none';
+                if (rightBtns) rightBtns.style.display = 'none';
                 
                 updateHorizonTabButton(); 
                 selectPlanet(currentPlanetKey, true);
@@ -2087,9 +2117,9 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 if (sunPnl) sunPnl.style.display = 'flex';
                 if (infoBtn) infoBtn.style.display = 'none';
                 
-                // Skryjeme celý veľký panel s podkladom a ukážeme len čisté modré tlačidlo
+                // Skryjeme hlavný prehrávač a ukážeme nové pravé plávajúce tlačidlá
                 if (mainControls) mainControls.style.display = 'none';
-                if (horizToday) horizToday.style.display = 'block';
+                if (rightBtns) rightBtns.style.display = 'flex';
                 
                 updateHorizonTabButton(); 
                 selectPlanet(currentPlanetKey, true);
@@ -2381,7 +2411,10 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
                     ctx.font = '18px sans-serif'; 
-                    ctx.fillText(z.sym, symX, symY);
+                    
+                    if (showLabels) {
+                        ctx.fillText(z.sym, symX, symY);
+                    }
                     
                     // 1. Zaregistrujeme ochranný box a TIEŽ dotykovú zónu (hitbox) pre kliknutie!
                     occupiedBoxes.push({ x: symX - 12, y: symY - 12, w: 24, h: 24 });
@@ -2397,11 +2430,13 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
 
                     let textX = zx + (ringRad + 16) * cosR;
                     let textY = zy + (ringRad + 16) * sinR;
-
-                    ctx.fillStyle = 'rgba(148, 163, 184, 0.85)';
-                    ctx.font = '15px sans-serif'; 
                     let zodText = t.zodiac[z.id];
-                    ctx.fillText(zodText, textX, textY);
+
+                    if (showLabels) {
+                        ctx.fillStyle = 'rgba(148, 163, 184, 0.85)';
+                        ctx.font = '15px sans-serif'; 
+                        ctx.fillText(zodText, textX, textY);
+                    }
 
                     // 2. Vypočítame a zaregistrujeme ochranný box okolo TEXTU zverokruhu
                     let textW = ctx.measureText(zodText).width;
@@ -2430,10 +2465,13 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 sunGlow.addColorStop(0, '#fffdf0'); sunGlow.addColorStop(0.2, '#facc15'); sunGlow.addColorStop(1, 'transparent');
                 ctx.fillStyle = sunGlow; ctx.arc(cx, cy, 20 * zoom, 0, Math.PI * 2); ctx.fill();
 
-                ctx.fillStyle = '#facc15'; 
                 ctx.font = currentPlanetKey === "Sun" ? 'bold 14px sans-serif' : '14px sans-serif'; 
                 let textWidth = ctx.measureText(t.planets["Sun"]).width;
-                ctx.fillText(t.planets["Sun"], cx - textWidth/2, cy - 20 * zoom - 5);
+                
+                if (showLabels) {
+                    ctx.fillStyle = '#facc15'; 
+                    ctx.fillText(t.planets["Sun"], cx - textWidth/2, cy - 20 * zoom - 5);
+                }
                 
                 // Povieme systému, že tu je Slnko
                 occupiedBoxes.push({ x: cx - textWidth/2, y: cy - 20 * zoom - 19, w: textWidth, h: 14 });
@@ -2530,11 +2568,6 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                     
                     ctx.font = '14px sans-serif';
                     let textWidth = ctx.measureText(t.planets[key]).width;
-                    horizonPositions[key] = { 
-                        cx: screenX, cy: screenY, cr: Math.max(15, drawRadius + 5),
-                        rx1: screenX + 12, rx2: screenX + 16 + textWidth + 5, 
-                        ry1: screenY - 10, ry2: screenY + 10 
-                    };
 
                     if (isVisible) { ctx.fillStyle = p.color; ctx.globalAlpha = 1.0; } 
                     else { ctx.fillStyle = 'rgba(100, 116, 139, 0.25)'; ctx.globalAlpha = 0.3; }
@@ -2639,23 +2672,103 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                         }
                     }
                     ctx.globalAlpha = 1.0;
-
-                    ctx.fillStyle = 'black'; 
-                    ctx.font = currentPlanetKey === key ? 'bold 15px sans-serif' : '14px sans-serif'; 
-                    ctx.fillText(t.planets[key], screenX + 16, screenY + 5);
+                    ctx.font = currentPlanetKey === key ? 'bold 15px sans-serif' : '14px sans-serif';
                     
-                    if (key === "Sun") {
-                        ctx.fillStyle = '#facc15';
-                    } else {
-                        ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#f8fafc';
+                    // --- ZAČIATOK: INTELIGENTNÉ UMIESTŇOVANIE NÁPISOV PRE HORIZONT ---
+                    // 1. Zaregistrujeme samotné teleso planéty ako prekážku
+                    occupiedBoxes.push({ x: screenX - drawRadius - 2, y: screenY - drawRadius - 2, w: drawRadius*2 + 4, h: drawRadius*2 + 4 });
+
+                    let textHeight = 14;
+                    let possiblePositions = [];
+                    for (let ring = 0; ring < 8; ring++) {
+                        let g = drawRadius + 12 + (ring * 22);
+                        possiblePositions.push(
+                            { x: screenX + g, y: screenY + 5 },                     
+                            { x: screenX - textWidth/2, y: screenY - g - 5 },       
+                            { x: screenX - textWidth - g, y: screenY + 5 },         
+                            { x: screenX - textWidth/2, y: screenY + g + 15 },      
+                            { x: screenX + g, y: screenY - g },                     
+                            { x: screenX - textWidth - g, y: screenY - g },         
+                            { x: screenX + g, y: screenY + g + 10 },                
+                            { x: screenX - textWidth - g, y: screenY + g + 10 }     
+                        );
                     }
-                    
-                    ctx.strokeStyle = 'black'; 
-                    ctx.lineWidth = 3; 
-                    ctx.lineJoin = 'round';
 
-                    ctx.strokeText(t.planets[key], screenX + 16, screenY + 5);
-                    ctx.fillText(t.planets[key], screenX + 16, screenY + 5);
+                    if (!labelTargets[key]) labelTargets[key] = { actualX: possiblePositions[0].x, actualY: possiblePositions[0].y, prefIdx: 0 };
+
+                    let checkPosValidHoriz = (pos, emergencyMode = false) => {
+                        let testBox = { x: pos.x, y: pos.y - textHeight, w: textWidth, h: textHeight };
+                        for (let ob of occupiedBoxes) {
+                            if (emergencyMode && !ob.isUI && !ob.isEdge) continue; 
+                            if (checkCollision(testBox, ob)) return false;
+                        }
+                        return true;
+                    };
+
+                    let targetPos = possiblePositions[0];
+                    let bestIdx = labelTargets[key].prefIdx;
+                    let found = false;
+
+                    if (bestIdx !== 0 && checkPosValidHoriz(possiblePositions[0])) {
+                        targetPos = possiblePositions[0]; labelTargets[key].prefIdx = 0; found = true;
+                    } else if (checkPosValidHoriz(possiblePositions[bestIdx])) {
+                        targetPos = possiblePositions[bestIdx]; found = true;
+                    } else {
+                        for (let i = 0; i < possiblePositions.length; i++) {
+                            if (checkPosValidHoriz(possiblePositions[i])) { targetPos = possiblePositions[i]; labelTargets[key].prefIdx = i; found = true; break; }
+                        }
+                        if (!found) {
+                            for (let i = 0; i < possiblePositions.length; i++) {
+                                let pos = possiblePositions[i];
+                                let testBox = { x: pos.x, y: pos.y - textHeight, w: textWidth, h: textHeight };
+                                let hitUI = false;
+                                for (let ob of occupiedBoxes) { if ((ob.isUI || ob.isEdge) && checkCollision(testBox, ob)) { hitUI = true; break; } }
+                                if (!hitUI) { targetPos = pos; labelTargets[key].prefIdx = i; found = true; break; }
+                            }
+                        }
+                    }
+
+                    if (found) {
+                        occupiedBoxes.push({ x: targetPos.x, y: targetPos.y - textHeight, w: textWidth, h: textHeight });
+                        labelTargets[key].actualX += (targetPos.x - labelTargets[key].actualX) * 0.05;
+                        labelTargets[key].actualY += (targetPos.y - labelTargets[key].actualY) * 0.05;
+                    }
+
+                    let actX = labelTargets[key].actualX;
+                    let actY = labelTargets[key].actualY;
+
+                    if (showLabels && found) {
+                        let distFromPlanet = Math.hypot(actX + textWidth/2 - screenX, actY - textHeight/2 - screenY);
+                        if (distFromPlanet > drawRadius + 15) {
+                            ctx.beginPath();
+                            // OPRAVA: Dynamická farba čiar (Čierna nad horizontom, biela pod ním)
+                            if (alt > 0) {
+                                ctx.strokeStyle = currentPlanetKey === key ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.6)';
+                            } else {
+                                ctx.strokeStyle = currentPlanetKey === key ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.5)';
+                            }
+                            
+                            ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+                            ctx.moveTo(screenX, screenY); ctx.lineTo(actX + textWidth/2, actY - textHeight/2);
+                            ctx.stroke(); ctx.setLineDash([]);
+                        }
+
+                        ctx.fillStyle = 'black'; 
+                        ctx.fillText(t.planets[key], actX, actY);
+                        
+                        ctx.fillStyle = key === "Sun" ? '#facc15' : (currentPlanetKey === key ? '#7dd3fc' : '#f8fafc');
+                        
+                        ctx.strokeStyle = 'black'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+                        ctx.strokeText(t.planets[key], actX, actY);
+                        ctx.fillText(t.planets[key], actX, actY);
+                    }
+
+                    horizonPositions[key] = { 
+                        cx: screenX, cy: screenY, cr: Math.max(15, drawRadius + 5),
+                        rx1: actX - 5, rx2: actX + textWidth + 5, 
+                        ry1: actY - textHeight - 4, ry2: actY + 4 
+                    };
+                    // --- KONIEC: INTELIGENTNÉ UMIESTŇOVANIE NÁPISOV PRE HORIZONT ---
 
                     if (currentPlanetKey === key) {
                         // --- DVOJITÝ OREO ZVÝRAZŇOVAČ ---
@@ -3041,22 +3154,24 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             let actX = labelTargets[key].actualX;
             let actY = labelTargets[key].actualY;
 
-            // 5. Vodiaca čiara
-            let distFromPlanet = Math.hypot(actX + textWidth/2 - px, actY - textHeight/2 - py);
-            if (distFromPlanet > pRadius + 15) {
-                ctx.beginPath();
-                ctx.strokeStyle = currentPlanetKey === key ? 'rgba(56, 189, 248, 0.8)' : 'rgba(203, 213, 225, 0.6)';
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([4, 4]);
-                ctx.moveTo(px, py);
-                ctx.lineTo(actX + textWidth/2, actY - textHeight/2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
+            // 5. Vodiaca čiara a text (iba ak sú zapnuté názvy)
+            if (showLabels) {
+                let distFromPlanet = Math.hypot(actX + textWidth/2 - px, actY - textHeight/2 - py);
+                if (distFromPlanet > pRadius + 15) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = currentPlanetKey === key ? 'rgba(56, 189, 248, 0.8)' : 'rgba(203, 213, 225, 0.6)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([4, 4]);
+                    ctx.moveTo(px, py);
+                    ctx.lineTo(actX + textWidth/2, actY - textHeight/2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
 
-            // 6. Kreslenie textu a aktívnych zón
-            ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#cbd5e1'; 
-            ctx.fillText(t.planets[key], actX, actY);
+                // 6. Kreslenie textu
+                ctx.fillStyle = currentPlanetKey === key ? '#7dd3fc' : '#cbd5e1'; 
+                ctx.fillText(t.planets[key], actX, actY);
+            }
             
             horizonPositions[key] = { 
                 cx: px, cy: py, cr: Math.max(10, pRadius + 6),
@@ -3188,14 +3303,12 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         function toggleRadarPanel(event) {
             if (event) event.stopPropagation();
             let panel = document.getElementById('jupiter-radar-panel');
-            let infoBtn = document.getElementById('btn-radar-info');
+            let infoBtn = document.getElementById('btn-radar-info-float');
             
             if (panel.style.display === 'block') {
-                // Ak okno zatvárame -> zobrazíme ikonku
                 panel.style.display = 'none';
-                if (infoBtn && activeTab === 'horizon') infoBtn.style.display = 'inline';
+                if (infoBtn && activeTab === 'horizon') infoBtn.style.display = 'flex';
             } else {
-                // Ak okno otvárame -> skryjeme ikonku
                 panel.style.display = 'block';
                 if (infoBtn) infoBtn.style.display = 'none';
             }
@@ -3358,6 +3471,10 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             if (currentLang === 'de') latinTitle = "Lateinischer Name";
             if (currentLang === 'es') latinTitle = "Nombre latino";
             if (currentLang === 'fr') latinTitle = "Nom latin";
+            if (currentLang === 'zh') latinTitle = "拉丁名称";
+            if (currentLang === 'hi') latinTitle = "लैटिन नाम";
+            if (currentLang === 'ja') latinTitle = "ラテン語名";
+            if (currentLang === 'ko') latinTitle = "라틴어 이름";
             document.getElementById('lbl-stat-period').innerText = latinTitle;
             document.getElementById('stat-period').innerText = zData.latin;
 
@@ -3374,21 +3491,31 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             }
         }
 
-        // HISTORICKÉ MAPY SÚHVEZDÍ (Urania's Mirror - 1825)
+        // HISTORICKÉ MAPY SÚHVEZDÍ (Urania's Mirror - 1825) - OPRAVENÉ NÁZVY!
         const zodiacImages = {
-            Aries: "Urania's_Mirror_-_Aries_and_Musca_Borealis.jpg",
-            Taurus: "Urania's_Mirror_-_Taurus.jpg",
-            Gemini: "Urania's_Mirror_-_Gemini.jpg",
-            Cancer: "Urania's_Mirror_-_Cancer.jpg",
-            Leo: "Urania's_Mirror_-_Leo_Major_and_Leo_Minor.jpg",
-            Virgo: "Urania's_Mirror_-_Virgo.jpg",
-            Libra: "Urania's_Mirror_-_Libra.jpg",
-            Scorpio: "Urania's_Mirror_-_Scorpio.jpg",
-            Sagittarius: "Urania's_Mirror_-_Corona_Australis,_Scutum,_and_Sagittarius.jpg",
-            Capricorn: "Urania's_Mirror_-_Capricornus.jpg",
-            Aquarius: "Urania's_Mirror_-_Aquarius,_Piscis_Australis_&_Ballon_Aerostatique.jpg",
-            Pisces: "Urania's_Mirror_-_Pisces.jpg"
+            Aries: "Sidney Hall - Urania's Mirror - Aries and Musca Borealis.jpg",
+            Taurus: "Sidney Hall - Urania's Mirror - Taurus.jpg",
+            Gemini: "Sidney Hall - Urania's Mirror - Gemini.jpg",
+            Cancer: "Sidney Hall - Urania's Mirror - Cancer.jpg",
+            Leo: "Sidney Hall - Urania's Mirror - Leo Major and Leo Minor.jpg",
+            Virgo: "Sidney Hall - Urania's Mirror - Virgo.jpg",
+            Libra: "Sidney Hall - Urania's Mirror - Libra.jpg",
+            Scorpio: "Sidney Hall - Urania's Mirror - Scorpio.jpg",
+            Sagittarius: "Sidney Hall - Urania's Mirror - Sagittarius and Corona Australis, Microscopium, and Telescopium.jpg",
+            Capricorn: "Sidney Hall - Urania's Mirror - Capricornus.jpg",
+            Aquarius: "Sidney Hall - Urania's Mirror - Aquarius, Piscis Australis & Ballon Aerostatique.jpg",
+            Pisces: "Sidney Hall - Urania's Mirror - Pisces.jpg"
         };
+
+        // PREDNAČÍTANIE OBRÁZKOV DO PAMÄTE (Cache)
+        function preloadZodiacImages() {
+            for (let key in zodiacImages) {
+                let img = new Image();
+                img.src = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(zodiacImages[key])}`;
+            }
+        }
+        // Spustíme prednačítavanie potichu 2 sekundy po štarte, aby sme nespomalili úvodné zobrazenie oblohy
+        setTimeout(preloadZodiacImages, 2000);
 
         // FUNKCIA PO KLIKNUTÍ NA BOX ZNAMENIA (Otvorí popup okno s textom a obrázkom)
         function handleStatClick(boxIndex) {
@@ -3407,14 +3534,16 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             } else if (boxIndex === 2) {
                 title = zData.starsTitle;
                 
-                // Načítame presný historický obrázok z nášho zoznamu
                 let imgName = zodiacImages[currentZodiacKey];
-                let imgUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${imgName}`;
+                let imgUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imgName)}`;
                 
-                // Magický filter: invertuje farby a posunie odtieň, aby papier vyzeral ako nočná obloha!
+                // OPRAVA: Pridaný pevný rozmer, text Načítavam... a plynulé zobrazenie obrázku
+                let loadingText = currentLang === 'sk' ? 'Načítavam obraz...' : (currentLang === 'cs' ? 'Načítám obraz...' : 'Loading image...');
+                
                 content = zData.stars + `<br><br>
-                <div style="border-radius: 12px; overflow: hidden; border: 1px solid #38bdf8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); background: #0f172a; margin-top: 10px;">
-                    <img src="${imgUrl}" alt="${zData.latin}" style="width: 100%; display: block; filter: invert(0.9) hue-rotate(200deg) contrast(1.3) saturate(1.2);">
+                <div style="border-radius: 12px; overflow: hidden; border: 1px solid #38bdf8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); background: #0f172a; margin-top: 10px; position: relative; aspect-ratio: 1.4 / 1; display: flex; justify-content: center; align-items: center;">
+                    <div id="loading-text" style="position: absolute; color: #94a3b8; font-size: 0.9rem; z-index: 1;">${loadingText} ⏳</div>
+                    <img src="${imgUrl}" alt="${zData.latin}" onload="document.getElementById('loading-text').style.display='none'; this.style.opacity=1;" style="width: 100%; height: 100%; object-fit: cover; filter: invert(0.9) hue-rotate(200deg) contrast(1.3) saturate(1.2); opacity: 0; transition: opacity 0.4s ease; position: relative; z-index: 2;">
                 </div>`;
                 
             } else if (boxIndex === 3) {
@@ -3422,10 +3551,86 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 content = zData.myth;
             }
 
+            // Pridanie malého nadpisu (ikona + názov znamenia)
+            let cSign = zodiacSigns.find(s => s.id === currentZodiacKey);
+            let signName = t.zodiac[currentZodiacKey];
+            document.getElementById('zodiac-popup-sign-name').innerHTML = `<span style="color:#facc15; margin-right:4px; font-size: 0.9rem;">${cSign.sym}</span> ${signName}`;
+
             document.getElementById('zodiac-simple-title').innerText = title;
             document.getElementById('zodiac-simple-content').innerHTML = content;
             document.getElementById('zodiac-overlay').style.display = 'flex';
         }
+
+        // --- LOGIKA PRE VYPNUTIE/ZAPNUTIE NÁZVOV ---
+        let showLabels = true;
+        
+        function toggleLabels() {
+            showLabels = !showLabels;
+            if (showLabels) {
+                // Zapnutý stav (Svieti na modro)
+                document.getElementById('icon-labels-on').style.display = 'block';
+                document.getElementById('icon-labels-off').style.display = 'none';
+                document.getElementById('btn-toggle-labels').style.borderColor = 'rgba(56, 189, 248, 0.4)';
+            } else {
+                // Vypnutý stav (Preškrtnuté na červeno)
+                document.getElementById('icon-labels-on').style.display = 'none';
+                document.getElementById('icon-labels-off').style.display = 'block';
+                document.getElementById('btn-toggle-labels').style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            }
+        }
+// FUNKCIA PRE TLAČIDLO "CELKOVÝ POHĽAD" (Vykradnutá matematika zo Slnka)
+        function resetZoomToSystem() {
+            if (activeTab !== "system") return;
+            
+            isTrackingPlanet = false; // Uvoľníme kameru od sledovania konkrétnej planéty
+            targetOffsetX = 0;        // Namierime kameru presne na stred (Slnko)
+            targetOffsetY = 0;
+            
+            // Vypočítame vzdialenosť najvzdialenejšej planéty
+            let maxDist = 0;
+            let dE = (simDate.getTime() - new Date(2026, 0, 1).getTime()) / 86400000;
+            for (let p in planetData) {
+                if (p !== "Sun" && p !== "Moon") {
+                    let pos = getPlanetPos(p, dE, 1);
+                    maxDist = Math.max(maxDist, Math.hypot(pos.x, pos.y) + planetData[p].size * 2);
+                }
+            }
+            
+            // OPRAVA: Zaistíme, aby zoom obsiahol minimálne 480 bodov do všetkých strán.
+            // Zverokruh má polomer 425 + 55 bodov necháme na pekné okraje a texty!
+            maxDist = Math.max(maxDist, 480);
+            
+            targetZoom = Math.max(0.15, (Math.min(canvas.clientWidth, canvas.clientHeight) - 40) / (maxDist * 2.1));
+        }
+// --- INTELIGENTNÉ VYHÝBANIE SA IKONIEK ---
+        setInterval(() => {
+            let btnLabels = document.getElementById('btn-toggle-labels');
+            let btnInfo = document.getElementById('btn-radar-info-float');
+            let rightBtns = document.getElementById('right-floating-btns');
+            
+            let infoDrawer = document.querySelector('.info-drawer'); // Hlavný spodný panel
+            let radarPanel = document.getElementById('jupiter-radar-panel'); // Tabuľka sledovania
+            
+            let targetBottomLeft = 20; 
+            let targetBottomRight = 20;
+            
+            // 1. Zarovnanie na vrchný okraj hlavného spodného panela (Pre Obe strany)
+            if (infoDrawer && infoDrawer.getBoundingClientRect().height > 0) {
+                let offset = window.innerHeight - infoDrawer.getBoundingClientRect().top + 15;
+                targetBottomLeft = offset;
+                targetBottomRight = offset; // Pravá strana ostáva vždy tu
+            }
+            
+            // 2. Ak sa objaví Radar tabuľka, iba ĽAVÉ ikonky sa zarovnajú nad ňu
+            if (radarPanel && radarPanel.style.display !== 'none' && radarPanel.getBoundingClientRect().height > 0) {
+                targetBottomLeft = window.innerHeight - radarPanel.getBoundingClientRect().top + 15;
+            }
+            
+            // Aplikujeme plynulý posun
+            if (btnLabels) btnLabels.style.bottom = targetBottomLeft + 'px';
+            if (btnInfo) btnInfo.style.bottom = targetBottomLeft + 'px';
+            if (rightBtns) rightBtns.style.bottom = targetBottomRight + 'px';
+        }, 150);
     </script>
 </body>
 </html>
