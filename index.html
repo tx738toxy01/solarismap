@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Solaris Map</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="solar-system-orbit-svgrepo-com.svg">
@@ -27,7 +27,7 @@
         
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #05050a; color: #e2e8f0; display: flex; flex-direction: column; }
         
-        header { background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.8) 100%); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(51, 65, 85, 0.5); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        header { background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.8) 100%); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(51, 65, 85, 0.5); padding: calc(15px + env(safe-area-inset-top)) 20px 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
         header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.05em; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
         
         .date-picker-btn { background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; font-weight: bold; font-family: monospace; display: block; text-align: center; cursor: pointer; transition: background 0.2s; line-height: 1.2; white-space: nowrap; }
@@ -43,14 +43,14 @@
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
         /* OVLÁDACÍ PANEL - NASA STYLE */
-        .controls-panel { position: absolute; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 24px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 5; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); width: 90px; }
+        .controls-panel { position: absolute; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 24px; padding: 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; z-index: 5; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); width: 90px; }
         .btn-teraz { background: #0284c7; color: white; font-weight: bold; font-size: 0.85rem; padding: 8px 12px; border-radius: 16px; border: none; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4); }
         .btn-teraz:active { transform: scale(0.95); }
         .btn-pause { background: transparent; color: #e2e8f0; font-size: 1.6rem; line-height: 1; border: none; cursor: pointer; transition: color 0.2s; }
         .btn-pause.active { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
         .divider { width: 80%; height: 1px; background-color: rgba(51, 65, 85, 0.6); margin: 2px 0; }
         
-        .speed-label { width: 100%; text-align: center; font-weight: bold; font-size: 1.15rem; color: #f8fafc; margin-top: 6px; letter-spacing: 1px; }
+        .speed-label { width: 100%; text-align: center; font-weight: bold; font-size: 1.15rem; color: #f8fafc; margin-top: 0; letter-spacing: 1px; }
         .speed-row { display: flex; align-items: center; justify-content: center; gap: 18px; width: 100%; color: #94a3b8; margin-top: 2px; }
         .speed-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
         .speed-btn svg { width: 34px; height: 34px; fill: currentColor; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
@@ -61,7 +61,7 @@
         .zoom-controls { position: absolute; right: 20px; top: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 5; }
         .btn-zoom { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #e2e8f0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
         
-        #sun-times-panel { position: absolute; top: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; gap: 6px; z-index: 5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-align: right; }
+        #sun-times-panel { position: absolute; top: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 8px; padding: 0 14px; display: none; flex-direction: column; justify-content: center; gap: 2px; z-index: 5; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-align: right; height: 44px; box-sizing: border-box; }
         .sun-time-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 0.85rem; color: #cbd5e1; font-family: monospace; font-weight: normal; letter-spacing: 0.5px;}
         .sun-icon { display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.6)); margin-right: 2px; }
         
@@ -77,7 +77,7 @@
         .stat-value { font-size: clamp(0.75rem, 3.2vw, 1.1rem); font-weight: 600; color: #f8fafc; font-family: monospace; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; width: 100%; word-break: break-word; }
         
         .tab-menu { position: absolute; left: 20px; top: 20px; display: flex; gap: 8px; z-index: 5; }
-        .tab-btn { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .tab-btn { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.6); color: #94a3b8; padding: 0 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; height: 44px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
         .tab-btn.active { background: #0284c7 !important; border-color: #0284c7 !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .tab-btn-location-mode { padding: 8px 12px; display: flex; align-items: center; gap: 6px; }
         
@@ -169,7 +169,7 @@
         @media (max-width: 480px) {
             /* 1. Zmenšenie hlavnej horné lišty (Header) */
             header { 
-                padding: 10px 12px !important; 
+                padding: calc(10px + env(safe-area-inset-top)) 12px 10px 12px !important; 
             }
             header h1 { 
                 font-size: 1rem !important; 
@@ -188,13 +188,14 @@
                 max-width: 58% !important; /* Panel nepresiahne polovicu obrazovky */
             }
             .tab-btn {
-                padding: 6px 10px !important;
+                padding: 0 10px !important;
                 font-size: 0.72rem !important;
                 border-radius: 6px !important;
                 white-space: nowrap !important;
                 overflow: hidden !important;
-                text-overflow: ellipsis !important; /* Ak je text dlhý, skráti ho na "..." a nenaruší rozloženie */
+                text-overflow: ellipsis !important;
                 max-width: 105px !important;
+                height: 38px !important;
             }
             .tab-btn-location-mode {
                 padding: 6px 8px !important;
@@ -206,10 +207,12 @@
             #sun-times-panel {
                 right: 10px !important;
                 top: 15px !important;
-                padding: 6px 8px !important;
-                gap: 4px !important;
+                padding: 0 8px !important;
+                gap: 0 !important;
                 max-width: 38% !important;
-                border-radius: 8px !important;
+                border-radius: 6px !important;
+                height: 38px !important;
+                justify-content: center !important;
             }
             .sun-time-row {
                 font-size: 0.72rem !important;
@@ -221,12 +224,18 @@
     right: 10px !important;
 }
             /* 4. Zmenšenie sledovacieho panela vľavo dole */
-            #jupiter-radar-panel {
-                padding: 8px 10px !important;
-                width: 220px !important;
-                height: 104px !important;
-            }
-            .btn-radar-close { top: 6px !important; right: 10px !important; font-size: 1rem !important; }
+        #jupiter-radar-panel {
+            padding: 8px 10px !important;
+            width: 220px !important;
+            height: 104px !important;
+        }
+        
+        /* Zrovnanie výšky pravých tlačidiel s ľavým panelom */
+        #right-floating-btns { height: 104px !important; gap: 8px !important; }
+        .radar-action-btn { width: 48px !important; }
+        .radar-action-btn svg { width: 18px !important; height: 18px !important; }
+
+        .btn-radar-close { top: 6px !important; right: 10px !important; font-size: 1rem !important; }
             .radar-title { font-size: 0.75rem !important; margin-bottom: 4px !important; }
             .radar-row { font-size: 0.7rem !important; margin-bottom: 3px !important; }
             .radar-vis-box { margin-top: 4px !important; padding-top: 4px !important; }
@@ -248,8 +257,9 @@
             #main-controls-panel { bottom: 10px !important; transform: scale(0.8) !important; transform-origin: bottom right !important; }
             
             /* Tlačidlá Teraz a Počasie posunieme bezpečne NAD časovač */
-            #right-floating-btns { bottom: 85px !important; transform: scale(0.8) !important; transform-origin: bottom right !important; }
-        #btn-radar-info-float { bottom: 85px !important; transform: scale(0.8) !important; transform-origin: bottom left !important; }
+            #right-floating-btns { position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s; height: 118px; }
+.radar-action-btn { height: auto !important; flex: 1; }
+#btn-radar-info-float { transform: scale(0.8) !important; transform-origin: bottom left !important; }
     }
 
     /* Naozaj kriticky nízka obrazovka - lupa preskočí naležato, aby sa nezrazila s prehrávačom */
@@ -298,6 +308,13 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
         <div class="tab-menu">
             <button class="tab-btn active" id="tab-btn-system" onclick="switchView('system')">Solárna mapa</button>
             <button class="tab-btn" id="tab-btn-horizon" onclick="onHorizonTabClick(event)">Lokálny Horizont</button>
+            <button class="tab-btn" id="btn-quick-map-tab" onclick="toggleQuickMap(event)" title="Zobraziť mapu" style="display: none; padding: 0 10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                    <line x1="9" y1="3" x2="9" y2="18"></line>
+                    <line x1="15" y1="6" x2="15" y2="21"></line>
+                </svg>
+            </button>
         </div>
 <div id="weather-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
     <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 24px; padding: 24px; width: 90%; max-width: 340px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center;">
@@ -1056,13 +1073,16 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
 
         function updateHorizonTabButton() {
             let btn = document.getElementById('tab-btn-horizon');
+            let mapBtn = document.getElementById('btn-quick-map-tab'); // Nové tlačidlo
             
             if (activeTab === 'horizon') {
-                btn.innerHTML = `📍 ${myLocName} <span onclick="toggleQuickMap(event)" style="margin-left: 8px; font-size: 1.1rem; cursor: pointer; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Zobraziť mapu">🗺️</span>`;
+                btn.innerHTML = `📍 ${myLocName}`; // Vymazané staré emoji mapy
                 btn.classList.add('tab-btn-location-mode');
+                if (mapBtn) mapBtn.style.display = 'flex'; // Zobrazíme našu novú mapu
             } else {
                 btn.innerHTML = translations[currentLang].tabHorizon;
                 btn.classList.remove('tab-btn-location-mode');
+                if (mapBtn) mapBtn.style.display = 'none'; // Skryjeme mapu
                 
                 let qm = document.getElementById('quick-map-panel');
                 if (qm) qm.style.display = 'none';
