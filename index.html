@@ -4079,128 +4079,127 @@ function closeApp() {
                 content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">Kritická chyba. ❌</div>`;
             }
         }
-// --- INTERNÉ MATEMATICKÉ "API" PRE ASTRONOMICKÉ ÚKAZY ---
-        async function fetchAstroEvents(planetKey) {
-            // Umelé načítavanie, aby to pôsobilo ako luxusné API z webu
-            await new Promise(r => setTimeout(r, 700)); 
-            
+// --- SKUTOČNÉ INTERNETOVÉ API PRE VŠETKY ASTRONOMICKÉ ÚKAZY (So zdrojmi) ---
+        async function fetchAstroEvents() {
             let events = [];
-            let startMs = simDate.getTime();
-            let msPerDay = 86400000;
-            
-            let isSK = currentLang === 'sk';
-            let isCS = currentLang === 'cs';
-            
-            let tOpp = isSK ? "Opozícia (Najlepšia viditeľnosť)" : (isCS ? "Opozice (Nejlepší viditelnost)" : "Opposition (Best visibility)");
-            let tElo = isSK ? "Najväčšia elongácia (Výborná viditeľnosť)" : (isCS ? "Největší elongace (Výborná viditelnost)" : "Greatest Elongation");
-            let tFull = isSK ? "Spln Mesiaca" : (isCS ? "Úplněk" : "Full Moon");
-            let tNew = isSK ? "Nov Mesiaca" : (isCS ? "Nov" : "New Moon");
-            let tEqui = isSK ? "Začiatok ročného obdobia (Slnovrat/Rovnodennosť)" : (isCS ? "Začátek ročního období" : "Season Change (Equinox/Solstice)");
+            let appDate = typeof simDate !== 'undefined' ? simDate : new Date();
+            let appYear = appDate.getFullYear();
+            let realToday = new Date();
 
-            if (["Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"].includes(planetKey)) {
-                let prevDist = Infinity;
-                let isDecreasing = true;
-                // Vypočítame ďalšie 4 opozície (minimum vzdialenosti k Zemi)
-                for (let i = 1; i < 6000; i+=3) { 
-                    let d = (startMs + i * msPerDay - new Date(2026, 0, 1).getTime()) / msPerDay;
-                    let ePos = getPlanetPos("Earth", d, 1);
-                    let pPos = getPlanetPos(planetKey, d, 1);
-                    let dist = Math.hypot(pPos.x - ePos.x, pPos.y - ePos.y);
+            try {
+                // 1. VLÁDNE API (USNO) - PRIAME VOLANIE
+                try {
+                    let fetchEclipse = async (type, icon) => {
+                        let res = await fetch(`https://aa.usno.navy.mil/api/eclipses/${type}/year?year=${appYear}`);
+                        if (res.ok) {
+                            let data = await res.json();
+                            if (data && data.eclipses) {
+                                data.eclipses.forEach(ecl => {
+                                    let eclDate = new Date(appYear, ecl.month - 1, ecl.day);
+                                    if (eclDate.getTime() >= appDate.getTime() - 86400000) {
+                                        // PRIDANÝ ZDROJ: US Naval Observatory
+                                        events.push({ title: ecl.event, date: eclDate, url: "https://eclipse.gsfc.nasa.gov/solar.html", icon: icon, source: "US Naval Observatory" });
+                                    }
+                                });
+                            }
+                        }
+                    };
+                    await fetchEclipse("solar", "☀️");
+                    await fetchEclipse("lunar", "🌑");
+                } catch(e) { console.log("Chyba USNO API:", e); }
 
-                    if (isDecreasing && dist > prevDist) {
-                        events.push({ title: tOpp, date: new Date(startMs + (i - 3) * msPerDay), icon: "✨" });
-                        isDecreasing = false;
-                        if (events.length >= 4) break;
-                    } else if (!isDecreasing && dist < prevDist) {
-                        isDecreasing = true;
-                    }
-                    prevDist = dist;
-                }
-            } else if (["Mercury", "Venus"].includes(planetKey)) {
-                let prevElong = 0;
-                let isIncreasing = true;
-                // Vypočítame najväčšiu uhlovú vzdialenosť od Slnka (Elongácia)
-                for (let i = 1; i < 2000; i+=2) {
-                    let d = (startMs + i * msPerDay - new Date(2026, 0, 1).getTime()) / msPerDay;
-                    let ePos = getPlanetPos("Earth", d, 1);
-                    let pPos = getPlanetPos(planetKey, d, 1);
-                    let sunGeo = Math.atan2(-ePos.y, -ePos.x);
-                    let pGeo = Math.atan2(pPos.y - ePos.y, pPos.x - ePos.x);
-                    let elong = Math.abs(((pGeo - sunGeo + Math.PI*3) % (Math.PI*2)) - Math.PI);
+                // 2. ŠTANDARDNÝ RSS FEED (Všetko čo server In-The-Sky pošle)
+                try {
+                    let res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://in-the-sky.org/rss.php?feed=dfan'));
+                    let xmlText = await res.text();
+                    
+                    let parser = new DOMParser();
+                    let xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                    let items = xmlDoc.querySelectorAll("item");
+                    
+                    items.forEach(item => {
+                        let title = item.querySelector("title")?.textContent || "";
+                        let pubDateStr = item.querySelector("pubDate")?.textContent || "";
+                        let link = item.querySelector("link")?.textContent || "";
+                        
+                        if (!title.toLowerCase().includes("eclipse") && pubDateStr) {
+                            let itemDate = new Date(pubDateStr);
+                            if (!isNaN(itemDate.getTime()) && itemDate.getTime() >= realToday.getTime() - 86400000) {
+                                // PRIDANÝ ZDROJ: In-The-Sky.org
+                                events.push({ title: title, date: itemDate, url: link, icon: "🔭", source: "In-The-Sky.org" });
+                            }
+                        }
+                    });
+                } catch(e) { console.log("Chyba RSS API:", e); }
 
-                    if (isIncreasing && elong < prevElong) {
-                        events.push({ title: tElo, date: new Date(startMs + (i - 2) * msPerDay), icon: "🌗" });
-                        isIncreasing = false;
-                        if (events.length >= 4) break;
-                    } else if (!isIncreasing && elong > prevElong) {
-                        isIncreasing = true;
-                    }
-                    prevElong = elong;
-                }
-            } else if (planetKey === "Moon") {
-                // Fázy mesiaca (Generuje automaticky)
-                for(let i=1; i<=60; i++) {
-                    events.push({ title: i%2===0 ? tFull : tNew, date: new Date(startMs + i * 14.76 * msPerDay), icon: i%2===0 ? "🌕" : "🌑" });
-                }
-                events = events.slice(0, 5);
-            } else if (planetKey === "Sun" || planetKey === "Earth") {
-                // Slnovraty a rovnodennosti
-                for(let i=1; i<800; i+=10) {
-                    let eDate = new Date(startMs + i * msPerDay);
-                    let m = eDate.getMonth();
-                    let d = eDate.getDate();
-                    if ((m === 2 && d >= 20 && d <= 21) || (m === 5 && d >= 20 && d <= 21) || (m === 8 && d >= 22 && d <= 23) || (m === 11 && d >= 21 && d <= 22)) {
-                        events.push({ title: tEqui, date: new Date(eDate.getTime()), icon: "☀️" });
-                    }
-                }
-                events = events.filter((v,i,a)=>a.findIndex(t=>(t.date.getMonth() === v.date.getMonth() && t.date.getFullYear()===v.date.getFullYear()))===i).slice(0, 4);
-            } else if (planetKey === "Halley") {
-                events.push({ title: "Perihélium (Najbližšie k Slnku)", date: new Date("2061-07-28"), icon: "☄️" });
+                // ZORADENIE VÝSLEDKOV OD NAJBLIŽŠÍCH
+                events.sort((a, b) => a.date - b.date);
+
+            } catch (error) {
+                console.log("Kritická chyba pri sťahovaní úkazov:", error);
             }
             return events;
         }
 
-        // --- ZAVOLANIE "API" A NAPLNENIE OKNA ---
-        async function openAstroEvents(planetKey) {
+        // --- ZAVOLANIE API A VYKRESLENIE OKNA ---
+        async function openAstroEvents() {
             let overlay = document.getElementById('astro-events-overlay');
             let content = document.getElementById('astro-events-content');
             let title = document.getElementById('astro-events-title');
             
             overlay.style.display = 'flex';
-            let mainTrans = translations[currentLang] || translations['en'];
             
-            title.innerHTML = `📅 ${mainTrans.planets[planetKey]} - Úkazy`;
+            let titleTxt = currentLang === 'sk' ? "Všetky najbližšie úkazy" : (currentLang === 'cs' ? "Všechny nejbližší úkazy" : "All Upcoming Events");
+            title.innerHTML = `📅 ${titleTxt}`;
             
-            let loadTxt = currentLang === 'sk' ? "Prehľadávam vesmírne modely... 🔭" : "Prohledávám vesmírné modely... 🔭";
+            let loadTxt = currentLang === 'sk' ? "Sťahujem dáta z astronomických serverov... 📡" : "Stahuji data... 📡";
             content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${loadTxt}</div>`;
             
-            // VOLÁME "API"
-            let events = await fetchAstroEvents(planetKey);
+            let events = await fetchAstroEvents();
             
             if (events.length === 0) {
-                content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">Žiadne blízke úkazy.</div>`;
+                content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">Servery momentálne nehlásia žiadne blízke úkazy.</div>`;
                 return;
+            }
+
+            let targetLang = currentLang === 'sk' ? 'sk' : (currentLang === 'cs' ? 'cs' : 'en');
+            if (targetLang !== 'en') {
+                let transTxt = currentLang === 'sk' ? "Prekladám úkazy... ⏳" : "Překládám úkazy... ⏳";
+                content.innerHTML = `<div style="text-align:center; color:#38bdf8; padding: 40px 10px; font-weight: bold;">${transTxt}</div>`;
+                await Promise.all(events.map(async (item) => {
+                    try {
+                        let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${targetLang}`);
+                        let transData = await transRes.json();
+                        if (transData.responseData && transData.responseData.translatedText) {
+                            item.title = transData.responseData.translatedText;
+                        }
+                    } catch (e) {} 
+                }));
             }
             
             let html = "";
+            let readMore = targetLang === 'sk' ? "Detail úkazu na webe" : (targetLang === 'cs' ? "Detail úkazu na webu" : "Event details");
+
             events.forEach(e => {
                 let d = e.date;
                 let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
-                let diffDays = Math.ceil((d.getTime() - simDate.getTime()) / 86400000);
                 
-                let inTxt = currentLang === 'sk' ? "Za" : (currentLang === 'cs' ? "Za" : "In");
-                let daysTxt = currentLang === 'sk' ? "dní" : (currentLang === 'cs' ? "dní" : "days");
-                let timeBadge = `<span style="background: rgba(250, 204, 21, 0.2); color: #facc15; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">${inTxt} ${diffDays} ${daysTxt}</span>`;
+                let targetDate = typeof simDate !== 'undefined' ? simDate : new Date();
+                let diffDays = Math.ceil((d.getTime() - targetDate.getTime()) / 86400000);
+                
+                let badgeTxt = diffDays === 0 ? "DNES" : (diffDays > 0 ? `Za ${diffDays} dní` : `Pred ${Math.abs(diffDays)} dňami`);
+                let timeBadge = `<span style="background: rgba(250, 204, 21, 0.2); color: #facc15; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap;">${badgeTxt}</span>`;
                 
                 html += `
                 <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid #facc15; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
                     <div style="color:#94a3b8; font-size:0.8rem; font-family:monospace; display: flex; justify-content: space-between; align-items: center;">
-                        <div>📅 ${dateStr}</div>
+                        <div>📅 ${dateStr} <span style="color: #64748b; font-size: 0.65rem; margin-left: 6px;">(${e.source})</span></div>
                         <div>${timeBadge}</div>
                     </div>
-                    <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 1.2rem;">${e.icon}</span> ${e.title}
+                    <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; line-height: 1.3;">
+                        <span style="font-size: 1.1rem; margin-right: 4px;">${e.icon}</span> ${e.title}
                     </div>
+                    <a href="${e.url}" target="_blank" style="color:#facc15; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${readMore} →</a>
                 </div>`;
             });
             
