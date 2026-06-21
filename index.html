@@ -269,6 +269,24 @@
         }
     }
 
+        /* NOVÉ TLAČIDLO LIVE A KLIKACIE ZNAMENIA */
+        .live-badge { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 4px; padding: 2px 6px; font-size: 0.65rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 5px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; margin-left: 4px; }
+        .live-badge:hover { background: rgba(239, 68, 68, 0.25); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        .live-dot { width: 6px; height: 6px; background-color: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; animation: pulseLive 1.5s infinite; }
+        @keyframes pulseLive { 0% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 10px #ef4444; } 100% { transform: scale(0.8); opacity: 0.7; } }
+        
+        .zodiac-clickable { cursor: pointer; transition: color 0.2s; pointer-events: auto; }
+        .zodiac-clickable:hover { color: #facc15 !important; }
+
+        /* TLAČIDLO KALENDÁRA ÚKAZOV */
+        .btn-calendar { background: transparent; border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .btn-calendar:hover { background: rgba(250, 204, 21, 0.15); border-color: #facc15; color: #facc15; box-shadow: 0 0 12px rgba(250, 204, 21, 0.3); transform: scale(1.05); }
+
+        /* ZVONČEK GLOBÁLNYCH UDALOSTÍ */
+        .global-bell { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.5); color: #facc15; border-radius: 50%; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 12px; animation: pulseBell 2s infinite; font-size: 1.1rem; box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); transition: all 0.2s; }
+        .global-bell:hover { background: rgba(245, 158, 11, 0.3); transform: scale(1.1); }
+        @keyframes pulseBell { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); } 70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+
 </style>
     </style>
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4acb1e8606884ad08dd46b43d69a39ef"}'></script>
@@ -276,7 +294,10 @@
 <body>
 
     <header>
-        <h1><span>🌌</span> Solaris Map</h1>
+        <h1>
+            <span>🌌</span> Solaris Map
+            <div onclick="showGlobalSpaceEvents()" class="global-bell" title="Svetové vesmírne novinky">🔔</div>
+        </h1>
         <div style="display: flex; align-items: center; gap: 12px;">
             <div title="Zmeniť dátum a čas">
                 <div class="date-picker-btn" id="live-date" onclick="openPicker()">--.--.---- --:--:--</div>
@@ -350,6 +371,46 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
         </div>
     </div>
 </div>
+
+<div id="astro-events-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(6px);">
+    <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid #facc15; border-radius: 20px; padding: 24px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px;">
+            <div id="astro-events-title" style="font-size: 1.25rem; font-weight: bold; color: #facc15; display: flex; align-items: center; gap: 8px;">
+                -- Úkazy
+            </div>
+            <button onclick="document.getElementById('astro-events-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; margin-top: -4px;">×</button>
+        </div>
+        <div id="astro-events-content" style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 4px;">
+            </div>
+    </div>
+</div>
+
+<div id="events-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; justify-content: center; align-items: center; backdrop-filter: blur(6px);">
+    <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid #ef4444; border-radius: 20px; padding: 24px; width: 90%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px;">
+            <div>
+                <div id="events-popup-planet-name" style="font-size: 1.15rem; font-weight: bold; color: #f8fafc; display: flex; align-items: center; gap: 8px;">--</div>
+            </div>
+            <button onclick="document.getElementById('events-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; margin-top: -4px;">×</button>
+        </div>
+        <div id="events-content" style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 4px;">
+            </div>
+    </div>
+</div>
+
+<div id="global-events-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(6px);">
+    <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid #f59e0b; border-radius: 20px; padding: 24px; width: 90%; max-width: 480px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px;">
+            <div style="font-size: 1.25rem; font-weight: bold; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                🔔 Globálne vesmírne udalosti
+            </div>
+            <button onclick="document.getElementById('global-events-overlay').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; margin-top: -4px;">×</button>
+        </div>
+        <div id="global-events-content" style="display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+            </div>
+    </div>
+</div>
+
         <div id="jupiter-radar-panel">
             <button onclick="toggleRadarPanel(event)" class="btn-radar-close">✕</button>
             <div class="radar-title" id="radar-planet-title">📡 Sledovanie: Zem</div>
@@ -413,11 +474,27 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
             <div class="planet-title">
                 <canvas id="title-icon-canvas" width="32" height="32" style="position: static; width: 32px; height: 32px; margin-right: -2px; flex-shrink: 0;"></canvas>
                 <span id="selected-planet-name">Zem</span>
+                
+                <div id="live-event-badge" class="live-badge" onclick="showSpaceEvents(currentPlanetKey); event.stopPropagation();" title="Vesmírne udalosti">
+                    <span class="live-dot"></span>LIVE
+                </div>
             </div>
             
-            <div style="position: relative;">
-                <div class="planet-selector" id="planet-select-btn" onclick="let d = document.getElementById('planet-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">Zem</div>
-                <div id="planet-dropdown" style="display: none; position: absolute; bottom: 100%; right: 0; background: #1e293b; border: 1px solid #475569; border-radius: 8px; margin-bottom: 5px; padding: 5px 0; min-width: 140px; box-shadow: 0 -5px 20px rgba(0,0,0,0.6); z-index: 100; max-height: 65vh; overflow-y: auto;"></div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn-calendar" onclick="openAstroEvents(currentPlanetKey)" title="Astronomické úkazy pre tento objekt">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <circle cx="12" cy="16" r="1.5" fill="currentColor"></circle>
+                    </svg>
+                </button>
+                
+                <div style="position: relative;">
+                    <div class="planet-selector" id="planet-select-btn" onclick="let d = document.getElementById('planet-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; event.stopPropagation();">Zem</div>
+                    <div id="planet-dropdown" style="display: none; position: absolute; bottom: 100%; right: 0; background: #1e293b; border: 1px solid #475569; border-radius: 8px; margin-bottom: 5px; padding: 5px 0; min-width: 140px; box-shadow: 0 -5px 20px rgba(0,0,0,0.6); z-index: 100; max-height: 65vh; overflow-y: auto;"></div>
+                </div>
             </div>
         </div>
         
@@ -2469,7 +2546,16 @@ function closeApp() {
             let sunDeg = (Math.atan2(-ePosR.y, -ePosR.x) * 180 / Math.PI + 360) % 360;
             let cSign = zodiacSigns[Math.floor(sunDeg / 30) % 12];
             let t = translations[currentLang];
-            document.getElementById('selected-planet-name').innerHTML = t.planets["Sun"] + " <span style='font-size: 0.85rem; font-weight: normal; color: #cbd5e1; margin-left: 6px;'>• " + cSign.sym + " " + t.zodiac[cSign.id] + "</span>";
+            
+            // Vytvoríme HTML reťazec s klikacím spanom
+            let newText = t.planets["Sun"] + " <span class='zodiac-clickable' onclick='selectZodiac(\"" + cSign.id + "\"); event.stopPropagation();' style='font-size: 0.85rem; font-weight: normal; color: #cbd5e1; margin-left: 6px; text-decoration: underline; text-decoration-color: rgba(203, 213, 225, 0.3); text-underline-offset: 3px;' title='Klikni pre detail znamenia'>• " + cSign.sym + " " + t.zodiac[cSign.id] + "</span>";
+            
+            // Optimalizácia: Zápis do DOMu urobíme LEN vtedy, ak sa text naozaj zmenil.
+            // Inak by sme každých 16 milisekúnd zničili element, na ktorý chceš práve kliknúť!
+            let nameEl = document.getElementById('selected-planet-name');
+            if (nameEl.innerHTML !== newText) {
+                nameEl.innerHTML = newText;
+            }
         } else if (currentPlanetKey === "Moon" && currentPanelMode === 'planet') {
             // 1. Live aktualizácia samotnej obrázkovej ikonky
             drawTitleIcon("Moon");
@@ -2480,12 +2566,14 @@ function closeApp() {
             let phaseVal = ((Math.atan2(pPosM.y - ePosM.y, pPosM.x - ePosM.x) - Math.atan2(-ePosM.y, -ePosM.x)) / (Math.PI * 2));
             phaseVal = ((phaseVal % 1) + 1) % 1;
             
-            // Mesiaca sme rozdelili na 8 rovnakých častí (0 až 7)
             let phaseIdx = Math.floor((phaseVal + 0.0625) * 8) % 8;
-            
-            // 3. Zápis textu Mesiaca so správnym prekladom
             let t = translations[currentLang];
-            document.getElementById('selected-planet-name').innerHTML = t.planets["Moon"] + " <span style='font-size: 0.85rem; font-weight: normal; color: #cbd5e1; margin-left: 6px;'>• " + t.moonPhases[phaseIdx] + "</span>";
+            
+            let newMoonText = t.planets["Moon"] + " <span style='font-size: 0.85rem; font-weight: normal; color: #cbd5e1; margin-left: 6px;'>• " + t.moonPhases[phaseIdx] + "</span>";
+            let nameEl = document.getElementById('selected-planet-name');
+            if (nameEl.innerHTML !== newMoonText) {
+                nameEl.innerHTML = newMoonText;
+            }
         }
 
         ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
@@ -3033,10 +3121,10 @@ function closeApp() {
                     let diffDays = (simDate.getTime() - new Date().getTime()) / 86400000;
                     if (diffDays >= -2 && diffDays <= 14) {
                         weatherBtn.style.opacity = "1";
-                        weatherBtn.style.background = "#0284c7"; 
-                        weatherBtn.style.borderColor = "#0284c7";
+                        weatherBtn.style.background = "#4f46e5"; // Krásna Indigo farba pre odlíšenie
+                        weatherBtn.style.borderColor = "#6366f1";
                         weatherBtn.style.color = "white";
-                        weatherBtn.style.boxShadow = "0 4px 10px rgba(2, 132, 199, 0.4)";
+                        weatherBtn.style.boxShadow = "0 4px 12px rgba(79, 70, 229, 0.5)";
                     } else {
                         weatherBtn.style.opacity = "0.4";
                         weatherBtn.style.background = "rgba(15, 23, 42, 0.8)"; 
@@ -3805,6 +3893,319 @@ function closeApp() {
             if (btnInfo) btnInfo.style.bottom = targetBottomLeft + 'px';
             if (rightBtns) rightBtns.style.bottom = targetBottomRight + 'px';
         }, 150);
+// Rýchly slovník pre LIVE okno
+        const liveDict = {
+            sk: { title: "LIVE Udalosti a Správy", loading: "Pripájam sa na vesmírne servery... 📡", empty: "Pre tento objekt momentálne API nehlási žiadne nové udalosti.", readMore: "Čítať originál" },
+            cs: { title: "LIVE Události a Zprávy", loading: "Připojuji se na vesmírné servery... 📡", empty: "Pro tento objekt momentálně API nehlásí žádné nové události.", readMore: "Číst originál" },
+            en: { title: "LIVE Events & News", loading: "Connecting to space servers... 📡", empty: "No recent events found for this object on the servers.", readMore: "Read original" }
+        };
+
+        // Asynchrónna funkcia pre ťahanie dát z API (S AUTOMATICKÝM PREKLADOM)
+        async function showSpaceEvents(planetKey) {
+            let overlay = document.getElementById('events-overlay');
+            let content = document.getElementById('events-content');
+            let title = document.getElementById('events-popup-planet-name');
+            
+            // Nastavenie jazyka pre nadpisy
+            let eTrans = liveDict[currentLang] || liveDict['en'];
+            let mainTrans = translations[currentLang] || translations['en'];
+            
+            title.innerHTML = `<span style="color:${planetData[planetKey].color}; font-size: 1.4rem; line-height: 0.5;">●</span> ${mainTrans.planets[planetKey]} - ${eTrans.title}`;
+            
+            // Zobrazenie loading okna (kým čakáme na stiahnutie)
+            overlay.style.display = 'flex';
+            content.innerHTML = `<div style="text-align:center; color:#38bdf8; padding: 30px 10px; font-weight: bold; letter-spacing: 0.5px;">${eTrans.loading}</div>`;
+            
+            try {
+                // TRIEDIČ: Upravíme kľúčové slovo pre API
+                let searchWord = planetKey;
+                if (planetKey === "Sun") searchWord = "Solar"; 
+                if (planetKey === "Moon") searchWord = "Lunar";
+                if (planetKey === "Halley") searchWord = "Comet";
+                
+                // 1. KROK: Potiahnutie správ v Angličtine
+                let response = await fetch(`https://api.spaceflightnewsapi.net/v4/articles?title_contains=${searchWord}&limit=10`);
+                let data = await response.json();
+                
+                if (!data.results || data.results.length === 0) {
+                    content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">${eTrans.empty}</div>`;
+                    return;
+                }
+                
+                // 2. KROK: AUTOMATICKÝ PREKLAD (Ak nemáme nastavenú angličtinu)
+                let targetLang = currentLang === 'sk' ? 'sk' : (currentLang === 'cs' ? 'cs' : 'en');
+                
+                if (targetLang !== 'en') {
+                    // Ukážeme používateľovi, že pracujeme na preklade
+                    let translatingText = currentLang === 'sk' ? "Prekladám správy do slovenčiny... ⏳" : "Překládám zprávy do češtiny... ⏳";
+                    content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 30px 10px; font-weight: bold; letter-spacing: 0.5px;">${translatingText}</div>`;
+                    
+                    // Preložíme všetky nadpisy naraz (vlákna bežia paralelne) pomocou free MyMemory API
+                    await Promise.all(data.results.map(async (item) => {
+                        try {
+                            // Enkódujeme anglický nadpis a pošleme ho preložiť
+                            let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${targetLang}`);
+                            let transData = await transRes.json();
+                            
+                            // Ak sa preklad podaril, prepíšeme pôvodný anglický nadpis
+                            if (transData.responseData && transData.responseData.translatedText) {
+                                item.title = transData.responseData.translatedText;
+                            }
+                        } catch (e) {
+                            console.log("Jeden preklad zlyhal, ponechávam angličtinu."); // Ak by vypadol net, ostane aspoň EN
+                        }
+                    }));
+                }
+                
+                // 3. KROK: Vykreslenie hotových a preložených kartičiek
+                let html = "";
+                data.results.forEach(item => {
+                    let d = new Date(item.published_at);
+                    let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+                    
+                    html += `
+                    <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
+                        <div style="color:#94a3b8; font-size:0.75rem; font-family:monospace; display: flex; justify-content: space-between;">
+                            <span>📅 ${dateStr}</span>
+                            <span style="color: #64748b;">ZDROJ: ${item.news_site}</span>
+                        </div>
+                        <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; line-height: 1.3;">${item.title}</div>
+                        <a href="${item.url}" target="_blank" style="color:#38bdf8; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${eTrans.readMore} →</a>
+                    </div>`;
+                });
+                
+                content.innerHTML = html;
+                
+            } catch (err) {
+                let errorTxt = currentLang === 'sk' ? "Chyba pripojenia k API. Skontrolujte internet. ❌" : (currentLang === 'cs' ? "Chyba připojení k API. Zkontrolujte internet. ❌" : "API Connection Error. ❌");
+                content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">${errorTxt}</div>`;
+            }
+        }
+
+        // Asynchrónna funkcia pre GLOBÁLNE správy a nadchádzajúce misie (2x API)
+        async function showGlobalSpaceEvents() {
+            let overlay = document.getElementById('global-events-overlay');
+            let content = document.getElementById('global-events-content');
+            
+            overlay.style.display = 'flex';
+            let loadingTxt = currentLang === 'sk' ? "Pripájam sa na viaceré svetové servery... 📡" : "Připojuji se na světové servery... 📡";
+            content.innerHTML = `<div style="text-align:center; color:#f59e0b; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${loadingTxt}</div>`;
+            
+            let combined = [];
+            
+            try {
+                // 1. API: Nadchádzajúce štarty a misie (Space Devs)
+                try {
+                    let res1 = await fetch('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=6');
+                    let data1 = await res1.json();
+                    if (data1.results) {
+                        data1.results.forEach(l => combined.push({
+                            title: "🚀 MISIA/ŠTART: " + l.name,
+                            date: new Date(l.net),
+                            url: l.url || "#",
+                            type: "launch",
+                            source: l.launch_service_provider ? l.launch_service_provider.name : "Space Agency"
+                        }));
+                    }
+                } catch(e) { console.log("Zlyhalo načítanie misií."); }
+
+                // 2. API: Najnovšie všeobecné správy a úkazy (Spaceflight News)
+                try {
+                    let res2 = await fetch('https://api.spaceflightnewsapi.net/v4/articles?limit=8');
+                    let data2 = await res2.json();
+                    if (data2.results) {
+                        data2.results.forEach(n => combined.push({
+                            title: "📰 SPRÁVA: " + n.title,
+                            date: new Date(n.published_at),
+                            url: n.url,
+                            type: "news",
+                            source: n.news_site
+                        }));
+                    }
+                } catch(e) { console.log("Zlyhalo načítanie správ."); }
+
+                if (combined.length === 0) {
+                    content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">Nepodarilo sa stiahnuť dáta. Skontroluj internet.</div>`;
+                    return;
+                }
+
+                // ZORADENIE: Od budúcnosti (misie čo nás čakajú) po minulosť (najnovšie správy)
+                combined.sort((a, b) => b.date - a.date);
+
+                // PREKLAD (Ak nie je EN)
+                let targetLang = currentLang === 'sk' ? 'sk' : (currentLang === 'cs' ? 'cs' : 'en');
+                if (targetLang !== 'en') {
+                    let transTxt = currentLang === 'sk' ? "Prekladám údaje z agentúr... ⏳" : "Překládám údaje z agentur... ⏳";
+                    content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold;">${transTxt}</div>`;
+                    
+                    await Promise.all(combined.map(async (item) => {
+                        try {
+                            let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${targetLang}`);
+                            let transData = await transRes.json();
+                            if (transData.responseData && transData.responseData.translatedText) {
+                                item.title = transData.responseData.translatedText;
+                            }
+                        } catch (e) {} // ignoruj chybu jedného prekladu
+                    }));
+                }
+
+                // VYKRESLENIE
+                let html = "";
+                let readMore = targetLang === 'sk' ? "Čítať originál" : (targetLang === 'cs' ? "Číst originál" : "Read original");
+                
+                combined.forEach(item => {
+                    let d = item.date;
+                    // Krajší formát dátumu a času
+                    let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} o ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                    
+                    let isFuture = d > new Date();
+                    let badge = isFuture ? `<span style="background: rgba(244, 63, 94, 0.2); color: #f43f5e; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: 6px;">ČOSKORO</span>` : '';
+                    let accentColor = item.type === "launch" ? "#f43f5e" : "#38bdf8"; // Červená pre misie, Modrá pre správy
+                    
+                    html += `
+                    <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid ${accentColor}; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
+                        <div style="color:#94a3b8; font-size:0.75rem; font-family:monospace; display: flex; justify-content: space-between; align-items: center;">
+                            <div>📅 ${dateStr} ${badge}</div>
+                            <div style="color: #64748b; font-weight: bold; text-align: right; max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.source}">${item.source}</div>
+                        </div>
+                        <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; line-height: 1.4;">${item.title}</div>
+                        <a href="${item.url}" target="_blank" style="color:${accentColor}; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${readMore} →</a>
+                    </div>`;
+                });
+                
+                content.innerHTML = html;
+
+            } catch (err) {
+                content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">Kritická chyba. ❌</div>`;
+            }
+        }
+// --- INTERNÉ MATEMATICKÉ "API" PRE ASTRONOMICKÉ ÚKAZY ---
+        async function fetchAstroEvents(planetKey) {
+            // Umelé načítavanie, aby to pôsobilo ako luxusné API z webu
+            await new Promise(r => setTimeout(r, 700)); 
+            
+            let events = [];
+            let startMs = simDate.getTime();
+            let msPerDay = 86400000;
+            
+            let isSK = currentLang === 'sk';
+            let isCS = currentLang === 'cs';
+            
+            let tOpp = isSK ? "Opozícia (Najlepšia viditeľnosť)" : (isCS ? "Opozice (Nejlepší viditelnost)" : "Opposition (Best visibility)");
+            let tElo = isSK ? "Najväčšia elongácia (Výborná viditeľnosť)" : (isCS ? "Největší elongace (Výborná viditelnost)" : "Greatest Elongation");
+            let tFull = isSK ? "Spln Mesiaca" : (isCS ? "Úplněk" : "Full Moon");
+            let tNew = isSK ? "Nov Mesiaca" : (isCS ? "Nov" : "New Moon");
+            let tEqui = isSK ? "Začiatok ročného obdobia (Slnovrat/Rovnodennosť)" : (isCS ? "Začátek ročního období" : "Season Change (Equinox/Solstice)");
+
+            if (["Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"].includes(planetKey)) {
+                let prevDist = Infinity;
+                let isDecreasing = true;
+                // Vypočítame ďalšie 4 opozície (minimum vzdialenosti k Zemi)
+                for (let i = 1; i < 6000; i+=3) { 
+                    let d = (startMs + i * msPerDay - new Date(2026, 0, 1).getTime()) / msPerDay;
+                    let ePos = getPlanetPos("Earth", d, 1);
+                    let pPos = getPlanetPos(planetKey, d, 1);
+                    let dist = Math.hypot(pPos.x - ePos.x, pPos.y - ePos.y);
+
+                    if (isDecreasing && dist > prevDist) {
+                        events.push({ title: tOpp, date: new Date(startMs + (i - 3) * msPerDay), icon: "✨" });
+                        isDecreasing = false;
+                        if (events.length >= 4) break;
+                    } else if (!isDecreasing && dist < prevDist) {
+                        isDecreasing = true;
+                    }
+                    prevDist = dist;
+                }
+            } else if (["Mercury", "Venus"].includes(planetKey)) {
+                let prevElong = 0;
+                let isIncreasing = true;
+                // Vypočítame najväčšiu uhlovú vzdialenosť od Slnka (Elongácia)
+                for (let i = 1; i < 2000; i+=2) {
+                    let d = (startMs + i * msPerDay - new Date(2026, 0, 1).getTime()) / msPerDay;
+                    let ePos = getPlanetPos("Earth", d, 1);
+                    let pPos = getPlanetPos(planetKey, d, 1);
+                    let sunGeo = Math.atan2(-ePos.y, -ePos.x);
+                    let pGeo = Math.atan2(pPos.y - ePos.y, pPos.x - ePos.x);
+                    let elong = Math.abs(((pGeo - sunGeo + Math.PI*3) % (Math.PI*2)) - Math.PI);
+
+                    if (isIncreasing && elong < prevElong) {
+                        events.push({ title: tElo, date: new Date(startMs + (i - 2) * msPerDay), icon: "🌗" });
+                        isIncreasing = false;
+                        if (events.length >= 4) break;
+                    } else if (!isIncreasing && elong > prevElong) {
+                        isIncreasing = true;
+                    }
+                    prevElong = elong;
+                }
+            } else if (planetKey === "Moon") {
+                // Fázy mesiaca (Generuje automaticky)
+                for(let i=1; i<=60; i++) {
+                    events.push({ title: i%2===0 ? tFull : tNew, date: new Date(startMs + i * 14.76 * msPerDay), icon: i%2===0 ? "🌕" : "🌑" });
+                }
+                events = events.slice(0, 5);
+            } else if (planetKey === "Sun" || planetKey === "Earth") {
+                // Slnovraty a rovnodennosti
+                for(let i=1; i<800; i+=10) {
+                    let eDate = new Date(startMs + i * msPerDay);
+                    let m = eDate.getMonth();
+                    let d = eDate.getDate();
+                    if ((m === 2 && d >= 20 && d <= 21) || (m === 5 && d >= 20 && d <= 21) || (m === 8 && d >= 22 && d <= 23) || (m === 11 && d >= 21 && d <= 22)) {
+                        events.push({ title: tEqui, date: new Date(eDate.getTime()), icon: "☀️" });
+                    }
+                }
+                events = events.filter((v,i,a)=>a.findIndex(t=>(t.date.getMonth() === v.date.getMonth() && t.date.getFullYear()===v.date.getFullYear()))===i).slice(0, 4);
+            } else if (planetKey === "Halley") {
+                events.push({ title: "Perihélium (Najbližšie k Slnku)", date: new Date("2061-07-28"), icon: "☄️" });
+            }
+            return events;
+        }
+
+        // --- ZAVOLANIE "API" A NAPLNENIE OKNA ---
+        async function openAstroEvents(planetKey) {
+            let overlay = document.getElementById('astro-events-overlay');
+            let content = document.getElementById('astro-events-content');
+            let title = document.getElementById('astro-events-title');
+            
+            overlay.style.display = 'flex';
+            let mainTrans = translations[currentLang] || translations['en'];
+            
+            title.innerHTML = `📅 ${mainTrans.planets[planetKey]} - Úkazy`;
+            
+            let loadTxt = currentLang === 'sk' ? "Prehľadávam vesmírne modely... 🔭" : "Prohledávám vesmírné modely... 🔭";
+            content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${loadTxt}</div>`;
+            
+            // VOLÁME "API"
+            let events = await fetchAstroEvents(planetKey);
+            
+            if (events.length === 0) {
+                content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">Žiadne blízke úkazy.</div>`;
+                return;
+            }
+            
+            let html = "";
+            events.forEach(e => {
+                let d = e.date;
+                let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+                let diffDays = Math.ceil((d.getTime() - simDate.getTime()) / 86400000);
+                
+                let inTxt = currentLang === 'sk' ? "Za" : (currentLang === 'cs' ? "Za" : "In");
+                let daysTxt = currentLang === 'sk' ? "dní" : (currentLang === 'cs' ? "dní" : "days");
+                let timeBadge = `<span style="background: rgba(250, 204, 21, 0.2); color: #facc15; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">${inTxt} ${diffDays} ${daysTxt}</span>`;
+                
+                html += `
+                <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid #facc15; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="color:#94a3b8; font-size:0.8rem; font-family:monospace; display: flex; justify-content: space-between; align-items: center;">
+                        <div>📅 ${dateStr}</div>
+                        <div>${timeBadge}</div>
+                    </div>
+                    <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.2rem;">${e.icon}</span> ${e.title}
+                    </div>
+                </div>`;
+            });
+            
+            content.innerHTML = html;
+        }
     </script>
 </body>
 </html>
