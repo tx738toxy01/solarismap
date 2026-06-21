@@ -99,7 +99,7 @@
             z-index: 2000; 
         }
         
-        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(56, 189, 248, 0.7); border-radius: 16px; padding: 12px 16px; width: 300px; max-width: calc(100vw - 95px); z-index: 4; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 15px rgba(56, 189, 248, 0.15); height: 134px; box-sizing: border-box; }
+        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.98); border: 2px solid rgba(56, 189, 248, 0.85); border-radius: 16px; padding: 14px 18px; width: 320px; max-width: calc(100vw - 95px); z-index: 4; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(56, 189, 248, 0.3); height: 148px; box-sizing: border-box; }
         .btn-radar-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10; padding: 0; }
         .radar-title { font-size: 0.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; padding-right: 20px; }
         .radar-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; }
@@ -108,7 +108,7 @@
         .radar-vis-lbl { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
         .radar-vis-val { font-size: 0.95rem; font-weight: bold; line-height: 1.2; margin-top: 2px; }
 
-        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #ef4444; color: #ffffff; padding: clamp(10px, 2.5vw, 14px) clamp(16px, 4vw, 24px); border-radius: 8px; font-size: clamp(0.75rem, 3.5vw, 1.05rem); font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.6); white-space: normal; text-align: center; max-width: 90vw; width: max-content; line-height: 1.4; }
+        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #ef4444; color: #ffffff; padding: 10px 20px; border-radius: 8px; font-size: clamp(0.75rem, 3.5vw, 1.05rem); font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.6); white-space: normal; text-align: center; max-width: 90vw; width: max-content; line-height: 1.4; }
         
         .radar-action-btn { transition: all 0.15s ease-in-out; }
         .radar-action-btn:active { transform: scale(0.85) !important; filter: brightness(1.2); }
@@ -224,18 +224,18 @@
     top: 15px !important;
     right: 10px !important;
 }
-            /* 4. Zväčšenie a zvýraznenie sledovacieho panela vľavo dole */
+            /* 4. Ešte väčšie sledovacie okno a tlačidlá na mobile */
         #jupiter-radar-panel {
-            padding: 10px 12px !important;
-            width: 245px !important;
-            height: 120px !important;
-            border: 1.5px solid rgba(56, 189, 248, 0.8) !important;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7), 0 0 10px rgba(56, 189, 248, 0.2) !important;
+            padding: 12px 14px !important;
+            width: 270px !important;
+            height: 134px !important;
+            border: 2px solid rgba(56, 189, 248, 0.9) !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8), 0 0 15px rgba(56, 189, 248, 0.3) !important;
         }
         
         /* Zrovnanie výšky pravých tlačidiel s ľavým panelom */
-        #right-floating-btns { height: 120px !important; gap: 8px !important; }
-        .radar-action-btn { width: 56px !important; height: auto !important; flex: 1 !important; border-radius: 12px !important; }
+        #right-floating-btns { height: 134px !important; gap: 8px !important; }
+        .radar-action-btn { width: 62px !important; height: auto !important; flex: 1 !important; border-radius: 14px !important; }
         .radar-action-btn svg { width: 20px !important; height: 20px !important; }
 
         .btn-radar-close { top: 6px !important; right: 10px !important; font-size: 1rem !important; }
@@ -260,7 +260,7 @@
             #main-controls-panel { bottom: 10px !important; transform: scale(0.8) !important; transform-origin: bottom right !important; }
             
             /* Tlačidlá Teraz a Počasie posunieme bezpečne NAD časovač */
-            #right-floating-btns { position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s; height: 134px; }
+            #right-floating-btns { position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s; height: 148px; }
 .radar-action-btn { height: auto !important; flex: 1; }
 #btn-radar-info-float { transform: scale(0.8) !important; transform-origin: bottom left !important; }
     }
@@ -562,13 +562,13 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
                     <iframe id="quick-map-iframe" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>
                 </div>
 
-    <button id="btn-toggle-labels" onclick="toggleLabels()" style="position: fixed; bottom: 20px; left: 16px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 50%; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-        <svg id="icon-labels-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button id="btn-toggle-labels" onclick="toggleLabels()" style="position: fixed; bottom: 20px; left: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s; box-shadow: 0 6px 15px rgba(0,0,0,0.7), 0 0 12px rgba(56, 189, 248, 0.4);">
+        <svg id="icon-labels-on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="4 7 4 4 20 4 20 7"></polyline>
             <line x1="9" y1="20" x2="15" y2="20"></line>
             <line x1="12" y1="4" x2="12" y2="20"></line>
         </svg>
-        <svg id="icon-labels-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; opacity: 0.5;">
+        <svg id="icon-labels-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; opacity: 0.5;">
             <polyline points="4 7 4 4 20 4 20 7"></polyline>
             <line x1="9" y1="20" x2="15" y2="20"></line>
             <line x1="12" y1="4" x2="12" y2="20"></line>
@@ -576,8 +576,8 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
         </svg>
     </button>
     
-    <button id="btn-radar-info-float" onclick="toggleRadarPanel(event)" style="position: fixed; bottom: 20px; left: 68px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 50%; width: 44px; height: 44px; display: none; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" title="Zobraziť sledovanie">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button id="btn-radar-info-float" onclick="toggleRadarPanel(event)" style="position: fixed; bottom: 20px; left: 74px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 50%; width: 50px; height: 50px; display: none; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s; box-shadow: 0 6px 15px rgba(0,0,0,0.7), 0 0 12px rgba(56, 189, 248, 0.4);" title="Zobraziť sledovanie">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -586,13 +586,13 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
 
     <div id="right-floating-btns" style="position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s;">
         
-        <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 16px; font-size: 0.65rem; font-weight: bold; cursor: pointer; width: 62px; height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; opacity: 0.4; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+        <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 16px; font-size: 0.7rem; font-weight: bold; cursor: pointer; width: 69px; height: 69px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; opacity: 0.4; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
             <span id="lbl-radar-weather" style="letter-spacing: 0.05em;">Počasie</span>
         </button>
         
-        <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; font-size: 0.65rem; font-weight: bold; cursor: pointer; width: 62px; height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.5);">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; font-size: 0.7rem; font-weight: bold; cursor: pointer; width: 69px; height: 69px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; backdrop-filter: blur(4px); box-shadow: 0 6px 12px rgba(2, 132, 199, 0.5);">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <span id="lbl-radar-now" style="letter-spacing: 0.05em;">Teraz</span>
         </button>
 
@@ -623,7 +623,7 @@ function closeApp() {
                 visNoHor: "Nie (Pod obzorom)", visNoSun: "Nie (Silné slnečné svetlo)", visNoFar: "Nie (Príliš ďaleko)", visNoMoonPhase: "Nie (Fáza novu)", visNoHubble: "Nie (Vyžaduje Hubblov ďalekohľad)",
                 visYesBright: "Áno (Žiari na oblohe)", visYesNormal: "Áno (Dobre viditeľné)", visYesFaint: "Áno (Na hranici viditeľnosti)", visYesDayMoon: "Áno (Viditeľný aj cez deň)",
                 statDist: "Vzdialenosť", statSpeed: "Rýchlosť", statPeriod: "Doba obehu",
-                btnToday: "Teraz", swipeTip: "Potiahnutím posúvaš čas (← Minulosť | Budúcnosť →)",
+                btnToday: "Teraz", swipeTip: "Potiahnutím posúvaš čas (← Vzad | Vpred →)",
                 periodY: " r", periodD: " d", pickerTitle: "Dátum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušiť", pickerConfirm: "Potvrdiť",
                 pickerDay: "Deň", pickerMonth: "Mesiac", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
                 settingsTitle: "⚙️ Nastavenia", settingsLang: "Jazyk", settingsStartup: "Objekt po štarte", quickSelect: "Rýchly výber",
@@ -644,7 +644,7 @@ function closeApp() {
                 visNoHor: "Ne (Pod obzorem)", visNoSun: "Ne (Silné sluneční světlo)", visNoFar: "Ne (Příliš daleko)", visNoMoonPhase: "Ne (Fáze novu)", visNoHubble: "Ne (Vyžaduje Hubbleův dalekohled)",
                 visYesBright: "Ano (Září na obloze)", visYesNormal: "Ano (Dobře viditelné)", visYesFaint: "Ano (Na hranici viditelnosti)", visYesDayMoon: "Ano (Viditelný i ve dne)",
                 statDist: "Vzdálenost", statSpeed: "Rychlost", statPeriod: "Doba oběhu",
-                btnToday: "Nyní", swipeTip: "Tažením posouváš čas (← Minulost | Budoucnost →)",
+                btnToday: "Nyní", swipeTip: "Tažením posouváš čas (← Vzad | Vpřed →)",
                 periodY: " r", periodD: " d", pickerTitle: "Datum a Čas <small style='color:#64748b; font-weight:normal; margin-left:6px; font-size:0.8rem;'>(rok -9999 až +9999)</small>", pickerCancel: "Zrušit", pickerConfirm: "Potvrdit",
                 pickerDay: "Den", pickerMonth: "Měsíc", pickerYear: "Rok", pickerHour: "Hod", pickerMinute: "Min",
                 settingsTitle: "⚙️ Nastavení", settingsLang: "Jazyk", settingsStartup: "Objekt po startu", quickSelect: "Rychlý výběr",
@@ -1688,7 +1688,7 @@ function closeApp() {
 
         function showToast(msg) {
             const tip = document.getElementById('swipe-tip');
-            tip.innerText = msg;
+            tip.innerHTML = msg;
             tip.style.opacity = '1';
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => { tip.style.opacity = '0'; }, 3500);
@@ -3742,12 +3742,12 @@ function closeApp() {
                 // Zapnutý stav (Svieti na modro)
                 document.getElementById('icon-labels-on').style.display = 'block';
                 document.getElementById('icon-labels-off').style.display = 'none';
-                document.getElementById('btn-toggle-labels').style.borderColor = 'rgba(56, 189, 248, 0.4)';
+                document.getElementById('btn-toggle-labels').style.borderColor = '#38bdf8';
             } else {
                 // Vypnutý stav (Preškrtnuté na červeno)
                 document.getElementById('icon-labels-on').style.display = 'none';
                 document.getElementById('icon-labels-off').style.display = 'block';
-                document.getElementById('btn-toggle-labels').style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                document.getElementById('btn-toggle-labels').style.borderColor = '#ef4444';
             }
         }
 // FUNKCIA PRE TLAČIDLO "CELKOVÝ POHĽAD" (Vykradnutá matematika zo Slnka)
