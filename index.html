@@ -98,7 +98,7 @@
             z-index: 2000; 
         }
         
-        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 10px 14px; width: 280px; max-width: calc(100vw - 90px); z-index: 4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); height: 118px; box-sizing: border-box; }
+        #jupiter-radar-panel { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(56, 189, 248, 0.7); border-radius: 16px; padding: 12px 16px; width: 300px; max-width: calc(100vw - 95px); z-index: 4; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 15px rgba(56, 189, 248, 0.15); height: 134px; box-sizing: border-box; }
         .btn-radar-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #ef4444; font-size: 1.1rem; font-weight: bold; cursor: pointer; z-index: 10; padding: 0; }
         .radar-title { font-size: 0.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; padding-right: 20px; }
         .radar-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; }
@@ -107,7 +107,7 @@
         .radar-vis-lbl { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
         .radar-vis-val { font-size: 0.95rem; font-weight: bold; line-height: 1.2; margin-top: 2px; }
 
-        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #ef4444; color: #ffffff; padding: 14px 24px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.6); white-space: nowrap; }
+        .toast-tip { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #ef4444; color: #ffffff; padding: clamp(10px, 2.5vw, 14px) clamp(16px, 4vw, 24px); border-radius: 8px; font-size: clamp(0.75rem, 3.5vw, 1.05rem); font-weight: bold; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.6); white-space: normal; text-align: center; max-width: 90vw; width: max-content; line-height: 1.4; }
         
         .radar-action-btn { transition: all 0.15s ease-in-out; }
         .radar-action-btn:active { transform: scale(0.85) !important; filter: brightness(1.2); }
@@ -180,27 +180,27 @@
                 font-size: 0.75rem !important; 
             }
 
-            /* 2. Zmenšenie a zabezpečenie panelu s vyhľadávaním / polohou */
+            /* 2. Zväčšenie a zabezpečenie panelu s vyhľadávaním / polohou */
             .tab-menu {
                 left: 10px !important;
                 top: 15px !important;
-                gap: 4px !important;
-                max-width: 58% !important; /* Panel nepresiahne polovicu obrazovky */
+                gap: 6px !important;
+                max-width: 68% !important; 
             }
             .tab-btn {
-                padding: 0 10px !important;
-                font-size: 0.72rem !important;
-                border-radius: 6px !important;
+                padding: 0 12px !important;
+                font-size: 0.88rem !important;
+                border-radius: 8px !important;
                 white-space: nowrap !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
-                max-width: 105px !important;
-                height: 38px !important;
+                max-width: 135px !important;
+                height: 44px !important;
             }
             .tab-btn-location-mode {
-                padding: 6px 8px !important;
+                padding: 6px 10px !important;
                 gap: 4px !important;
-                max-width: 135px !important;
+                max-width: 155px !important;
             }
 
             /* 3. Zmenšenie panelu východu a západu slnka */
@@ -223,17 +223,19 @@
     top: 15px !important;
     right: 10px !important;
 }
-            /* 4. Zmenšenie sledovacieho panela vľavo dole */
+            /* 4. Zväčšenie a zvýraznenie sledovacieho panela vľavo dole */
         #jupiter-radar-panel {
-            padding: 8px 10px !important;
-            width: 220px !important;
-            height: 104px !important;
+            padding: 10px 12px !important;
+            width: 245px !important;
+            height: 120px !important;
+            border: 1.5px solid rgba(56, 189, 248, 0.8) !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7), 0 0 10px rgba(56, 189, 248, 0.2) !important;
         }
         
         /* Zrovnanie výšky pravých tlačidiel s ľavým panelom */
-        #right-floating-btns { height: 104px !important; gap: 8px !important; }
-        .radar-action-btn { width: 48px !important; }
-        .radar-action-btn svg { width: 18px !important; height: 18px !important; }
+        #right-floating-btns { height: 120px !important; gap: 8px !important; }
+        .radar-action-btn { width: 56px !important; height: auto !important; flex: 1 !important; border-radius: 12px !important; }
+        .radar-action-btn svg { width: 20px !important; height: 20px !important; }
 
         .btn-radar-close { top: 6px !important; right: 10px !important; font-size: 1rem !important; }
             .radar-title { font-size: 0.75rem !important; margin-bottom: 4px !important; }
@@ -257,7 +259,7 @@
             #main-controls-panel { bottom: 10px !important; transform: scale(0.8) !important; transform-origin: bottom right !important; }
             
             /* Tlačidlá Teraz a Počasie posunieme bezpečne NAD časovač */
-            #right-floating-btns { position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s; height: 118px; }
+            #right-floating-btns { position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s; height: 134px; }
 .radar-action-btn { height: auto !important; flex: 1; }
 #btn-radar-info-float { transform: scale(0.8) !important; transform-origin: bottom left !important; }
     }
@@ -583,12 +585,12 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
 
     <div id="right-floating-btns" style="position: fixed; right: 12px; bottom: 20px; display: none; flex-direction: column; gap: 10px; z-index: 50; transition: all 0.2s;">
         
-        <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 14px; font-size: 0.6rem; font-weight: bold; cursor: pointer; width: 54px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; opacity: 0.4; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <button id="btn-radar-weather" class="radar-action-btn" onclick="handleWeatherClick()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #94a3b8; border-radius: 16px; font-size: 0.65rem; font-weight: bold; cursor: pointer; width: 62px; height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; opacity: 0.4; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
             <span id="lbl-radar-weather" style="letter-spacing: 0.05em;">Počasie</span>
         </button>
         
-        <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 14px; font-size: 0.6rem; font-weight: bold; cursor: pointer; width: 54px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.5);">
+        <button id="btn-radar-now" class="radar-action-btn" onclick="resetToToday()" onpointerdown="this.style.transform='scale(0.85)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'" style="background: #0284c7; color: white; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; font-size: 0.65rem; font-weight: bold; cursor: pointer; width: 62px; height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.5);">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <span id="lbl-radar-now" style="letter-spacing: 0.05em;">Teraz</span>
         </button>
@@ -822,17 +824,17 @@ function closeApp() {
             }
         };
 
-        // Pridanie nových prekladov (Krok 3)
-        Object.assign(translations.sk, { settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie", toastTapObject: "Ťukni na objekt" });
-        Object.assign(translations.cs, { settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontem, vyber jiný objekt.", radarWeatherBtn: "Počasí", toastTapObject: "Klepni na objekt" });
-        Object.assign(translations.en, { settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather", toastTapObject: "Tap the object" });
-        Object.assign(translations.de, { settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter", toastTapObject: "Tippe auf das Objekt" });
-        Object.assign(translations.fr, { settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo", toastTapObject: "Touchez l'objet" });
-        Object.assign(translations.es, { settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima", toastTapObject: "Toca el objeto" });
-        Object.assign(translations.zh, { settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气", toastTapObject: "点击天体" });
-        Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम", toastTapObject: "वस्तु पर टैप करें" });
-        Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気", toastTapObject: "天体をタップ" });
-        Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨", toastTapObject: "천체를 탭하세요" });
+        // Pridanie nových prekladov (Krok 3) vrátane limitov pre počasie a oblačnosti
+        Object.assign(translations.sk, { settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie", toastTapObject: "Ťukni na objekt", weatherToastLimit: "Predpoveď je dostupná len na 14 dní dopredu a 2 dni dozadu.", weatherClouds: "Oblačnosť" });
+        Object.assign(translations.cs, { settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontem, vyber jiný objekt.", radarWeatherBtn: "Počasí", toastTapObject: "Klepni na objekt", weatherToastLimit: "Předpověď je dostupná pouze na 14 dní dopředu a 2 dny dozadu.", weatherClouds: "Oblačnost" });
+        Object.assign(translations.en, { settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather", toastTapObject: "Tap the object", weatherToastLimit: "Forecast is limited to 14 days ahead and 2 days back.", weatherClouds: "Cloud cover" });
+        Object.assign(translations.de, { settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter", toastTapObject: "Tippe auf das Objekt", weatherToastLimit: "Die Vorhersage ist auf 14 Tage im Voraus und 2 Tage zurück beschränkt.", weatherClouds: "Bewölkung" });
+        Object.assign(translations.fr, { settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo", toastTapObject: "Touchez l'objet", weatherToastLimit: "Les prévisions sont limitées à 14 jours en avant et 2 jours en arrière.", weatherClouds: "Nuages" });
+        Object.assign(translations.es, { settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima", toastTapObject: "Toca el objeto", weatherToastLimit: "El pronóstico se limita a 14 días en el futuro y 2 días en el pasado.", weatherClouds: "Nubosidad" });
+        Object.assign(translations.zh, { settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气", toastTapObject: "点击天体", weatherToastLimit: "天气预报仅限未来 14 天和过去 2 天。", weatherClouds: "云量" });
+        Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम", toastTapObject: "वस्तु पर टैप करें", weatherToastLimit: "पूर्वानुमान 14 दिन आगे और 2 दिन पीछे तक सीमित है。", weatherClouds: "बादल" });
+        Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気", toastTapObject: "天体をタップ", weatherToastLimit: "天気予報は14日先から過去2日まで利用可能です。", weatherClouds: "雲量" });
+        Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨", toastTapObject: "천체를 탭하세요", weatherToastLimit: "일기 예보는 미래 14일과 과거 2일까지만 제공됩니다.", weatherClouds: "구름" });
         // --- PREKLADY PRE ZNAMENIA (ANGLIČTINA = ZÁKLADNÝ FALLBACK) ---
         Object.assign(translations.en, {
             zodiacUI: { title: "Zodiac: ", duration: "Duration (Tap for Fun Fact)", constellation: "Constellation (Tap for Info)", mythology: "Name & Mythology (Story)" },
@@ -2897,8 +2899,8 @@ function closeApp() {
                         let distFromPlanet = Math.hypot(actX + textWidth/2 - screenX, actY - textHeight/2 - screenY);
                         if (distFromPlanet > drawRadius + 15) {
                             ctx.beginPath();
-                            // OPRAVA: Dynamická farba čiar (Čierna nad horizontom, biela pod ním)
-                            if (alt > 0) {
+                            // OPRAVA: Dynamická farba čiar (Čierna nad svetlým horizontom, biela v noci a pod horizontom)
+                            if (alt > 0 && skyColor !== '#020617') {
                                 ctx.strokeStyle = currentPlanetKey === key ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.6)';
                             } else {
                                 ctx.strokeStyle = currentPlanetKey === key ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.5)';
@@ -3024,24 +3026,25 @@ function closeApp() {
                         document.getElementById('jup-vis').innerText = visText;
                         document.getElementById('jup-vis').style.color = visColor;
 
-                        // Inteligentné nasvietenie tlačidla Počasie
-                        let weatherBtn = document.getElementById('btn-radar-weather');
-                        if (weatherBtn) {
-                            let diffMinutes = Math.abs(simDate.getTime() - new Date().getTime()) / 60000;
-                            if (diffMinutes < 5) {
-                                weatherBtn.style.opacity = "1";
-                                weatherBtn.style.background = "#0284c7"; // Rovnaká farba ako Teraz
-                                weatherBtn.style.borderColor = "#0284c7";
-                                weatherBtn.style.color = "white";
-                                weatherBtn.style.boxShadow = "0 4px 10px rgba(2, 132, 199, 0.4)";
-                            } else {
-                                weatherBtn.style.opacity = "0.4";
-                                weatherBtn.style.background = "rgba(15, 23, 42, 0.8)"; // Pôvodná tmavá
-                                weatherBtn.style.borderColor = "rgba(148, 163, 184, 0.4)";
-                                weatherBtn.style.color = "#94a3b8";
-                                weatherBtn.style.boxShadow = "none";
-                            }
                         }
+                }
+                
+                // Inteligentné nasvietenie tlačidla Počasie (Podpora predpovede -2 až +14 dní)
+                let weatherBtn = document.getElementById('btn-radar-weather');
+                if (weatherBtn) {
+                    let diffDays = (simDate.getTime() - new Date().getTime()) / 86400000;
+                    if (diffDays >= -2 && diffDays <= 14) {
+                        weatherBtn.style.opacity = "1";
+                        weatherBtn.style.background = "#0284c7"; 
+                        weatherBtn.style.borderColor = "#0284c7";
+                        weatherBtn.style.color = "white";
+                        weatherBtn.style.boxShadow = "0 4px 10px rgba(2, 132, 199, 0.4)";
+                    } else {
+                        weatherBtn.style.opacity = "0.4";
+                        weatherBtn.style.background = "rgba(15, 23, 42, 0.8)"; 
+                        weatherBtn.style.borderColor = "rgba(148, 163, 184, 0.4)";
+                        weatherBtn.style.color = "#94a3b8";
+                        weatherBtn.style.boxShadow = "none";
                     }
                 }
             }
@@ -3472,16 +3475,15 @@ function closeApp() {
 
 // INTEGROVANÁ LOGIKA PRE KLIKNUTIE NA TLAČIDLO POČASIA
         function handleWeatherClick() {
-            const t = translations[currentLang];
-            let diffMinutes = Math.abs(simDate.getTime() - new Date().getTime()) / 60000;
+            let diffDays = (simDate.getTime() - new Date().getTime()) / 86400000;
 
-            // 1. Kontrola, či sme v prítomnosti (max 5 minút odchýlka)
-            if (diffMinutes > 5) {
-                showToast(t.weatherToastTime);
+            // 1. Kontrola, či je čas v limite (API dáva zvyčajne 2 dni dozadu a 14 dní dopredu)
+            if (diffDays < -2 || diffDays > 14) {
+                showToast(translations[currentLang].weatherToastLimit);
                 return;
             }
 
-            // 3. Ak všetko sedí, otvor modal
+            // 2. Ak všetko sedí, otvor modal
             openWeatherModal();
         }
 
@@ -3502,17 +3504,34 @@ function closeApp() {
                 let lon = myLon;
                 let locName = myLocName || "---";
                 
-                // 2. Opýtame sa API na všetko podstatné
-                let url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,surface_pressure,cloud_cover,weather_code`;
+                // 2. Opýtame sa API na hodinovú predpoveď (14 dní dopredu, 2 dozadu)
+                let url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,cloud_cover,weather_code&past_days=2&forecast_days=14`;
                 let response = await fetch(url);
                 let data = await response.json();
 
-                let current = data.current;
-                let clouds = current.cloud_cover;
-                let code = current.weather_code;
-                let temp = current.temperature_2m;
-                let wind = current.wind_speed_10m;
-                let humidity = current.relative_humidity_2m;
+                // Nájdeme najbližšiu hodinu v stiahnutom poli k nášmu nastavenému simDate
+                let targetTime = simDate.getTime();
+                let closestIdx = 0;
+                let minDiff = Infinity;
+
+                data.hourly.time.forEach((tStr, idx) => {
+                    let tMs = new Date(tStr + "Z").getTime(); // Pridáme Z, aby sa čas presne spracoval v UTC
+                    let diff = Math.abs(tMs - targetTime);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestIdx = idx;
+                    }
+                });
+
+                let clouds = data.hourly.cloud_cover[closestIdx];
+                let code = data.hourly.weather_code[closestIdx];
+                let temp = data.hourly.temperature_2m[closestIdx];
+                let wind = data.hourly.wind_speed_10m[closestIdx];
+                let humidity = data.hourly.relative_humidity_2m[closestIdx];
+                
+                // Vytvoríme formátovaný reťazec dátumu a času pre zobrazenie
+                let pad = (n) => n.toString().padStart(2, '0');
+                let targetDateStr = `${pad(simDate.getDate())}.${pad(simDate.getMonth()+1)}.${simDate.getFullYear()} ${pad(simDate.getHours())}:${pad(simDate.getMinutes())}`;
                 
                 // 3. Logika úrovní z napojených prekladov (t.weatherVerdicts)
                 let verdict = "";
@@ -3531,7 +3550,8 @@ function closeApp() {
 
                 // 4. Vykreslenie pomocou slovenských, anglických, alebo iných výrazov
                 content.innerHTML = `
-                    <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px; text-transform: uppercase;">${t.weatherLoc}: ${locName}</div>
+                    <div style="font-size: 0.85rem; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">📅 ${targetDateStr}</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px; text-transform: uppercase;">${t.weatherLoc}: ${locName}</div>
                     
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; text-align: center;">
                         <div style="background: rgba(30, 41, 59, 0.5); padding: 10px 5px; border-radius: 8px; border: 1px solid rgba(51, 65, 85, 0.5);">
@@ -3550,6 +3570,7 @@ function closeApp() {
 
                     <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px;">${t.weatherEval}:</div>
                     <div style="padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid ${vColor}40;">
+                        <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: -2px;">${t.weatherClouds}</div>
                         <div style="font-size: 3.2rem; font-weight: bold; color: #f8fafc; line-height: 1; margin-bottom: 10px;">
                             ☁️ ${clouds}<span style="font-size: 1.5rem; color: #64748b;">%</span>
                         </div>
