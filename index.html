@@ -46,7 +46,7 @@
         .controls-panel { position: absolute; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 24px; padding: 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; z-index: 5; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); width: 90px; }
         .btn-teraz { background: #0284c7; color: white; font-weight: bold; font-size: 0.85rem; padding: 8px 12px; border-radius: 16px; border: none; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4); }
         .btn-teraz:active { transform: scale(0.95); }
-        .btn-pause { background: transparent; color: #e2e8f0; font-size: 1.6rem; line-height: 1; border: none; cursor: pointer; transition: color 0.2s; }
+        .btn-pause { background: transparent; color: #e2e8f0; font-size: 1.6rem; line-height: 1; border: none; cursor: pointer; transition: color 0.2s; margin-top: 8px; margin-bottom: 4px; }
         .btn-pause.active { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
         .divider { width: 80%; height: 1px; background-color: rgba(51, 65, 85, 0.6); margin: 2px 0; }
         
@@ -233,9 +233,9 @@
         }
         
         /* Zrovnanie výšky pravých tlačidiel s ľavým panelom */
-        #right-floating-btns { height: 134px !important; gap: 8px !important; }
-        .radar-action-btn { width: 62px !important; height: auto !important; flex: 1 !important; border-radius: 14px !important; }
-        .radar-action-btn svg { width: 20px !important; height: 20px !important; }
+        #right-floating-btns { height: 104px !important; gap: 8px !important; }
+        .radar-action-btn { width: 48px !important; height: auto !important; flex: 1 !important; border-radius: 12px !important; }
+        .radar-action-btn svg { width: 18px !important; height: 18px !important; }
 
         .btn-radar-close { top: 6px !important; right: 10px !important; font-size: 1rem !important; }
             .radar-title { font-size: 0.75rem !important; margin-bottom: 4px !important; }
@@ -3787,7 +3787,7 @@ function closeApp() {
             
             // 1. Zarovnanie na vrchný okraj hlavného spodného panela (Pre Obe strany)
             if (infoDrawer && infoDrawer.getBoundingClientRect().height > 0) {
-                let offset = window.innerHeight - infoDrawer.getBoundingClientRect().top + 15;
+                let offset = window.innerHeight - infoDrawer.getBoundingClientRect().top + 20;
                 targetBottomLeft = offset;
                 targetBottomRight = offset; // Pravá strana ostáva vždy tu
             }
