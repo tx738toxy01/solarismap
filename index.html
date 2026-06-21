@@ -3461,13 +3461,18 @@ function closeApp() {
             if (event) event.stopPropagation();
             let panel = document.getElementById('jupiter-radar-panel');
             let infoBtn = document.getElementById('btn-radar-info-float');
+            let rightBtns = document.getElementById('right-floating-btns'); // Pridané pre pravú stranu
             
             if (panel.style.display === 'block') {
+                // Vypnutie panela
                 panel.style.display = 'none';
                 if (infoBtn && activeTab === 'horizon') infoBtn.style.display = 'flex';
+                if (rightBtns) rightBtns.style.display = 'none'; // Schová tlačidlá Teraz a Počasie
             } else {
+                // Zapnutie panela
                 panel.style.display = 'block';
                 if (infoBtn) infoBtn.style.display = 'none';
+                if (rightBtns && activeTab === 'horizon') rightBtns.style.display = 'flex'; // Znova ich ukáže
             }
         }
 
