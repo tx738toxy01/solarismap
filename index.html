@@ -4108,36 +4108,42 @@ function closeApp() {
                     await fetchEclipse("lunar", "🌑");
                 } catch(e) { console.log("Chyba USNO API:", e); }
 
-                // 2. ŠTANDARDNÝ RSS FEED (Všetko čo server In-The-Sky pošle)
+                // 2. ŠTANDARDNÝ RSS FEED (Cez bezpečné RSS2JSON API)
                 try {
-                    let res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://in-the-sky.org/rss.php?feed=dfan'));
-                    let xmlText = await res.text();
+                    let rssUrl = encodeURIComponent('https://in-the-sky.org/rss.php?feed=dfan');
+                    let res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + rssUrl);
                     
-                    let parser = new DOMParser();
-                    let xmlDoc = parser.parseFromString(xmlText, "text/xml");
-                    let items = xmlDoc.querySelectorAll("item");
+                    if (!res.ok) throw new Error("RSS API neodpovedá.");
                     
-                    items.forEach(item => {
-                        let title = item.querySelector("title")?.textContent || "";
-                        let pubDateStr = item.querySelector("pubDate")?.textContent || "";
-                        let link = item.querySelector("link")?.textContent || "";
+                    let data = await res.json();
+                    if (data.status !== "ok") throw new Error("Chyba pri konverzii RSS dát.");
+                    
+                    data.items.forEach(item => {
+                        let title = item.title || "";
+                        let pubDateStr = item.pubDate || "";
+                        let link = item.link || "";
                         
                         if (!title.toLowerCase().includes("eclipse") && pubDateStr) {
-                            let itemDate = new Date(pubDateStr);
+                            let safeDateStr = pubDateStr.replace(' ', 'T');
+                            let itemDate = new Date(safeDateStr);
+                            
                             if (!isNaN(itemDate.getTime()) && itemDate.getTime() >= realToday.getTime() - 86400000) {
-                                // PRIDANÝ ZDROJ: In-The-Sky.org
                                 events.push({ title: title, date: itemDate, url: link, icon: "🔭", source: "In-The-Sky.org" });
                             }
                         }
                     });
-                } catch(e) { console.log("Chyba RSS API:", e); }
+                } catch(e) { 
+                    console.log("Chyba RSS API:", e); 
+                    events.push({ title: "CHYBA SPOJENIA: " + e.message, date: realToday, url: "#", icon: "❌", source: "Systém" });
+                }
 
                 // ZORADENIE VÝSLEDKOV OD NAJBLIŽŠÍCH
                 events.sort((a, b) => a.date - b.date);
 
             } catch (error) {
-                console.log("Kritická chyba pri sťahovaní úkazov:", error);
-            }
+    console.log("Kritická chyba pri sťahovaní úkazov:", error);
+    events.push({ title: "CHYBA SPOJENIA: " + error.message, date: new Date(), url: "#", icon: "❌", source: "Systém" });
+}
             return events;
         }
 
