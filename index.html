@@ -676,7 +676,8 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
 function closeApp() { 
             window.close(); 
             setTimeout(() => { 
-                showToast("⚠️ Prehliadač blokuje zatvorenie. Aplikáciu musíte zavrieť ručne."); 
+                let t = translations[currentLang] || translations['en'];
+                showToast(t.closeWarn); 
             }, 300); 
         }
         window.addEventListener('click', () => {
@@ -951,8 +952,8 @@ function closeApp() {
         Object.assign(translations.cs, {
             zodiacUI: { title: "Znamení: ", duration: "Trvání (Klikni pro Fun Fact)", constellation: "Souhvězdí (Klikni pro Info)", mythology: "Název a Mytologie (Příběh)" },
             zodiacDetails: {
-                Aries: { date: "21. Březen - 19. Duben", fact: "Bod jarní rovnodennosti se zde již přes 2000 let nenachází. Zemská osa se vychýlila a Slunce v první jarní den dnes svítí v souhvězdí Ryb.", starsTitle: "4 hlavní hvězdy", stars: "Nejjasnější hvězda je Hamal. Souhvězdí je na obloze poměrně malé a nevýrazné.", latin: "Aries", myth: "Podle řecké mytologie představuje zlatého berana, který zachránil Frixa a Hellé. Jeho zlaté rouno později hledali Iásón a Argonauti." },
-                Taurus: { date: "20. Duben - 20. Květen", fact: "Přímo v tomto souhvězdí se nachází Krabí mlhovina – zbytek po explozi supernovy z roku 1054, kterou bylo vidět i ve dne.", starsTitle: "19 hlavních hvězd", stars: "Nejjasnější hvězdou je červený obr Aldebaran (Oko Býka). Součástí jsou i hvězdokupy Plejády a Hyády.", latin: "Taurus", myth: "Představuje sněhobílého býka, na kterého se proměnil samotný Zeus, aby unesl fénickou princeznu Europu na Krétu." },
+                Aries: { date: "21. Březen - 19. Duben", fact: "Bod jarní rovnodennosti se zde již přes 2000 let nenachází. Zemská osa se vychýlila a Slunce v první jarní den dnes svítí v souhvězdí Ryb.", starsTitle: "4 hlavní hvězdy", stars: "Nejjasnější hvězda je Hamal. Souhvězdí je na obloze poměrně malé a nevýrazné.", latin: "Aries", myth: "Podle řecké mytologie představuje zlatého berana, který zachránil Frixa a Hellé. Jeho zlaté rouno captivity později hledali Iásón a Argonauti." },
+                Taurus: { date: "20. Duben - 20. Květen", fact: "Přímo v tomto souhvězdí se nachází Krabí mlhovina – zbytek po explozi supernovy z roku 1054, kterou bylo vidět i ve dne.", starsTitle: "19 hlavních hvězd", stars: "Nejjasnější hvězdou je červený obr Aldebaran (Oko Býka). Součástí jsou i hvězdokupy Plejády a Hyády.", latin: "Taurus", myth: "Představuje sněhobílého býka, v něhož se proměnil samotný Zeus, aby unesl fénickou princeznu Europu na Krétu." },
                 Gemini: { date: "21. Květen - 20. Červen", fact: "Zatímco pouhým okem vypadá Castor jako jedna hvězda, ve skutečnosti je to systém až šesti hvězd obíhajících kolem sebe.", starsTitle: "17 hlavních hvězd", stars: "Nejznámější jsou dvojčata Castor a Pollux. Nachází se zde i otevřená hvězdokupa M35.", latin: "Gemini", myth: "Bratři Castor a Pollux, z nichž jeden byl smrtelný a druhý nesmrtelný. Po Castorově smrti prosil Pollux Dia, aby mohli zůstat navždy spolu." },
                 Cancer: { date: "21. Červen - 22. Červenec", fact: "Je to nejméně jasné souhvězdí zvěrokruhu, ale ukrývá krásnou hvězdokupu Jesličky, kde se rodí stovky nových hvězd.", starsTitle: "5 hlavních hvězd", stars: "Nejjasnější hvězda je Al Tarf. Kvůli slabým hvězdám je těžké ho ve městech vůbec zpozorovat.", latin: "Cancer", myth: "Obrovský krab, kterého poslala bohyně Héra, aby ztížil Herkulovi boj s devítihlavou Hydrou. Herkules ho však rozšlápl." },
                 Leo: { date: "23. Červenec - 22. Srpen", fact: "Nejjasnější hvězda Regulus rotuje tak rychle (přes milion km/h), že má tvar zploštělého vejce.", starsTitle: "15 hlavních hvězd", stars: "Regulus (Lví srdce) a Denebola (Ocas lva) tvoří jasný obrazec připomínající ležící šelmu.", latin: "Leo", myth: "Nemejský lev s nezranitelnou kůží, kterého porazil Herkules v rámci svých dvanácti úkolů." },
@@ -3893,71 +3894,57 @@ function closeApp() {
             if (btnInfo) btnInfo.style.bottom = targetBottomLeft + 'px';
             if (rightBtns) rightBtns.style.bottom = targetBottomRight + 'px';
         }, 150);
-// Rýchly slovník pre LIVE okno
-        const liveDict = {
-            sk: { title: "LIVE Udalosti a Správy", loading: "Pripájam sa na vesmírne servery... 📡", empty: "Pre tento objekt momentálne API nehlási žiadne nové udalosti.", readMore: "Čítať originál" },
-            cs: { title: "LIVE Události a Zprávy", loading: "Připojuji se na vesmírné servery... 📡", empty: "Pro tento objekt momentálně API nehlásí žádné nové události.", readMore: "Číst originál" },
-            en: { title: "LIVE Events & News", loading: "Connecting to space servers... 📡", empty: "No recent events found for this object on the servers.", readMore: "Read original" }
-        };
+// --- DYNAMICKÉ TEXTY PRE VŠETKY JAZYKY (UI, LIVE správy, chyby, úkazy) ---
+        Object.assign(translations.sk, { liveTitle: "LIVE Udalosti a Správy", liveGlobal: "🔔 Globálne vesmírne udalosti", liveLoading: "Pripájam sa na servery... 📡", liveEmpty: "Momentálne žiadne nové udalosti.", liveTrans: "Prekladám údaje... ⏳", liveErr: "Chyba pripojenia. ❌", readMore: "Čítať originál", astroTitle: "Najbližšie úkazy", astroEmpty: "Žiadne blízke úkazy.", sysErr: "CHYBA SPOJENIA", sysSrc: "Systém", closeWarn: "⚠️ Aplikáciu musíte zavrieť ručne.", timeToday: "DNES", timeIn: "Za", timeDays: "dní", timeAgo: "Pred", timeAgoDays: "dňami", soon: "ČOSKORO" });
+        Object.assign(translations.cs, { liveTitle: "LIVE Události a Zprávy", liveGlobal: "🔔 Globální vesmírné události", liveLoading: "Připojuji se na servery... 📡", liveEmpty: "Momentálně žádné nové události.", liveTrans: "Překládám údaje... ⏳", liveErr: "Chyba připojení. ❌", readMore: "Číst originál", astroTitle: "Nejbližší úkazy", astroEmpty: "Žádné blízké úkazy.", sysErr: "CHYBA SPOJENÍ", sysSrc: "Systém", closeWarn: "⚠️ Aplikaci musíte zavřít ručně.", timeToday: "DNES", timeIn: "Za", timeDays: "dní", timeAgo: "Před", timeAgoDays: "dny", soon: "BRZY" });
+        Object.assign(translations.en, { liveTitle: "LIVE Events & News", liveGlobal: "🔔 Global Space Events", liveLoading: "Connecting to servers... 📡", liveEmpty: "No recent events found.", liveTrans: "Translating data... ⏳", liveErr: "Connection Error. ❌", readMore: "Read original", astroTitle: "Upcoming Events", astroEmpty: "No upcoming events found.", sysErr: "CONNECTION ERROR", sysSrc: "System", closeWarn: "⚠️ You must close the app manually.", timeToday: "TODAY", timeIn: "In", timeDays: "days", timeAgo: "", timeAgoDays: "days ago", soon: "SOON" });
+        Object.assign(translations.de, { liveTitle: "LIVE Events & News", liveGlobal: "🔔 Globale Weltraumereignisse", liveLoading: "Verbinde mit Servern... 📡", liveEmpty: "Keine aktuellen Ereignisse.", liveTrans: "Übersetze Daten... ⏳", liveErr: "Verbindungsfehler. ❌", readMore: "Original lesen", astroTitle: "Kommende Ereignisse", astroEmpty: "Keine kommenden Ereignisse.", sysErr: "VERBINDUNGSFEHLER", sysSrc: "System", closeWarn: "⚠️ Bitte App manuell schließen.", timeToday: "HEUTE", timeIn: "In", timeDays: "Tagen", timeAgo: "Vor", timeAgoDays: "Tagen", soon: "BALD" });
+        Object.assign(translations.fr, { liveTitle: "Événements et Actus LIVE", liveGlobal: "🔔 Événements Spatiaux Globaux", liveLoading: "Connexion aux serveurs... 📡", liveEmpty: "Aucun événement récent.", liveTrans: "Traduction des données... ⏳", liveErr: "Erreur de connexion. ❌", readMore: "Lire l'original", astroTitle: "Événements à venir", astroEmpty: "Aucun événement à venir.", sysErr: "ERREUR DE CONNEXION", sysSrc: "Système", closeWarn: "⚠️ Fermez l'application manuellement.", timeToday: "AUJOURD'HUI", timeIn: "Dans", timeDays: "jours", timeAgo: "Il y a", timeAgoDays: "jours", soon: "BIENTÔT" });
+        Object.assign(translations.es, { liveTitle: "Eventos y Noticias EN VIVO", liveGlobal: "🔔 Eventos Espaciales Globales", liveLoading: "Conectando a servidores... 📡", liveEmpty: "No hay eventos recientes.", liveTrans: "Traduciendo datos... ⏳", liveErr: "Error de conexión. ❌", readMore: "Leer original", astroTitle: "Próximos Eventos", astroEmpty: "No se encontraron eventos.", sysErr: "ERROR DE CONEXIÓN", sysSrc: "Sistema", closeWarn: "⚠️ Cierra la aplicación manualmente.", timeToday: "HOY", timeIn: "En", timeDays: "días", timeAgo: "Hace", timeAgoDays: "días", soon: "PRONTO" });
+        Object.assign(translations.zh, { liveTitle: "实时事件与新闻", liveGlobal: "🔔 全球太空事件", liveLoading: "正在连接服务器... 📡", liveEmpty: "目前没有新事件。", liveTrans: "正在翻译数据... ⏳", liveErr: "连接错误。❌", readMore: "阅读原文", astroTitle: "即将发生的事件", astroEmpty: "未找到即将发生的事件。", sysErr: "连接错误", sysSrc: "系统", closeWarn: "⚠️ 请手动关闭应用。", timeToday: "今天", timeIn: "", timeDays: "天后", timeAgo: "", timeAgoDays: "天前", soon: "即将" });
+        Object.assign(translations.hi, { liveTitle: "लाइव घटनाएँ और समाचार", liveGlobal: "🔔 वैश्विक अंतरिक्ष घटनाएँ", liveLoading: "सर्वर से जुड़ रहा है... 📡", liveEmpty: "कोई हालिया घटनाएँ नहीं।", liveTrans: "डेटा का अनुवाद हो रहा है... ⏳", liveErr: "कनेक्शन त्रुटि। ❌", readMore: "मूल पढ़ें", astroTitle: "आगामी घटनाएँ", astroEmpty: "कोई आगामी घटनाएँ नहीं मिलीं।", sysErr: "कनेक्शन त्रुटि", sysSrc: "सिस्टम", closeWarn: "⚠️ ऐप को मैन्युअल रूप से बंद करें।", timeToday: "आज", timeIn: "", timeDays: "दिनों में", timeAgo: "", timeAgoDays: "दिन पहले", soon: "जल्द ही" });
+        Object.assign(translations.ja, { liveTitle: "ライブイベントとニュース", liveGlobal: "🔔 グローバル宇宙イベント", liveLoading: "サーバーに接続中... 📡", liveEmpty: "最近のイベントはありません。", liveTrans: "データを翻訳中... ⏳", liveErr: "接続エラー。❌", readMore: "オリジナルを読む", astroTitle: "今後のイベント", astroEmpty: "今後のイベントは見つかりませんでした。", sysErr: "接続エラー", sysSrc: "システム", closeWarn: "⚠️ アプリを手動で閉じてください。", timeToday: "今日", timeIn: "", timeDays: "日後", timeAgo: "", timeAgoDays: "日前", soon: "まもなく" });
+        Object.assign(translations.ko, { liveTitle: "라이브 이벤트 및 뉴스", liveGlobal: "🔔 글로벌 우주 이벤트", liveLoading: "서버에 연결 중... 📡", liveEmpty: "최근 이벤트가 없습니다.", liveTrans: "데이터 번역 중... ⏳", liveErr: "연결 오류. ❌", readMore: "원본 읽기", astroTitle: "다가오는 이벤트", astroEmpty: "예정된 이벤트가 없습니다.", sysErr: "연결 오류", sysSrc: "시스템", closeWarn: "⚠️ 앱을 수동으로 닫으세요.", timeToday: "오늘", timeIn: "", timeDays: "일 후", timeAgo: "", timeAgoDays: "일 전", soon: "곧" });
 
-        // Asynchrónna funkcia pre ťahanie dát z API (S AUTOMATICKÝM PREKLADOM)
+        // --- EXTERNÉ OKNÁ (S plnou podporou prekladača do všetkých jazykov) ---
         async function showSpaceEvents(planetKey) {
             let overlay = document.getElementById('events-overlay');
             let content = document.getElementById('events-content');
             let title = document.getElementById('events-popup-planet-name');
+            let t = translations[currentLang] || translations['en'];
             
-            // Nastavenie jazyka pre nadpisy
-            let eTrans = liveDict[currentLang] || liveDict['en'];
-            let mainTrans = translations[currentLang] || translations['en'];
-            
-            title.innerHTML = `<span style="color:${planetData[planetKey].color}; font-size: 1.4rem; line-height: 0.5;">●</span> ${mainTrans.planets[planetKey]} - ${eTrans.title}`;
-            
-            // Zobrazenie loading okna (kým čakáme na stiahnutie)
+            title.innerHTML = `<span style="color:${planetData[planetKey].color}; font-size: 1.4rem; line-height: 0.5;">●</span> ${t.planets[planetKey]} - ${t.liveTitle}`;
             overlay.style.display = 'flex';
-            content.innerHTML = `<div style="text-align:center; color:#38bdf8; padding: 30px 10px; font-weight: bold; letter-spacing: 0.5px;">${eTrans.loading}</div>`;
+            content.innerHTML = `<div style="text-align:center; color:#38bdf8; padding: 30px 10px; font-weight: bold; letter-spacing: 0.5px;">${t.liveLoading}</div>`;
             
             try {
-                // TRIEDIČ: Upravíme kľúčové slovo pre API
                 let searchWord = planetKey;
                 if (planetKey === "Sun") searchWord = "Solar"; 
                 if (planetKey === "Moon") searchWord = "Lunar";
                 if (planetKey === "Halley") searchWord = "Comet";
                 
-                // 1. KROK: Potiahnutie správ v Angličtine
                 let response = await fetch(`https://api.spaceflightnewsapi.net/v4/articles?title_contains=${searchWord}&limit=10`);
                 let data = await response.json();
                 
                 if (!data.results || data.results.length === 0) {
-                    content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">${eTrans.empty}</div>`;
+                    content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">${t.liveEmpty}</div>`;
                     return;
                 }
                 
-                // 2. KROK: AUTOMATICKÝ PREKLAD (Ak nemáme nastavenú angličtinu)
-                let targetLang = currentLang === 'sk' ? 'sk' : (currentLang === 'cs' ? 'cs' : 'en');
-                
-                if (targetLang !== 'en') {
-                    // Ukážeme používateľovi, že pracujeme na preklade
-                    let translatingText = currentLang === 'sk' ? "Prekladám správy do slovenčiny... ⏳" : "Překládám zprávy do češtiny... ⏳";
-                    content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 30px 10px; font-weight: bold; letter-spacing: 0.5px;">${translatingText}</div>`;
-                    
-                    // Preložíme všetky nadpisy naraz (vlákna bežia paralelne) pomocou free MyMemory API
+                // UNIVERZÁLNY PREKLAD PRE VŠETKY JAZYKY OKREM EN
+                if (currentLang !== 'en') {
+                    content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 30px 10px; font-weight: bold; letter-spacing: 0.5px;">${t.liveTrans}</div>`;
                     await Promise.all(data.results.map(async (item) => {
                         try {
-                            // Enkódujeme anglický nadpis a pošleme ho preložiť
-                            let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${targetLang}`);
+                            let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${currentLang}`);
                             let transData = await transRes.json();
-                            
-                            // Ak sa preklad podaril, prepíšeme pôvodný anglický nadpis
                             if (transData.responseData && transData.responseData.translatedText) {
                                 item.title = transData.responseData.translatedText;
                             }
-                        } catch (e) {
-                            console.log("Jeden preklad zlyhal, ponechávam angličtinu."); // Ak by vypadol net, ostane aspoň EN
-                        }
+                        } catch (e) { console.log("Translation timeout/error."); }
                     }));
                 }
                 
-                // 3. KROK: Vykreslenie hotových a preložených kartičiek
                 let html = "";
                 data.results.forEach(item => {
                     let d = new Date(item.published_at);
@@ -3967,100 +3954,89 @@ function closeApp() {
                     <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
                         <div style="color:#94a3b8; font-size:0.75rem; font-family:monospace; display: flex; justify-content: space-between;">
                             <span>📅 ${dateStr}</span>
-                            <span style="color: #64748b;">ZDROJ: ${item.news_site}</span>
+                            <span style="color: #64748b;">SRC: ${item.news_site}</span>
                         </div>
                         <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; line-height: 1.3;">${item.title}</div>
-                        <a href="${item.url}" target="_blank" style="color:#38bdf8; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${eTrans.readMore} →</a>
+                        <a href="${item.url}" target="_blank" style="color:#38bdf8; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${t.readMore} →</a>
                     </div>`;
                 });
                 
                 content.innerHTML = html;
-                
             } catch (err) {
-                let errorTxt = currentLang === 'sk' ? "Chyba pripojenia k API. Skontrolujte internet. ❌" : (currentLang === 'cs' ? "Chyba připojení k API. Zkontrolujte internet. ❌" : "API Connection Error. ❌");
-                content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">${errorTxt}</div>`;
+                content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">${t.liveErr}</div>`;
             }
         }
 
-        // Asynchrónna funkcia pre GLOBÁLNE správy a nadchádzajúce misie (2x API)
         async function showGlobalSpaceEvents() {
             let overlay = document.getElementById('global-events-overlay');
             let content = document.getElementById('global-events-content');
+            let t = translations[currentLang] || translations['en'];
             
+            let headerDiv = overlay.querySelector('div > div:first-child > div');
+            if(headerDiv) headerDiv.innerHTML = t.liveGlobal;
+
             overlay.style.display = 'flex';
-            let loadingTxt = currentLang === 'sk' ? "Pripájam sa na viaceré svetové servery... 📡" : "Připojuji se na světové servery... 📡";
-            content.innerHTML = `<div style="text-align:center; color:#f59e0b; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${loadingTxt}</div>`;
+            content.innerHTML = `<div style="text-align:center; color:#f59e0b; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${t.liveLoading}</div>`;
             
             let combined = [];
             
             try {
-                // 1. API: Nadchádzajúce štarty a misie (Space Devs)
                 try {
                     let res1 = await fetch('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=6');
                     let data1 = await res1.json();
                     if (data1.results) {
                         data1.results.forEach(l => combined.push({
-                            title: "🚀 MISIA/ŠTART: " + l.name,
+                            title: "🚀 " + l.name,
                             date: new Date(l.net),
                             url: l.url || "#",
                             type: "launch",
                             source: l.launch_service_provider ? l.launch_service_provider.name : "Space Agency"
                         }));
                     }
-                } catch(e) { console.log("Zlyhalo načítanie misií."); }
+                } catch(e) {}
 
-                // 2. API: Najnovšie všeobecné správy a úkazy (Spaceflight News)
                 try {
                     let res2 = await fetch('https://api.spaceflightnewsapi.net/v4/articles?limit=8');
                     let data2 = await res2.json();
                     if (data2.results) {
                         data2.results.forEach(n => combined.push({
-                            title: "📰 SPRÁVA: " + n.title,
+                            title: "📰 " + n.title,
                             date: new Date(n.published_at),
                             url: n.url,
                             type: "news",
                             source: n.news_site
                         }));
                     }
-                } catch(e) { console.log("Zlyhalo načítanie správ."); }
+                } catch(e) {}
 
                 if (combined.length === 0) {
-                    content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">Nepodarilo sa stiahnuť dáta. Skontroluj internet.</div>`;
+                    content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">${t.liveErr}</div>`;
                     return;
                 }
 
-                // ZORADENIE: Od budúcnosti (misie čo nás čakajú) po minulosť (najnovšie správy)
                 combined.sort((a, b) => b.date - a.date);
 
-                // PREKLAD (Ak nie je EN)
-                let targetLang = currentLang === 'sk' ? 'sk' : (currentLang === 'cs' ? 'cs' : 'en');
-                if (targetLang !== 'en') {
-                    let transTxt = currentLang === 'sk' ? "Prekladám údaje z agentúr... ⏳" : "Překládám údaje z agentur... ⏳";
-                    content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold;">${transTxt}</div>`;
-                    
+                if (currentLang !== 'en') {
+                    content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold;">${t.liveTrans}</div>`;
                     await Promise.all(combined.map(async (item) => {
                         try {
-                            let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${targetLang}`);
+                            let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${currentLang}`);
                             let transData = await transRes.json();
                             if (transData.responseData && transData.responseData.translatedText) {
                                 item.title = transData.responseData.translatedText;
                             }
-                        } catch (e) {} // ignoruj chybu jedného prekladu
+                        } catch (e) {} 
                     }));
                 }
 
-                // VYKRESLENIE
                 let html = "";
-                let readMore = targetLang === 'sk' ? "Čítať originál" : (targetLang === 'cs' ? "Číst originál" : "Read original");
-                
                 combined.forEach(item => {
                     let d = item.date;
-                    // Krajší formát dátumu a času
-                    let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} o ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                    let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} - ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
                     
                     let isFuture = d > new Date();
-                    let badge = isFuture ? `<span style="background: rgba(244, 63, 94, 0.2); color: #f43f5e; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: 6px;">ČOSKORO</span>` : '';
-                    let accentColor = item.type === "launch" ? "#f43f5e" : "#38bdf8"; // Červená pre misie, Modrá pre správy
+                    let badge = isFuture ? `<span style="background: rgba(244, 63, 94, 0.2); color: #f43f5e; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: 6px;">${t.soon}</span>` : '';
+                    let accentColor = item.type === "launch" ? "#f43f5e" : "#38bdf8"; 
                     
                     html += `
                     <div style="background: rgba(30, 41, 59, 0.6); border-left: 3px solid ${accentColor}; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
@@ -4069,25 +4045,24 @@ function closeApp() {
                             <div style="color: #64748b; font-weight: bold; text-align: right; max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.source}">${item.source}</div>
                         </div>
                         <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; line-height: 1.4;">${item.title}</div>
-                        <a href="${item.url}" target="_blank" style="color:${accentColor}; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${readMore} →</a>
+                        <a href="${item.url}" target="_blank" style="color:${accentColor}; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${t.readMore} →</a>
                     </div>`;
                 });
                 
                 content.innerHTML = html;
-
             } catch (err) {
-                content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">Kritická chyba. ❌</div>`;
+                content.innerHTML = `<div style="text-align:center; color:#ef4444; padding: 20px;">${t.liveErr}</div>`;
             }
         }
-// --- SKUTOČNÉ INTERNETOVÉ API PRE VŠETKY ASTRONOMICKÉ ÚKAZY (So zdrojmi) ---
+
         async function fetchAstroEvents() {
             let events = [];
             let appDate = typeof simDate !== 'undefined' ? simDate : new Date();
             let appYear = appDate.getFullYear();
             let realToday = new Date();
+            let t = translations[currentLang] || translations['en'];
 
             try {
-                // 1. VLÁDNE API (USNO) - PRIAME VOLANIE
                 try {
                     let fetchEclipse = async (type, icon) => {
                         let res = await fetch(`https://aa.usno.navy.mil/api/eclipses/${type}/year?year=${appYear}`);
@@ -4097,7 +4072,6 @@ function closeApp() {
                                 data.eclipses.forEach(ecl => {
                                     let eclDate = new Date(appYear, ecl.month - 1, ecl.day);
                                     if (eclDate.getTime() >= appDate.getTime() - 86400000) {
-                                        // PRIDANÝ ZDROJ: US Naval Observatory
                                         events.push({ title: ecl.event, date: eclDate, url: "https://eclipse.gsfc.nasa.gov/solar.html", icon: icon, source: "US Naval Observatory" });
                                     }
                                 });
@@ -4106,17 +4080,15 @@ function closeApp() {
                     };
                     await fetchEclipse("solar", "☀️");
                     await fetchEclipse("lunar", "🌑");
-                } catch(e) { console.log("Chyba USNO API:", e); }
+                } catch(e) { console.log("USNO API err"); }
 
-                // 2. ŠTANDARDNÝ RSS FEED (Cez bezpečné RSS2JSON API)
                 try {
                     let rssUrl = encodeURIComponent('https://in-the-sky.org/rss.php?feed=dfan');
                     let res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + rssUrl);
                     
-                    if (!res.ok) throw new Error("RSS API neodpovedá.");
-                    
+                    if (!res.ok) throw new Error("RSS API failed");
                     let data = await res.json();
-                    if (data.status !== "ok") throw new Error("Chyba pri konverzii RSS dát.");
+                    if (data.status !== "ok") throw new Error("Parse err");
                     
                     data.items.forEach(item => {
                         let title = item.title || "";
@@ -4126,55 +4098,44 @@ function closeApp() {
                         if (!title.toLowerCase().includes("eclipse") && pubDateStr) {
                             let safeDateStr = pubDateStr.replace(' ', 'T');
                             let itemDate = new Date(safeDateStr);
-                            
                             if (!isNaN(itemDate.getTime()) && itemDate.getTime() >= realToday.getTime() - 86400000) {
                                 events.push({ title: title, date: itemDate, url: link, icon: "🔭", source: "In-The-Sky.org" });
                             }
                         }
                     });
                 } catch(e) { 
-                    console.log("Chyba RSS API:", e); 
-                    events.push({ title: "CHYBA SPOJENIA: " + e.message, date: realToday, url: "#", icon: "❌", source: "Systém" });
+                    events.push({ title: t.sysErr + ": " + e.message, date: realToday, url: "#", icon: "❌", source: t.sysSrc });
                 }
 
-                // ZORADENIE VÝSLEDKOV OD NAJBLIŽŠÍCH
                 events.sort((a, b) => a.date - b.date);
 
             } catch (error) {
-    console.log("Kritická chyba pri sťahovaní úkazov:", error);
-    events.push({ title: "CHYBA SPOJENIA: " + error.message, date: new Date(), url: "#", icon: "❌", source: "Systém" });
-}
+                events.push({ title: t.sysErr + ": " + error.message, date: realToday, url: "#", icon: "❌", source: t.sysSrc });
+            }
             return events;
         }
 
-        // --- ZAVOLANIE API A VYKRESLENIE OKNA ---
         async function openAstroEvents() {
             let overlay = document.getElementById('astro-events-overlay');
             let content = document.getElementById('astro-events-content');
             let title = document.getElementById('astro-events-title');
+            let t = translations[currentLang] || translations['en'];
             
             overlay.style.display = 'flex';
-            
-            let titleTxt = currentLang === 'sk' ? "Všetky najbližšie úkazy" : (currentLang === 'cs' ? "Všechny nejbližší úkazy" : "All Upcoming Events");
-            title.innerHTML = `📅 ${titleTxt}`;
-            
-            let loadTxt = currentLang === 'sk' ? "Sťahujem dáta z astronomických serverov... 📡" : "Stahuji data... 📡";
-            content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${loadTxt}</div>`;
+            title.innerHTML = `📅 ${t.astroTitle}`;
+            content.innerHTML = `<div style="text-align:center; color:#facc15; padding: 40px 10px; font-weight: bold; letter-spacing: 0.5px;">${t.liveLoading}</div>`;
             
             let events = await fetchAstroEvents();
-            
             if (events.length === 0) {
-                content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">Servery momentálne nehlásia žiadne blízke úkazy.</div>`;
+                content.innerHTML = `<div style="text-align:center; color:#94a3b8; padding: 20px;">${t.astroEmpty}</div>`;
                 return;
             }
 
-            let targetLang = currentLang === 'sk' ? 'sk' : (currentLang === 'cs' ? 'cs' : 'en');
-            if (targetLang !== 'en') {
-                let transTxt = currentLang === 'sk' ? "Prekladám úkazy... ⏳" : "Překládám úkazy... ⏳";
-                content.innerHTML = `<div style="text-align:center; color:#38bdf8; padding: 40px 10px; font-weight: bold;">${transTxt}</div>`;
+            if (currentLang !== 'en') {
+                content.innerHTML = `<div style="text-align:center; color:#38bdf8; padding: 40px 10px; font-weight: bold;">${t.liveTrans}</div>`;
                 await Promise.all(events.map(async (item) => {
                     try {
-                        let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${targetLang}`);
+                        let transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(item.title)}&langpair=en|${currentLang}`);
                         let transData = await transRes.json();
                         if (transData.responseData && transData.responseData.translatedText) {
                             item.title = transData.responseData.translatedText;
@@ -4184,16 +4145,13 @@ function closeApp() {
             }
             
             let html = "";
-            let readMore = targetLang === 'sk' ? "Detail úkazu na webe" : (targetLang === 'cs' ? "Detail úkazu na webu" : "Event details");
-
             events.forEach(e => {
                 let d = e.date;
                 let dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
-                
                 let targetDate = typeof simDate !== 'undefined' ? simDate : new Date();
                 let diffDays = Math.ceil((d.getTime() - targetDate.getTime()) / 86400000);
                 
-                let badgeTxt = diffDays === 0 ? "DNES" : (diffDays > 0 ? `Za ${diffDays} dní` : `Pred ${Math.abs(diffDays)} dňami`);
+                let badgeTxt = diffDays === 0 ? t.timeToday : (diffDays > 0 ? `${t.timeIn} ${diffDays} ${t.timeDays}` : `${t.timeAgo} ${Math.abs(diffDays)} ${t.timeAgoDays}`);
                 let timeBadge = `<span style="background: rgba(250, 204, 21, 0.2); color: #facc15; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; white-space: nowrap;">${badgeTxt}</span>`;
                 
                 html += `
@@ -4205,10 +4163,9 @@ function closeApp() {
                     <div style="color:#f8fafc; font-weight:bold; font-size: 0.95rem; line-height: 1.3;">
                         <span style="font-size: 1.1rem; margin-right: 4px;">${e.icon}</span> ${e.title}
                     </div>
-                    <a href="${e.url}" target="_blank" style="color:#facc15; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${readMore} →</a>
+                    <a href="${e.url}" target="_blank" style="color:#facc15; font-size: 0.8rem; text-decoration: none; margin-top: 4px; font-weight: bold;">${t.readMore} →</a>
                 </div>`;
             });
-            
             content.innerHTML = html;
         }
     </script>
