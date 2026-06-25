@@ -650,7 +650,19 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
         </svg>
     </button>
     
-    <button id="btn-radar-info-float" onclick="toggleRadarPanel(event)" style="position: fixed; bottom: 20px; left: 74px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 50%; width: 50px; height: 50px; display: none; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s; box-shadow: 0 6px 15px rgba(0,0,0,0.7), 0 0 12px rgba(56, 189, 248, 0.4);" title="Zobraziť sledovanie">
+    <!-- Tlačidlo Počasie (na mieste 74px) -->
+    <button id="btn-toggle-weather" onclick="toggleWeatherFx()" style="position: fixed; bottom: 20px; left: 74px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 50%; width: 50px; height: 50px; display: none; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s; box-shadow: 0 6px 15px rgba(0,0,0,0.7), 0 0 12px rgba(56, 189, 248, 0.4);" title="Vypnúť/Zapnúť efekty počasia">
+        <svg id="icon-weather-on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+        </svg>
+        <svg id="icon-weather-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; opacity: 0.5;">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+            <line x1="4" y1="4" x2="20" y2="20" stroke="#ef4444" stroke-width="2"></line>
+        </svg>
+    </button>
+
+    <!-- Posunuté tlačidlo I (na miesto 132px) -->
+    <button id="btn-radar-info-float" onclick="toggleRadarPanel(event)" style="position: fixed; bottom: 20px; left: 132px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 50%; width: 50px; height: 50px; display: none; justify-content: center; align-items: center; color: #38bdf8; z-index: 50; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.2s; box-shadow: 0 6px 15px rgba(0,0,0,0.7), 0 0 12px rgba(56, 189, 248, 0.4);" title="Zobraziť sledovanie">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -1106,7 +1118,53 @@ function closeApp() {
             { id: "Sagittarius", sym: "♐", angle: 240 }, { id: "Capricorn", sym: "♑", angle: 270 },
             { id: "Aquarius", sym: "♒", angle: 300 }, { id: "Pisces", sym: "♓", angle: 330 }
         ];
+// --- LOGIKA LOKÁLNEHO POČASIA A OBLAKOV ---
+        let showWeatherFx = true;
+        let cachedWeatherForecast = null;
+        let activeClouds = [];
 
+        function toggleWeatherFx() {
+            showWeatherFx = !showWeatherFx;
+            document.getElementById('icon-weather-on').style.display = showWeatherFx ? 'block' : 'none';
+            document.getElementById('icon-weather-off').style.display = showWeatherFx ? 'none' : 'block';
+            document.getElementById('btn-toggle-weather').style.borderColor = showWeatherFx ? '#38bdf8' : '#ef4444';
+        }
+
+        async function fetchBackgroundWeather() {
+            try {
+                let url = `https://api.open-meteo.com/v1/forecast?latitude=${myLat}&longitude=${myLon}&hourly=cloud_cover,weather_code&forecast_days=10`;
+                let res = await fetch(url);
+                cachedWeatherForecast = await res.json();
+            } catch(e) {}
+        }
+
+        function getSimulatedWeather() {
+            if (!cachedWeatherForecast) return { clouds: 0, code: 0 };
+            let targetTime = simDate.getTime();
+            let diffDays = (targetTime - Date.now()) / 86400000;
+            if (diffDays < -1 || diffDays > 10) return { clouds: 0, code: 0 }; 
+
+            let closestIdx = 0; let minDiff = Infinity;
+            cachedWeatherForecast.hourly.time.forEach((tStr, idx) => {
+                let diff = Math.abs(new Date(tStr + "Z").getTime() - targetTime);
+                if (diff < minDiff) { minDiff = diff; closestIdx = idx; }
+            });
+            return {
+                clouds: cachedWeatherForecast.hourly.cloud_cover[closestIdx],
+                code: cachedWeatherForecast.hourly.weather_code[closestIdx]
+            };
+        }
+
+        function renderCloud(ctx, cx, cy, scale, isDark) {
+            ctx.fillStyle = isDark ? 'rgba(71, 85, 105, 0.9)' : 'rgba(241, 245, 249, 0.85)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 20*scale, Math.PI*0.5, Math.PI*1.5);
+            ctx.arc(cx + 15*scale, cy - 15*scale, 25*scale, Math.PI*1, Math.PI*2);
+            ctx.arc(cx + 40*scale, cy - 10*scale, 20*scale, Math.PI*1.2, Math.PI*2);
+            ctx.arc(cx + 50*scale, cy, 15*scale, Math.PI*1.5, Math.PI*0.5);
+            ctx.closePath();
+            ctx.fill();
+        }
         let currentLang = localStorage.getItem('solaris_lang') || 'en';
         let currentEra = 'AD'; 
         // OPRAVA: Okamžite načítame uloženú planétu (alebo Slnko), aby nevznikal preblik s kométou
@@ -1161,6 +1219,7 @@ function closeApp() {
             myLocName = shortName;
             updateHorizonTabButton();
             closeLocPicker();
+            fetchBackgroundWeather();
         }
 
         function updateHorizonTabButton() {
@@ -2327,7 +2386,8 @@ function closeApp() {
             hideTooltip();
             
             let sunPnl = document.getElementById('sun-times-panel');
-            let infoBtn = document.getElementById('btn-radar-info');
+            let infoBtn = document.getElementById('btn-radar-info-float');
+            let wthBtn = document.getElementById('btn-toggle-weather');
             let mainControls = document.getElementById('main-controls-panel');
             let rightBtns = document.getElementById('right-floating-btns');
             
@@ -2337,8 +2397,8 @@ function closeApp() {
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'flex';
                 if (sunPnl) sunPnl.style.display = 'none';
                 if (infoBtn) infoBtn.style.display = 'none';
+                if (wthBtn) wthBtn.style.display = 'none';
                 
-                // Zobrazíme veľký panel prehrávača a skryjeme pravé plávajúce tlačidlá
                 if (mainControls) mainControls.style.display = 'flex';
                 if (rightBtns) rightBtns.style.display = 'none';
                 
@@ -2350,8 +2410,8 @@ function closeApp() {
                 document.getElementById('zoom-ctrl-wrapper').style.display = 'none';
                 if (sunPnl) sunPnl.style.display = 'flex';
                 if (infoBtn) infoBtn.style.display = 'none';
+                if (wthBtn) wthBtn.style.display = 'flex'; // ZMENA: Obláčik svieti hneď po prepnutí
                 
-                // Skryjeme hlavný prehrávač a ukážeme nové pravé plávajúce tlačidlá
                 if (mainControls) mainControls.style.display = 'none';
                 if (rightBtns) rightBtns.style.display = 'flex';
                 
@@ -2744,14 +2804,27 @@ function closeApp() {
                 let sunAz = realSun.az;
                 let sunAlt = realSun.alt;
 
+                let weather = getSimulatedWeather();
+                
+                // Zistíme či prší hneď na začiatku
+                let wCode = weather.code;
+                let isRain = [51,53,55,61,63,65,80,81,82,95,96,99].includes(wCode);
+                let isSnow = [71,73,75,77,85,86].includes(wCode);
+
+                // ZMENA: 50% alebo automaticky ak prší
+                let isHeavyClouds = showWeatherFx && (weather.clouds > 50 || isRain || isSnow);
+                let isDarkCloud = isHeavyClouds || weather.clouds > 40;
+
                 let skyColor;
-                if (sunAlt > 10) skyColor = '#38bdf8'; 
-                else if (sunAlt > -5) skyColor = '#fbbf24'; 
+                if (sunAlt > 10) skyColor = isHeavyClouds ? '#64748b' : '#38bdf8'; 
+                else if (sunAlt > -5) skyColor = isHeavyClouds ? '#475569' : '#fbbf24'; 
                 else skyColor = '#020617'; 
 
                 ctx.fillStyle = skyColor; ctx.fillRect(0, 0, canvas.clientWidth, horizonY);
                 ctx.fillStyle = '#090d16'; ctx.fillRect(0, horizonY, canvas.clientWidth, canvas.clientHeight - horizonY);
                 ctx.beginPath(); ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2; ctx.moveTo(0, horizonY); ctx.lineTo(canvas.clientWidth, horizonY); ctx.stroke();
+
+                
 
                 // --- DYNAMICKÉ OTOČENIE KAMERY ZA SLNKOM ---
                 let testD = new Date(simDate); testD.setUTCHours(12,0,0,0);
@@ -3116,6 +3189,65 @@ function closeApp() {
                         }
                 }
                 
+if (showWeatherFx) {
+                    let targetClouds = Math.floor((weather.clouds / 100) * 15);
+                    if (weather.clouds > 0 && targetClouds === 0) targetClouds = 1; 
+                    
+                    // ZMENA: Ak prší, vynútime aspoň 8 mrakov
+                    if ((isRain || isSnow) && targetClouds < 8) targetClouds = 8;
+                    
+                    while (activeClouds.length < targetClouds) {
+                        activeClouds.push({
+                            x: Math.random() * canvas.clientWidth,
+                            y: Math.random() * (horizonY * 0.6),
+                            speed: 0.2 + Math.random() * 0.6,
+                            scale: 0.6 + Math.random() * 1.2,
+                            drops: []
+                        });
+                    }
+                    while (activeClouds.length > targetClouds) { activeClouds.pop(); }
+
+                    activeClouds.forEach(c => {
+                        c.x += c.speed;
+                        if (c.x > canvas.clientWidth + 100 * c.scale) { c.x = -150 * c.scale;
+                            c.y = Math.random() * (horizonY * 0.6);
+                        }
+                        
+                        if (isRain || isSnow) {
+                            if (Math.random() < (isRain ? 0.3 : 0.1)) {
+                                c.drops.push({ 
+                                    dx: Math.random() * 50 * c.scale, 
+                                    dy: 10 * c.scale, 
+                                    speed: isRain ? (4 + Math.random() * 3) : (1 + Math.random() * 1.5)
+                                });
+                            }
+                        }
+                        
+                        c.drops.forEach((d, i) => {
+                            d.dy += d.speed;
+                            d.dx += isSnow ? (Math.random() - 0.5) : Math.random() * 0.5;
+                            
+                            if (c.y + d.dy > horizonY) {
+                                c.drops.splice(i, 1);
+                            } else {
+                                // ZMENA: Výraznejší dážď - bledomodrá farba a o kúsok väčšie kvapky pre lepší kontrast
+                                let rainColor = skyColor === '#020617' ? 'rgba(186, 230, 253, 0.8)' : 'rgba(224, 242, 254, 0.75)';
+                                ctx.fillStyle = isSnow ? 'white' : rainColor;
+                                
+                                ctx.beginPath();
+                                if (isSnow) {
+                                    ctx.arc(c.x + d.dx, c.y + d.dy, 1.8 * c.scale, 0, Math.PI * 2);
+                                } else {
+                                    // Kvapka je teraz širšia (2) a dlhšia (8)
+                                    ctx.fillRect(c.x + d.dx, c.y + d.dy, 2, 8);
+                                }
+                                ctx.fill();
+                            }
+                        });
+                        renderCloud(ctx, c.x, c.y, c.scale, isDarkCloud || skyColor === '#020617');
+                    });
+                }
+
                 // Inteligentné nasvietenie tlačidla Počasie (Podpora ECMWF predpovede pre dnešok až +10 dní)
                 let weatherBtn = document.getElementById('btn-radar-weather');
                 if (weatherBtn) {
@@ -3543,6 +3675,7 @@ function closeApp() {
 
         }, 500); 
 
+        fetchBackgroundWeather(); // STIAHNE POČASIE LEN RAZ PRI ŠTARTE
         requestAnimationFrame(updateAndRender);
 
         // Funkcia pre otváranie a zatváranie okna sledovania cez ℹ️ ikonku
@@ -3550,18 +3683,16 @@ function closeApp() {
             if (event) event.stopPropagation();
             let panel = document.getElementById('jupiter-radar-panel');
             let infoBtn = document.getElementById('btn-radar-info-float');
-            let rightBtns = document.getElementById('right-floating-btns'); // Pridané pre pravú stranu
+            let rightBtns = document.getElementById('right-floating-btns');
             
             if (panel.style.display === 'block') {
-                // Vypnutie panela
                 panel.style.display = 'none';
                 if (infoBtn && activeTab === 'horizon') infoBtn.style.display = 'flex';
-                if (rightBtns) rightBtns.style.display = 'none'; // Schová tlačidlá Teraz a Počasie
+                if (rightBtns) rightBtns.style.display = 'none'; 
             } else {
-                // Zapnutie panela
                 panel.style.display = 'block';
                 if (infoBtn) infoBtn.style.display = 'none';
-                if (rightBtns && activeTab === 'horizon') rightBtns.style.display = 'flex'; // Znova ich ukáže
+                if (rightBtns && activeTab === 'horizon') rightBtns.style.display = 'flex';
             }
         }
 
@@ -3868,29 +3999,28 @@ function closeApp() {
 // --- INTELIGENTNÉ VYHÝBANIE SA IKONIEK ---
         setInterval(() => {
             let btnLabels = document.getElementById('btn-toggle-labels');
+            let btnWeatherFx = document.getElementById('btn-toggle-weather');
             let btnInfo = document.getElementById('btn-radar-info-float');
             let rightBtns = document.getElementById('right-floating-btns');
             
-            let infoDrawer = document.querySelector('.info-drawer'); // Hlavný spodný panel
-            let radarPanel = document.getElementById('jupiter-radar-panel'); // Tabuľka sledovania
+            let infoDrawer = document.querySelector('.info-drawer'); 
+            let radarPanel = document.getElementById('jupiter-radar-panel'); 
             
             let targetBottomLeft = 20; 
             let targetBottomRight = 20;
             
-            // 1. Zarovnanie na vrchný okraj hlavného spodného panela (Pre Obe strany)
             if (infoDrawer && infoDrawer.getBoundingClientRect().height > 0) {
                 let offset = window.innerHeight - infoDrawer.getBoundingClientRect().top + 20;
                 targetBottomLeft = offset;
-                targetBottomRight = offset; // Pravá strana ostáva vždy tu
+                targetBottomRight = offset; 
             }
             
-            // 2. Ak sa objaví Radar tabuľka, iba ĽAVÉ ikonky sa zarovnajú nad ňu
             if (radarPanel && radarPanel.style.display !== 'none' && radarPanel.getBoundingClientRect().height > 0) {
                 targetBottomLeft = window.innerHeight - radarPanel.getBoundingClientRect().top + 15;
             }
             
-            // Aplikujeme plynulý posun
             if (btnLabels) btnLabels.style.bottom = targetBottomLeft + 'px';
+            if (btnWeatherFx) btnWeatherFx.style.bottom = targetBottomLeft + 'px';
             if (btnInfo) btnInfo.style.bottom = targetBottomLeft + 'px';
             if (rightBtns) rightBtns.style.bottom = targetBottomRight + 'px';
         }, 150);
