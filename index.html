@@ -3119,10 +3119,26 @@ function closeApp() {
                         }
                         // --- KONIEC OREO ZVÝRAZŇOVAČA ---
                         
-                        let r_au = Math.hypot(pPosRaw.x, pPosRaw.y) / 90; 
-                        let d_au = Math.hypot(dx, dy) / 90;
-                        let mag = p.H;
+                        let r_au = 1; 
+                        let d_au = 1;
                         
+                        // ZMENA: Výpočet magnitúdy z reálnych astronomických jednotiek (AU), nie z pixelov obrazovky
+                        if (key !== "Sun" && key !== "Moon") {
+                            let r1 = jplData[key] ? jplData[key].a : (p.a || 1);
+                            let a1 = planetVisuals[key].angle * (Math.PI / 180);
+                            let px_au = r1 * Math.cos(a1);
+                            let py_au = r1 * Math.sin(a1);
+                            
+                            let r2 = jplData["Earth"].a;
+                            let a2 = planetVisuals["Earth"].angle * (Math.PI / 180);
+                            let ex_au = r2 * Math.cos(a2);
+                            let ey_au = r2 * Math.sin(a2);
+                            
+                            r_au = Math.hypot(px_au, py_au);
+                            d_au = Math.hypot(px_au - ex_au, py_au - ey_au);
+                        }
+                        
+                        let mag = p.H;
                         if (key !== "Sun" && key !== "Moon") {
                             mag = p.H + 5 * Math.log10(r_au * d_au);
                         }
@@ -3171,7 +3187,9 @@ function closeApp() {
                             }
                         } else {
                             // ŠTANDARDNÁ LOGIKA PRE PLANÉTY
-                            if (mag > 7.5) visText = t.visNoHubble;
+                            // Tvrdá poistka: ak planéta nie je viditeľná voľným okom (napr. Pluto, Neptún), hneď vyžaduje teleskop
+                            if (!p.isVisibleNakedEye) visText = t.visNoHubble;
+                            else if (mag > 7.5) visText = t.visNoHubble;
                             else if (mag > 6.0) visText = t.visNoFar;
                             else if (sunAlt > 0) visText = t.visNoSun;
                             else if (sunAlt > -6 && mag > 1.0) visText = t.visNoSun;
