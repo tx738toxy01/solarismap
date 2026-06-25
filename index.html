@@ -577,6 +577,12 @@ onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transfor
                     <select id="setting-startup-select" onchange="changeStartupPlanet(this.value)" class="num-input" style="text-align: left; padding: 8px 12px; cursor: pointer;">
                         </select>
                 </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <span class="input-label" id="lbl-settings-view" style="text-align: left;">Okno po spustení</span>
+                    <select id="setting-view-select" onchange="changeStartupView(this.value)" class="num-input" style="text-align: left; padding: 8px 12px; cursor: pointer;">
+                    </select>
+                </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <span class="input-label" id="lbl-settings-location" style="text-align: left;">Počiatočné miesto</span>
@@ -912,16 +918,16 @@ function closeApp() {
         };
 
         // Pridanie nových prekladov (Krok 3) vrátane limitov pre počasie a oblačnosti (Aktualizované pre model ECMWF)
-        Object.assign(translations.sk, { settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie", toastTapObject: "Ťukni na objekt", weatherToastLimit: "Presná predpoveď je dostupná len na najbližších 10 dní.", weatherClouds: "Oblačnosť", weatherFor: "pre:" });
-        Object.assign(translations.cs, { settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontem, vyber jiný objekt.", radarWeatherBtn: "Počasí", toastTapObject: "Klepni na objekt", weatherToastLimit: "Přesná předpověď je dostupná pouze na nejbližších 10 dní.", weatherClouds: "Oblačnost", weatherFor: "pro:" });
-        Object.assign(translations.en, { settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather", toastTapObject: "Tap the object", weatherToastLimit: "Accurate forecast is limited to the next 10 days only.", weatherClouds: "Cloud cover", weatherFor: "for:" });
-        Object.assign(translations.de, { settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter", toastTapObject: "Tippe auf das Objekt", weatherToastLimit: "Die genaue Vorhersage ist auf die nächsten 10 Tage beschränkt.", weatherClouds: "Bewölkung", weatherFor: "für:" });
-        Object.assign(translations.fr, { settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo", toastTapObject: "Touchez l'objet", weatherToastLimit: "Les prévisions précises sont limitées aux 10 prochains jours.", weatherClouds: "Nuages", weatherFor: "pour :" });
-        Object.assign(translations.es, { settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima", toastTapObject: "Toca el objeto", weatherToastLimit: "El pronóstico exacto está limitado a los próximos 10 días.", weatherClouds: "Nubosidad", weatherFor: "para:" });
-        Object.assign(translations.zh, { settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气", toastTapObject: "点击天体", weatherToastLimit: "准确的天气预报仅限未来 10 天。", weatherClouds: "云量", weatherFor: "时间：" });
-        Object.assign(translations.hi, { settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम", toastTapObject: "वस्तु पर टैप करें", weatherToastLimit: "सटीक पूर्वानुमान केवल अगले 10 दिनों तक सीमित है।", weatherClouds: "बादल", weatherFor: "के लिए:" });
-        Object.assign(translations.ja, { settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気", toastTapObject: "天体をタップ", weatherToastLimit: "正確な天気予報は今後10日間のみ利用可能です。", weatherClouds: "雲量", weatherFor: "対象:" });
-        Object.assign(translations.ko, { settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨", toastTapObject: "천체를 탭하세요", weatherToastLimit: "정확한 일기 예보는 향후 10일까지만 제공됩니다.", weatherClouds: "구름", weatherFor: "대상:" });
+        Object.assign(translations.sk, { settingsView: "Okno po spustení", settingsLocation: "Počiatočné miesto", defaultCurrent: "Predvolené (Podľa GPS)", useCurrentLoc: "Použiť moju aktuálnu polohu", weatherToastTime: "Viem iba aktuálne podmienky, stlač Teraz!", weatherToastHorizon: "Objekt je pod horizontom, vyber iný objekt.", radarWeatherBtn: "Počasie", toastTapObject: "Ťukni na objekt", weatherToastLimit: "Presná predpoveď je dostupná len na najbližších 10 dní.", weatherClouds: "Oblačnosť", weatherFor: "pre:" });
+        Object.assign(translations.cs, { settingsView: "Okno po startu", settingsLocation: "Počáteční místo", defaultCurrent: "Výchozí (Podle GPS)", useCurrentLoc: "Použít mou aktuální polohu", weatherToastTime: "Známe jen aktuální podmínky, stiskni Nyní!", weatherToastHorizon: "Objekt je pod horizontom, vyber jiný objekt.", radarWeatherBtn: "Počasí", toastTapObject: "Klepni na objekt", weatherToastLimit: "Přesná předpověď je dostupná pouze na nejbližších 10 dní.", weatherClouds: "Oblačnost", weatherFor: "pro:" });
+        Object.assign(translations.en, { settingsView: "Startup View", settingsLocation: "Startup Location", defaultCurrent: "Default (By GPS)", useCurrentLoc: "Use my current location", weatherToastTime: "I only know current conditions, press Now!", weatherToastHorizon: "Object is below the horizon, pick one in the sky!", radarWeatherBtn: "Weather", toastTapObject: "Tap the object", weatherToastLimit: "Accurate forecast is limited to the next 10 days only.", weatherClouds: "Cloud cover", weatherFor: "for:" });
+        Object.assign(translations.de, { settingsView: "Startansicht", settingsLocation: "Startort", defaultCurrent: "Standard (Nach GPS)", useCurrentLoc: "Meinen aktuellen Standort verwenden", weatherToastTime: "Ich kenne nur das aktuelle Wetter, drücke Jetzt!", weatherToastHorizon: "Objekt ist unter dem Horizont, wähle ein anderes!", radarWeatherBtn: "Wetter", toastTapObject: "Tippe auf das Objekt", weatherToastLimit: "Die genaue Vorhersage ist auf die nächsten 10 Tage beschränkt.", weatherClouds: "Bewölkung", weatherFor: "für:" });
+        Object.assign(translations.fr, { settingsView: "Vue au démarrage", settingsLocation: "Lieu de démarrage", defaultCurrent: "Défaut (Par GPS)", useCurrentLoc: "Utiliser ma position actuelle", weatherToastTime: "Météo actuelle uniquement, appuyez sur Mnt !", weatherToastHorizon: "Objet sous l'horizon, choisissez-en un !", radarWeatherBtn: "Météo", toastTapObject: "Touchez l'objet", weatherToastLimit: "Les prévisions précises sont limitées aux 10 prochains jours.", weatherClouds: "Nuages", weatherFor: "pour :" });
+        Object.assign(translations.es, { settingsView: "Vista de inicio", settingsLocation: "Lugar de inicio", defaultCurrent: "Predeterminado (Por GPS)", useCurrentLoc: "Usar mi ubicación actual", weatherToastTime: "¡Solo sé el clima actual, pulsa Ahora!", weatherToastHorizon: "¡Objeto bajo el horizonte, elige uno en el cielo!", radarWeatherBtn: "Clima", toastTapObject: "Toca el objeto", weatherToastLimit: "El pronóstico exacto está limitado a los próximos 10 días.", weatherClouds: "Nubosidad", weatherFor: "para:" });
+        Object.assign(translations.zh, { settingsView: "启动视图", settingsLocation: "启动位置", defaultCurrent: "默认 (通过 GPS)", useCurrentLoc: "使用我当前的位置", weatherToastTime: "我只知道当前天气，请按 现在！", weatherToastHorizon: "物体在地平线以下，请在天空中选择一个！", radarWeatherBtn: "天气", toastTapObject: "点击天体", weatherToastLimit: "准确的天气预报仅限未来 10 天。", weatherClouds: "云量", weatherFor: "时间：" });
+        Object.assign(translations.hi, { settingsView: "प्रारंभिक दृश्य", settingsLocation: "स्टार्टअप स्थान", defaultCurrent: "डिफ़ॉल्ट (GPS द्वारा)", useCurrentLoc: "मेरे वर्तमान स्थान का उपयोग करें", weatherToastTime: "मुझे केवल वर्तमान स्थिति पता है, अभी दबाएं!", weatherToastHorizon: "वस्तु क्षितिज के नीचे है, आकाश में एक चुनें!", radarWeatherBtn: "मौसम", toastTapObject: "वस्तु पर टैप करें", weatherToastLimit: "सटीक पूर्वानुमान केवल अगले 10 दिनों तक सीमित है।", weatherClouds: "बादल", weatherFor: "के लिए:" });
+        Object.assign(translations.ja, { settingsView: "起動時の画面", settingsLocation: "初期位置", defaultCurrent: "デフォルト (GPS経由)", useCurrentLoc: "現在地を使用する", weatherToastTime: "現在の天候のみがわかります、「現在」を押してください！", weatherToastHorizon: "天体は地平線の下にあります、別の天体を選んでください。", radarWeatherBtn: "天気", toastTapObject: "天体をタップ", weatherToastLimit: "正確な天気予報 is 今後10日間のみ利用可能です。", weatherClouds: "雲量", weatherFor: "対象:" });
+        Object.assign(translations.ko, { settingsView: "시작 화면", settingsLocation: "초기 위치", defaultCurrent: "기본값 (GPS에 따름)", useCurrentLoc: "내 현재 위치 사용", weatherToastTime: "현재 조건만 알 수 있습니다. '현재'를 누르세요!", weatherToastHorizon: "천체가 지평선 아래에 있습니다. 다른 천체를 선택하세요.", radarWeatherBtn: "날씨", toastTapObject: "천체를 탭하세요", weatherToastLimit: "정확한 일기 예보는 향후 10일까지만 제공됩니다.", weatherClouds: "구름", weatherFor: "대상:" });
         // --- PREKLADY PRE ZNAMENIA (ANGLIČTINA = ZÁKLADNÝ FALLBACK) ---
         Object.assign(translations.en, {
             zodiacUI: { title: "Zodiac: ", duration: "Duration (Tap for Fun Fact)", constellation: "Constellation (Tap for Info)", mythology: "Name & Mythology (Story)" },
@@ -1185,6 +1191,7 @@ function closeApp() {
         let currentEra = 'AD'; 
         // OPRAVA: Okamžite načítame uloženú planétu (alebo Slnko), aby nevznikal preblik s kométou
         let currentPlanetKey = localStorage.getItem('solaris_startup_planet') || 'Sun';
+        let startupView = localStorage.getItem('solaris_startup_view') || 'system';
         let activeTab = "system";
 
         // ---- GLOBÁLNE PREMENNÉ PRE LOKÁCIU ---- //
@@ -1608,6 +1615,11 @@ function closeApp() {
             localStorage.setItem('solaris_startup_planet', val);
         }
 
+        function changeStartupView(val) {
+            startupView = val;
+            localStorage.setItem('solaris_startup_view', val);
+        }
+
         function populateSettings() {
             let langSel = document.getElementById('setting-lang-select');
             langSel.innerHTML = '';
@@ -1660,8 +1672,26 @@ function closeApp() {
             let stTitle = document.getElementById('lbl-settings-title'); if (stTitle) stTitle.innerText = t.settingsTitle;
             let stLang = document.getElementById('lbl-settings-lang'); if (stLang) stLang.innerText = t.settingsLang;
             let stStartup = document.getElementById('lbl-settings-startup'); if (stStartup) stStartup.innerText = t.settingsStartup;
+            let stView = document.getElementById('lbl-settings-view'); if (stView) stView.innerText = t.settingsView;
             
             let stLoc = document.getElementById('lbl-settings-location'); if (stLoc) stLoc.innerText = t.settingsLocation;
+
+            let viewSel = document.getElementById('setting-view-select');
+            if (viewSel) {
+                viewSel.innerHTML = '';
+                
+                let optSys = document.createElement('option');
+                optSys.value = 'system';
+                optSys.innerText = t.tabSystem;
+                if (startupView === 'system') optSys.selected = true;
+                viewSel.appendChild(optSys);
+                
+                let optHor = document.createElement('option');
+                optHor.value = 'horizon';
+                optHor.innerText = t.tabHorizon;
+                if (startupView === 'horizon') optHor.selected = true;
+                viewSel.appendChild(optHor);
+            }
             let useCur = document.getElementById('lbl-use-current'); if (useCur) useCur.innerText = t.useCurrentLoc;
             if (!savedStartupLocation) {
                 let stLocName = document.getElementById('startup-location-name');
@@ -3687,8 +3717,8 @@ if (showWeatherFx) {
         applyTranslations();
         setMode('real'); 
 
-        // 1. Okamžite nastavíme UI aj pamäť aplikácie (bez blikania nápisov)
-        selectPlanet(startupPlanet, true);
+        // 1. Spustíme počiatočné okno podľa nastavenia užívateľa
+        switchView(startupView);
 
         // 2. Vypočítame počiatočný zoom tak, aby ukázal presne prstenec zverokruhu (priemer 850)
         let minDim = Math.min(window.innerWidth, window.innerHeight);
