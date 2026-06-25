@@ -1132,17 +1132,18 @@ function closeApp() {
 
         async function fetchBackgroundWeather() {
             try {
-                let url = `https://api.open-meteo.com/v1/forecast?latitude=${myLat}&longitude=${myLon}&hourly=cloud_cover,weather_code&forecast_days=10`;
+                // ZMENA: Pridali sme wind_speed_10m do tichého sťahovania na pozadí
+                let url = `https://api.open-meteo.com/v1/forecast?latitude=${myLat}&longitude=${myLon}&hourly=cloud_cover,weather_code,wind_speed_10m&forecast_days=10`;
                 let res = await fetch(url);
                 cachedWeatherForecast = await res.json();
             } catch(e) {}
         }
 
         function getSimulatedWeather() {
-            if (!cachedWeatherForecast) return { clouds: 0, code: 0 };
+            if (!cachedWeatherForecast) return { clouds: 0, code: 0, wind: 5 };
             let targetTime = simDate.getTime();
             let diffDays = (targetTime - Date.now()) / 86400000;
-            if (diffDays < -1 || diffDays > 10) return { clouds: 0, code: 0 }; 
+            if (diffDays < -1 || diffDays > 10) return { clouds: 0, code: 0, wind: 5 }; 
 
             let closestIdx = 0; let minDiff = Infinity;
             cachedWeatherForecast.hourly.time.forEach((tStr, idx) => {
@@ -1151,7 +1152,9 @@ function closeApp() {
             });
             return {
                 clouds: cachedWeatherForecast.hourly.cloud_cover[closestIdx],
-                code: cachedWeatherForecast.hourly.weather_code[closestIdx]
+                code: cachedWeatherForecast.hourly.weather_code[closestIdx],
+                // ZMENA: Z API si potiahneme aj rýchlosť vetra pre animáciu
+                wind: cachedWeatherForecast.hourly.wind_speed_10m[closestIdx]
             };
         }
 
@@ -3225,8 +3228,14 @@ if (showWeatherFx) {
                     }
                     while (activeClouds.length > targetClouds) { activeClouds.pop(); }
 
+                    // ZMENA: Vypočítame koeficient sily vetra (z km/h na pixely)
+                    let windFactor = (weather.wind !== undefined ? weather.wind : 5) / 5;
+                    if (windFactor < 0.2) windFactor = 0.2; // Aj pri bezvetrí zachováme aspoň jemný vánok
+
                     activeClouds.forEach(c => {
-                        c.x += c.speed;
+                        // ZMENA: Mraky letia rýchlosťou podľa skutočného vetra
+                        c.x += c.speed * windFactor;
+                        
                         if (c.x > canvas.clientWidth + 100 * c.scale) { c.x = -150 * c.scale;
                             c.y = Math.random() * (horizonY * 0.6);
                         }
@@ -3243,7 +3252,8 @@ if (showWeatherFx) {
                         
                         c.drops.forEach((d, i) => {
                             d.dy += d.speed;
-                            d.dx += isSnow ? (Math.random() - 0.5) : Math.random() * 0.5;
+                            // ZMENA: Kvapky a sneh sú dramaticky odfukované vetrom do strany
+                            d.dx += isSnow ? (Math.random() - 0.5 + windFactor * 0.3) : (Math.random() * 0.5 + windFactor * 0.6);
                             
                             if (c.y + d.dy > horizonY) {
                                 c.drops.splice(i, 1);
