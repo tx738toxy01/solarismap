@@ -288,7 +288,6 @@
         @keyframes pulseBell { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); } 70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 
 </style>
-    </style>
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4acb1e8606884ad08dd46b43d69a39ef"}'></script>
     </head>
 <body>
@@ -1162,10 +1161,12 @@ function closeApp() {
             // ZMENA: Výraznejšia, tmavšia farba pre búrkové mraky
             ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(241, 245, 249, 0.85)';
             
-            // ZMENA: Pridáme tieň, aby sa mraky oddelili od akejkoľvek farby oblohy
-            ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.4)';
-            ctx.shadowBlur = 8 * scale;
-            ctx.shadowOffsetY = 2 * scale;
+            // ZMENA: Tiene vykresľujeme IBA na počítačoch. Na mobiloch tiene radikálne spomaľujú grafiku.
+            if (window.innerWidth > 768) {
+                ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.4)';
+                ctx.shadowBlur = 8 * scale;
+                ctx.shadowOffsetY = 2 * scale;
+            }
 
             ctx.beginPath();
             ctx.arc(cx, cy, 20*scale, Math.PI*0.5, Math.PI*1.5);
@@ -1805,7 +1806,10 @@ function closeApp() {
         });
 
         function resizeCanvas() {
-            let dpr = window.devicePixelRatio || 1;
+            // ZMENA: Obmedzenie maximálneho rozlíšenia (DPR) na mobiloch pre obrovský nárast výkonu
+            let maxDpr = (window.innerWidth <= 768) ? 1.5 : (window.devicePixelRatio || 1);
+            let dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+            
             canvas.style.width = container.clientWidth + 'px';
             canvas.style.height = container.clientHeight + 'px';
             canvas.width = container.clientWidth * dpr;
