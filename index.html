@@ -1159,7 +1159,14 @@ function closeApp() {
         }
 
         function renderCloud(ctx, cx, cy, scale, isDark) {
-            ctx.fillStyle = isDark ? 'rgba(71, 85, 105, 0.9)' : 'rgba(241, 245, 249, 0.85)';
+            // ZMENA: Výraznejšia, tmavšia farba pre búrkové mraky
+            ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(241, 245, 249, 0.85)';
+            
+            // ZMENA: Pridáme tieň, aby sa mraky oddelili od akejkoľvek farby oblohy
+            ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.4)';
+            ctx.shadowBlur = 8 * scale;
+            ctx.shadowOffsetY = 2 * scale;
+
             ctx.beginPath();
             ctx.arc(cx, cy, 20*scale, Math.PI*0.5, Math.PI*1.5);
             ctx.arc(cx + 15*scale, cy - 15*scale, 25*scale, Math.PI*1, Math.PI*2);
@@ -1167,6 +1174,11 @@ function closeApp() {
             ctx.arc(cx + 50*scale, cy, 15*scale, Math.PI*1.5, Math.PI*0.5);
             ctx.closePath();
             ctx.fill();
+            
+            // Po nakreslení mraku tieň resetujeme, aby neovplyvnil dážď alebo planéty
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.shadowColor = 'transparent';
         }
         let currentLang = localStorage.getItem('solaris_lang') || 'en';
         let currentEra = 'AD'; 
