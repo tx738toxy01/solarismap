@@ -3301,7 +3301,8 @@ if (showWeatherFx) {
                             // ZMENA: Kvapky a sneh sú dramaticky odfukované vetrom do strany
                             d.dx += isSnow ? (Math.random() - 0.5 + windFactor * 0.3) : (Math.random() * 0.5 + windFactor * 0.6);
                             
-                            if (c.y + d.dy > horizonY) {
+                            // ZMENA: Zohľadníme dĺžku dažďovej kvapky (8px) a snehu, aby nepretiekli pod čiaru horizontu
+                            if (c.y + d.dy > horizonY - (isSnow ? 3 : 8)) {
                                 c.drops.splice(i, 1);
                             } else {
                                 // ZMENA: Výraznejší dážď - bledomodrá farba a o kúsok väčšie kvapky pre lepší kontrast
