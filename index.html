@@ -3243,11 +3243,11 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
                 
 if (showWeatherFx) {
                     // Zvýšený limit: pri 100% oblačnosti bude na obrazovke až 40 mrakov (predtým 15)
-                    let targetClouds = Math.floor((weather.clouds / 100) * 40);
+                    let targetClouds = Math.floor((weather.clouds / 100) * 60);
                     if (weather.clouds > 0 && targetClouds === 0) targetClouds = 1; 
                     
                     // ZMENA: Ak prší alebo sneží, vynútime aspoň 15 mrakov pre dramatickejší efekt
-                    if ((isRain || isSnow) && targetClouds < 15) targetClouds = 15;
+                    if ((isRain || isSnow) && targetClouds < 30) targetClouds = 30;
                     
                     while (activeClouds.length < targetClouds) {
                         activeClouds.push({
