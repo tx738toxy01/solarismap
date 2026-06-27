@@ -3780,8 +3780,20 @@ if (showWeatherFx) {
             const t = translations[currentLang];
             
             let pad = (n) => n.toString().padStart(2, '0');
-            let targetDateStr = `${pad(simDate.getDate())}.${pad(simDate.getMonth()+1)}.${simDate.getFullYear()}`;
-            let targetTimeStr = `${pad(simDate.getHours())}:${pad(simDate.getMinutes())}`;
+
+// Aplikovanie časovej zóny vybranej lokality na lokálnu kópiu dátumu
+let displayDateWeather = new Date(simDate);
+if (myTimezone) {
+    try {
+        let tzDateStr = simDate.toLocaleString('en-US', { timeZone: myTimezone });
+        displayDateWeather = new Date(tzDateStr);
+    } catch(e) {
+        // v prípade chyby ostane predvolený systémový čas
+    }
+}
+
+let targetDateStr = `${pad(displayDateWeather.getDate())}.${pad(displayDateWeather.getMonth()+1)}.${displayDateWeather.getFullYear()}`;
+let targetTimeStr = `${pad(displayDateWeather.getHours())}:${pad(displayDateWeather.getMinutes())}`;
             
             // 1. Zarovnanie nadpisu na stred do jedného riadku (bez <br>)
             if (wTitle) {
@@ -3984,7 +3996,7 @@ if (showWeatherFx) {
             let content = "";
             
             if (boxIndex === 1) {
-                title = zUI.duration.split(" (")[0] + " - Fun Fact";
+                title = "Fun Fact"; 
                 content = zData.fact;
             } else if (boxIndex === 2) {
                 title = zData.starsTitle;
