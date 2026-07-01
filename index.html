@@ -1297,7 +1297,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             if (currentMapZoom < 2) currentMapZoom = 2;
             if (currentMapZoom > 20) currentMapZoom = 20;
             
-            iframe.src = `https://maps.google.com/maps?ll=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
+            iframe.src = `https://maps.google.com/maps?q=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
         }
 
         function toggleQuickMap(event) {
@@ -1310,7 +1310,7 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             } else {
                 panel.style.display = 'block';
                 currentMapZoom = 11; 
-                iframe.src = `https://maps.google.com/maps?ll=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
+                iframe.src = `https://maps.google.com/maps?q=${myLat},${myLon}&z=${currentMapZoom}&output=embed`;
             }
         }
         		
@@ -2243,15 +2243,16 @@ onmouseover="this.style.color='#38bdf8'; this.style.transform='rotate(90deg)'" o
             currentPlanetKey = key;
             let dp = document.getElementById('planet-dropdown');
             
-            // RESET VZHĽADU BOXOV PRE PLANÉTU (Stanú sa neklikateľnými)
+            // AKTIVÁCIA BOXOV PRE PLANÉTU (Stanú sa klikateľnými)
             for(let i=1; i<=3; i++) {
                 let box = document.getElementById('stat-box-' + i);
                 if (box) {
-                    box.style.cursor = 'default';
-                    box.style.border = '1px solid rgba(51, 65, 85, 0.3)';
-                    box.style.background = 'rgba(30, 41, 59, 0.4)';
-                    box.onmouseover = null;
-                    box.onmouseout = null;
+                    box.style.cursor = 'pointer';
+                    box.style.border = '1px solid #38bdf8';
+                    box.style.background = 'rgba(15, 23, 42, 0.8)';
+                    box.onmouseover = () => box.style.background = 'rgba(56, 189, 248, 0.2)';
+                    box.onmouseout = () => box.style.background = 'rgba(15, 23, 42, 0.8)';
+                    box.title = t.planetUI ? (i === 1 ? "Fun Fact" : (i === 2 ? t.planetUI.originTitle : t.planetUI.historyTitle)) : "Info";
                 }
             }
             
@@ -3959,6 +3960,22 @@ let targetTimeStr = `${pad(displayDateWeather.getHours())}:${pad(displayDateWeat
             }
         }
 
+        // FOTOGRAFIE PLANÉT A OBJEKTOV (Wikimedia Commons)
+        const planetImages = {
+            Sun: "The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg",
+            Moon: "FullMoon2010.jpg",
+            Mercury: "Mercury_in_true_color.jpg",
+            Venus: "PIA23791-Venus-RealAndEnhancedContrastViews-20200608_%28cropped2%29.jpg",
+            Earth: "The_Earth_seen_from_Apollo_17.jpg",
+            Mars: "OSIRIS_Mars_true_color.jpg",
+            Jupiter: "Jupiter.jpg",
+            Saturn: "Saturn_during_Equinox.jpg",
+            Uranus: "Uranus2.jpg",
+            Neptune: "Neptune_-_Voyager_2_%2829777304466%29.png",
+            Pluto: "Pluto_in_True_Color_-_High-Res.jpg",
+            Halley: "Halley%27s_Comet_%281986%29.jpg"
+        };
+
         // HISTORICKÉ MAPY SÚHVEZDÍ (Urania's Mirror - 1825) - OPRAVENÉ NÁZVY!
         const zodiacImages = {
             Aries: "Sidney Hall - Urania's Mirror - Aries and Musca Borealis.jpg",
@@ -3985,47 +4002,75 @@ let targetTimeStr = `${pad(displayDateWeather.getHours())}:${pad(displayDateWeat
         // Spustíme prednačítavanie potichu 2 sekundy po štarte, aby sme nespomalili úvodné zobrazenie oblohy
         setTimeout(preloadZodiacImages, 2000);
 
-        // FUNKCIA PO KLIKNUTÍ NA BOX ZNAMENIA (Otvorí popup okno s textom a obrázkom)
+        // FUNKCIA PO KLIKNUTÍ NA BOX (Otvorí responzívne skrolovateľné okno s textom a obrázkom)
         function handleStatClick(boxIndex) {
-            if (currentPanelMode !== 'zodiac') return; // Ak je tam planéta, boxy nie sú klikateľné
-            
             let t = translations[currentLang];
-            let zData = (t.zodiacDetails || translations['en'].zodiacDetails)[currentZodiacKey];
-            let zUI = t.zodiacUI || translations['en'].zodiacUI;
-            
             let title = "";
             let content = "";
-            
-            if (boxIndex === 1) {
-                title = "Fun Fact"; 
-                content = zData.fact;
-            } else if (boxIndex === 2) {
-                title = zData.starsTitle;
-                
-                let imgName = zodiacImages[currentZodiacKey];
-                let imgUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imgName)}`;
-                
-                // OPRAVA: Pridaný pevný rozmer, text Načítavam... a plynulé zobrazenie obrázku
-                let loadingText = currentLang === 'sk' ? 'Načítavam obraz...' : (currentLang === 'cs' ? 'Načítám obraz...' : 'Loading image...');
-                
-                content = zData.stars + `<br><br>
-                <div style="border-radius: 12px; overflow: hidden; border: 1px solid #38bdf8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); background: #0f172a; margin: 10px auto 0 auto; position: relative; min-height: 150px; min-width: 150px; width: fit-content; display: flex; justify-content: center; align-items: center;">
-                    <div id="loading-text" style="position: absolute; color: #94a3b8; font-size: 0.9rem; z-index: 1;">${loadingText} ⏳</div>
-                    <img src="${imgUrl}" alt="${zData.latin}" onload="document.getElementById('loading-text').style.display='none'; this.style.opacity=1;" style="max-width: 100%; max-height: 50vh; width: auto; height: auto; display: block; opacity: 0; transition: opacity 0.4s ease; position: relative; z-index: 2;">
-                </div>`;
-                
-            } else if (boxIndex === 3) {
-                title = zData.latin + " - " + zUI.mythology.split(" (")[0];
-                content = zData.myth;
+            let popupSignName = "";
+
+            // Dynamické pridanie skrolovania do kontajnera, aby kód nevypadával z obrazovky
+            let modalInnerCard = document.getElementById('zodiac-overlay').querySelector('div');
+            if (modalInnerCard) {
+                modalInnerCard.style.maxHeight = '85vh';
+                modalInnerCard.style.overflowY = 'auto';
+                modalInnerCard.style.webkitOverflowScrolling = 'touch'; 
             }
 
-            // Pridanie malého nadpisu (ikona + názov znamenia)
-            let cSign = zodiacSigns.find(s => s.id === currentZodiacKey);
-            let signName = t.zodiac[currentZodiacKey];
-            document.getElementById('zodiac-popup-sign-name').innerHTML = `<span style="color:#facc15; margin-right:4px; font-size: 0.9rem;">${cSign.sym}</span> ${signName}`;
+            if (currentPanelMode === 'zodiac') {
+                let zData = (t.zodiacDetails || translations['en'].zodiacDetails)[currentZodiacKey];
+                let zUI = t.zodiacUI || translations['en'].zodiacUI;
+                
+                if (boxIndex === 1) {
+                    title = "Fun Fact"; 
+                    content = zData.fact;
+                } else if (boxIndex === 2) {
+                    title = zData.starsTitle;
+                    let imgName = zodiacImages[currentZodiacKey];
+                    let imgUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imgName)}`;
+                    let loadingText = currentLang === 'sk' ? 'Načítavam ilustráciu...' : (currentLang === 'cs' ? 'Načítám ilustraci...' : 'Loading illustration...');
+                    
+                    content = `<div style="line-height:1.5; color:#cbd5e1;">${zData.stars}</div><br>
+                    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #38bdf8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); background: #0f172a; margin: 10px auto 0 auto; position: relative; min-height: 150px; min-width: 150px; width: fit-content; display: flex; justify-content: center; align-items: center;">
+                        <div id="loading-text" style="position: absolute; color: #94a3b8; font-size: 0.9rem; z-index: 1;">${loadingText} ⏳</div>
+                        <img src="${imgUrl}" alt="${zData.latin}" onload="document.getElementById('loading-text').style.display='none'; this.style.opacity=1;" style="max-width: 100%; max-height: 45vh; width: auto; height: auto; display: block; opacity: 0; transition: opacity 0.4s ease; position: relative; z-index: 2;">
+                    </div>`;
+                    
+                } else if (boxIndex === 3) {
+                    title = zData.latin + " - " + zUI.mythology.split(" (")[0];
+                    content = zData.myth;
+                }
+                let cSign = zodiacSigns.find(s => s.id === currentZodiacKey);
+                popupSignName = `<span style="color:#facc15; margin-right:4px; font-size: 0.9rem;">${cSign.sym}</span> ${t.zodiac[currentZodiacKey]}`;
 
+            } else if (currentPanelMode === 'planet') {
+                let pData = (t.planetDetails || translations['en'].planetDetails)[currentPlanetKey];
+                let pUI = t.planetUI || translations['en'].planetUI;
+
+                if (boxIndex === 1) {
+                    title = "Fun Fact";
+                    content = pData.fact;
+                } else if (boxIndex === 2) {
+                    title = pUI.originTitle;
+                    let imgName = planetImages[currentPlanetKey];
+                    let imgUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${imgName}`;
+                    let loadingText = currentLang === 'sk' ? 'Sťahujem fotografiu...' : (currentLang === 'cs' ? 'Stahuji fotografii...' : 'Downloading photo...');
+                    
+                    content = `<div style="line-height:1.5; color:#cbd5e1;">${pData.origin}</div><br>
+                    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #38bdf8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); background: #0f172a; margin: 10px auto 0 auto; position: relative; min-height: 150px; min-width: 150px; width: fit-content; display: flex; justify-content: center; align-items: center;">
+                        <div id="loading-text" style="position: absolute; color: #94a3b8; font-size: 0.9rem; z-index: 1;">${loadingText} ⏳</div>
+                        <img src="${imgUrl}" alt="${t.planets[currentPlanetKey]}" onload="document.getElementById('loading-text').style.display='none'; this.style.opacity=1;" style="max-width: 100%; max-height: 45vh; width: auto; height: auto; display: block; opacity: 0; transition: opacity 0.4s ease; position: relative; z-index: 2;">
+                    </div>`;
+                } else if (boxIndex === 3) {
+                    title = pUI.historyTitle;
+                    content = pData.history;
+                }
+                popupSignName = `<span style="color:${planetData[currentPlanetKey].color}; margin-right:6px; font-size: 1.2rem;">●</span> ${t.planets[currentPlanetKey]}`;
+            }
+
+            document.getElementById('zodiac-popup-sign-name').innerHTML = popupSignName;
             document.getElementById('zodiac-simple-title').innerText = title;
-            document.getElementById('zodiac-simple-content').innerHTML = content;
+            document.getElementById('zodiac-simple-content').innerHTML = `<div style="line-height:1.6; color:#e2e8f0; text-align:justify; font-size:0.95rem;">${content}</div>`;
             document.getElementById('zodiac-overlay').style.display = 'flex';
         }
 
@@ -4109,6 +4154,293 @@ let targetTimeStr = `${pad(displayDateWeather.getHours())}:${pad(displayDateWeat
         Object.assign(translations.hi, { liveTitle: "लाइव घटनाएँ और समाचार", liveGlobal: "🔔 वैश्विक अंतरिक्ष घटनाएँ", liveLoading: "सर्वर से जुड़ रहा है... 📡", liveEmpty: "कोई हालिया घटनाएँ नहीं।", liveTrans: "डेटा का अनुवाद हो रहा है... ⏳", liveErr: "कनेक्शन त्रुटि। ❌", readMore: "मूल पढ़ें", astroTitle: "आगामी घटनाएँ", astroEmpty: "कोई आगामी घटनाएँ नहीं मिलीं।", sysErr: "कनेक्शन त्रुटि", sysSrc: "सिस्टम", closeWarn: "⚠️ ऐप को मैन्युअल रूप से बंद करें।", timeToday: "आज", timeIn: "", timeDays: "दिनों में", timeAgo: "", timeAgoDays: "दिन पहले", soon: "जल्द ही" });
         Object.assign(translations.ja, { liveTitle: "ライブイベントとニュース", liveGlobal: "🔔 グローバル宇宙イベント", liveLoading: "サーバーに接続中... 📡", liveEmpty: "最近のイベントはありません。", liveTrans: "データを翻訳中... ⏳", liveErr: "接続エラー。❌", readMore: "オリジナルを読む", astroTitle: "今後のイベント", astroEmpty: "今後のイベントは見つかりませんでした。", sysErr: "接続エラー", sysSrc: "システム", closeWarn: "⚠️ アプリを手動で閉じてください。", timeToday: "今日", timeIn: "", timeDays: "日後", timeAgo: "", timeAgoDays: "日前", soon: "まもなく" });
         Object.assign(translations.ko, { liveTitle: "라이브 이벤트 및 뉴스", liveGlobal: "🔔 글로벌 우주 이벤트", liveLoading: "서버에 연결 중... 📡", liveEmpty: "최근 이벤트가 없습니다.", liveTrans: "데이터 번역 중... ⏳", liveErr: "연결 오류. ❌", readMore: "원본 읽기", astroTitle: "다가오는 이벤트", astroEmpty: "예정된 이벤트가 없습니다.", sysErr: "연결 오류", sysSrc: "시스템", closeWarn: "⚠️ 앱을 수동으로 닫으세요.", timeToday: "오늘", timeIn: "", timeDays: "일 후", timeAgo: "", timeAgoDays: "일 전", soon: "곧" });
+
+// --- TEXTOVÉ DÁTA PRE PLANÉTY A OBJEKTY (VŠETKY JAZYKY) ---
+        Object.assign(translations.sk, {
+            planetUI: { originTitle: "Vznik a zloženie", historyTitle: "Z histórie pozorovania" },
+            planetDetails: {
+                Sun: { fact: "Slnko obsahuje 99.86% všetkej hmoty v slnečnej sústave.", origin: "Vzniklo pred 4.6 miliardami rokov z oblaku plynu. Skladá sa prevažne z vodíka (73%) a hélia (25%).", history: "Uctievané vo viacerých starovekých kultúrach. Prvé slnečné škvrny teleskopom pozoroval Galileo Galilei v roku 1610." },
+                Moon: { fact: "Mesiac sa vzďaľuje od Zeme rýchlosťou približne 3.8 cm za rok.", origin: "Vznikol pravdepodobne po obrovskej zrážke Zeme s telesom veľkosti Marsu (Theia). Povrch je tvorený kremičitanmi.", history: "Pozorovaný od počiatku ľudstva. Prvý človek na ňom pristál v roku 1969 v rámci misie Apollo 11." },
+                Mercury: { fact: "Hoci je najbližšie k Slnku, nie je najteplejšou planétou (tou je Venuša).", origin: "Vznikol z ťažších prvkov blízko Slnka. Má obrovské železné jadro, ktoré tvorí až 85% jeho polomeru.", history: "Známy už Sumerom (3000 p.n.l.). Prvá sonda, ktorá ho navštívila, bola Mariner 10 v roku 1974." },
+                Venus: { fact: "Deň na Venuši trvá dlhšie ako jej rok, a rotuje opačným smerom ako väčšina planét.", origin: "Zložením podobná Zemi, ale s extrémnym skleníkovým efektom. Atmosféru tvorí z 96% oxid uhličitý.", history: "V staroveku ju považovali za dve rôzne hviezdy (Zornička a Večernica). Prvé úspešné pristátie sondy (Venera 7) bolo v roku 1970." },
+                Earth: { fact: "Je to zatiaľ jediné známe miesto vo vesmíre, kde existuje život.", origin: "Vznikla pred 4.5 miliardami rokov z protoplanetárneho disku. Má unikátnu hydrosféru s tekutou vodou na povrchu.", history: "Až v 16. storočí Kopernik presvedčivo ukázal, že Zem nie je stredom vesmíru, ale obieha okolo Slnka." },
+                Mars: { fact: "Nachádza sa tu najvyššia sopka v slnečnej sústave - Olympus Mons (vysoká 21 km).", origin: "Je to skalnatá planéta s tenkou atmosférou z CO2. Červenú farbu spôsobuje oxid železitý (hrdza) na povrchu.", history: "Pomenovaný po rímskom bohovi vojny. Od 60. rokov 20. storočia je cieľom mnohých úspešných povrchových roverov." },
+                Jupiter: { fact: "Je taký veľký, že by sa do neho zmestilo 1300 planét veľkosti Zeme.", origin: "Plynný obor tvorený primárne vodíkom a héliom. Pravdepodobne bol prvou planétou, ktorá sa sformovala v slnečnej sústave.", history: "Galileo Galilei v roku 1610 objavil jeho 4 najväčšie mesiace, čo definitívne potvrdilo, že nie všetko obieha okolo Zeme." },
+                Saturn: { fact: "Saturn má najmenšiu hustotu zo všetkých planét. Keby bol dostatočne veľký oceán, plával by na hladine.", origin: "Druhý plynný obor. Jeho slávne prstence sú tvorené miliardami kúskov ľadu a prachu, od veľkosti zrnka piesku po balvany.", history: "Prstence prvýkrát spozoroval Galileo (myslel si, že má uši). Najpodrobnejšie údaje priniesla sonda Cassini (2004-2017)." },
+                Uranus: { fact: "Urán rotuje 'na boku' – jeho os je naklonená až o 98 stupňov, pravdepodobne po dávnej kolízii.", origin: "Ľadový obor. Okrem vodíka a hélia obsahuje plášť z vody, amoniaku a metánu (ktorý mu dáva modrú farbu).", history: "Prvá planéta objavená teleskopom. Objavil ju William Herschel v roku 1781." },
+                Neptune: { fact: "Vetry na Neptúne dosahujú rýchlosť vyše 2000 km/h, čo sú najrýchlejšie vetry v slnečnej sústave.", origin: "Ľadový obor, zložením veľmi podobný Uránu. Jeho hlboká modrá farba je tiež dôsledkom absorpcie svetla metánom.", history: "Prvá planéta, ktorej existencia bola matematicky predpovedaná (U. Le Verrier) pred tým, než bola v roku 1846 reálne videná." },
+                Pluto: { fact: "Pluto je menšie ako zemský Mesiac a jeho obežná dráha zasahuje dovnútra dráhy Neptúna.", origin: "Trpasličia planéta v Kuiperovom páse. Skladá sa hlavne z kameňa a ľadu. Má vlastnú zložitú atmosféru.", history: "Objavené v roku 1930 (C. Tombaugh). V roku 2006 bolo preklasifikované z planéty na trpasličiu planétu. V roku 2015 ho navštívila sonda New Horizons." },
+                Halley: { fact: "Jej jadro má tvar arašidu (15x8 km) a je tmavšie ako uhlie.", origin: "Krátkoperiodická kométa pozostávajúca z prastarého ľadu a prachu z ranej slnečnej sústavy.", history: "Edmond Halley v roku 1705 ako prvý zistil, že kométy z rokov 1531, 1607 a 1682 sú ten istý objekt, a úspešne predpovedal jej návrat." }
+            }
+        });
+
+        Object.assign(translations.cs, {
+            planetUI: { originTitle: "Vznik a složení", historyTitle: "Z historie pozorování" },
+            planetDetails: {
+                Sun: { fact: "Slunce obsahuje 99.86% veškeré hmoty ve sluneční soustavě.", origin: "Vzniklo před 4.6 miliardami let z mračna plynu. Skládá se převážně z vodíku a helia.", history: "První sluneční skvrny teleskopem pozoroval Galileo Galilei v roce 1610." },
+                Moon: { fact: "Měsíc se vzdaluje od Země rychlostí přibližně 3.8 cm za rok.", origin: "Vznikl pravděpodobně po obrovské srážce Země s tělesem velikosti Marsu.", history: "První člověk na něm přistál v roce 1969 v rámci mise Apollo 11." },
+                Mercury: { fact: "Ačkoliv je nejblíže Slunci, není nejteplejší planetou (tou je Venuše).", origin: "Má obrovské železné jádro, které tvoří až 85% jeho poloměru.", history: "První sonda, která ho navštívila, byla Mariner 10 v roce 1974." },
+                Venus: { fact: "Den na Venuši trvá déle než její rok, a rotuje opačným směrem.", origin: "Atmosféru tvoří z 96% oxid uhličitý, což způsobuje masivní skleníkový efekt.", history: "První úspěšné přistání sondy (Venera 7) proběhlo v roce 1970." },
+                Earth: { fact: "Je to zatím jediné známé místo ve vesmíru, kde existuje život.", origin: "Vznikla před 4.5 miliardami let. Má unikátní hydrosféru s tekutou vodou.", history: "V 16. století Koperník přesvědčivě ukázal, že obíháme kolem Slunce." },
+                Mars: { fact: "Nachází se zde nejvyšší sopka sluneční soustavy - Olympus Mons (21 km).", origin: "Skalnatá planeta s řídkou atmosférou. Červenou barvu způsobuje rzi podobný povrch.", history: "Od 60. let 20. století je cílem mnoha úspěšných povrchových roverů." },
+                Jupiter: { fact: "Vejde se do něj 1300 planet velikosti Země.", origin: "Plynný obr tvořený primárně vodíkem a heliem. Zřejmě nejstarší planeta soustavy.", history: "Galileo Galilei objevil jeho 4 měsíce, čímž potvrdil, že ne vše obíhá kolem Země." },
+                Saturn: { fact: "Kdyby byl dostatečně velký oceán, Saturn by v něm plaval (má nejmenší hustotu).", origin: "Jeho slavné prstence jsou tvořeny miliardami kousků ledu a prachu.", history: "Nejpodrobnější údaje o prstencích a měsících přinesla sonda Cassini." },
+                Uranus: { fact: "Uran rotuje 'na boku' – jeho osa je nakloněna o 98 stupňů.", origin: "Ledový obr obsahující plášť z vody, amoniaku a metanu.", history: "První planeta objevená teleskopem (William Herschel v roce 1781)." },
+                Neptune: { fact: "Větry zde dosahují rychlosti přes 2000 km/h (nejrychlejší v soustavě).", origin: "Ledový obr, modrou barvu mu dává absorpce světla metanem.", history: "První planeta, jejíž existence byla nejprve matematicky předpovězena (1846)." },
+                Pluto: { fact: "Je menší než zemský Měsíc a jeho oběžná dráha se kříží s Neptunovou.", origin: "Trpasličí planeta v Kuiperově pásu. Skládá se hlavně z kamení a ledu.", history: "V roce 2006 bylo překlasifikováno. V roce 2015 ho navštívila sonda New Horizons." },
+                Halley: { fact: "Její jádro má tvar arašídu a je tmavší než uhlí.", origin: "Krátkoperiodická kometa složená z prastarého ledu a prachu.", history: "Edmond Halley úspěšně předpověděl její návrat, čímž potvrdil Newtonovy zákony." }
+            }
+        });
+
+        Object.assign(translations.en, {
+            planetUI: { originTitle: "Origin & Composition", historyTitle: "Observation History" },
+            planetDetails: {
+                Sun: { fact: "The Sun accounts for 99.86% of the mass in the solar system.", origin: "Formed 4.6 billion years ago. Made mostly of hydrogen and helium.", history: "Galileo first observed its sunspots with a telescope in 1610." },
+                Moon: { fact: "The Moon is drifting away from Earth at roughly 3.8 cm per year.", origin: "Likely formed after a Mars-sized body collided with early Earth.", history: "First human landing was the Apollo 11 mission in 1969." },
+                Mercury: { fact: "Despite being closest to the Sun, it's not the hottest planet.", origin: "Has a massive iron core comprising 85% of its radius.", history: "First visited by the Mariner 10 spacecraft in 1974." },
+                Venus: { fact: "A day on Venus is longer than its year, and it spins backwards.", origin: "Atmosphere is 96% CO2, creating a runaway greenhouse effect.", history: "Venera 7 achieved the first successful landing in 1970." },
+                Earth: { fact: "The only place in the universe known to harbor life.", origin: "Formed 4.5 billion years ago. Unique for its liquid water hydrosphere.", history: "Copernicus famously proved we orbit the Sun in the 16th century." },
+                Mars: { fact: "Home to Olympus Mons, a volcano 21 km high.", origin: "A rocky planet with iron oxide dust giving it a red hue.", history: "Target of numerous successful rover missions since the late 1990s." },
+                Jupiter: { fact: "So large that 1,300 Earths could fit inside it.", origin: "A gas giant composed primarily of hydrogen and helium.", history: "Galileo's discovery of its 4 moons proved not everything orbits Earth." },
+                Saturn: { fact: "It is the only planet less dense than water.", origin: "Its iconic rings are made of billions of ice and dust particles.", history: "The Cassini mission provided the most detailed data to date." },
+                Uranus: { fact: "It rotates on its side with an axial tilt of 98 degrees.", origin: "An ice giant whose methane content gives it a pale blue color.", history: "First planet discovered with a telescope (William Herschel, 1781)." },
+                Neptune: { fact: "Winds on Neptune can reach supersonic speeds of 2,000 km/h.", origin: "Ice giant similar to Uranus, but with a deeper blue color.", history: "First planet predicted by mathematics before visual observation (1846)." },
+                Pluto: { fact: "Pluto is smaller than Earth's Moon.", origin: "A dwarf planet in the Kuiper belt made of rock and ice.", history: "Reclassified in 2006. Visited by New Horizons in 2015." },
+                Halley: { fact: "Its peanut-shaped nucleus is darker than coal.", origin: "A short-period comet made of ancient ice and dust.", history: "Edmond Halley famously proved it was the same returning object." }
+            }
+        });
+
+        Object.assign(translations.de, {
+            planetUI: { originTitle: "Ursprung & Zusammensetzung", historyTitle: "Beobachtungsgeschichte" },
+            planetDetails: {
+                Sun: { fact: "Die Sonne macht 99,86% der Masse unseres Sonnensystems aus.", origin: "Vor 4,6 Mrd. Jahren entstanden. Besteht hauptsächlich aus Wasserstoff und Helium.", history: "Galileo beobachtete 1610 erstmals Sonnenflecken mit einem Teleskop." },
+                Moon: { fact: "Der Mond entfernt sich jährlich um ca. 3,8 cm von der Erde.", origin: "Entstand vermutlich durch die Kollision der Erde mit einem marsgroßen Körper.", history: "Erste bemannte Landung war Apollo 11 im Jahr 1969." },
+                Mercury: { fact: "Obwohl der Sonne am nächsten, ist er nicht der heißeste Planet.", origin: "Besitzt einen gewaltigen Eisenkern (85% des Radius).", history: "Mariner 10 war 1974 die erste Sonde, die ihn besuchte." },
+                Venus: { fact: "Ein Venus-Tag ist länger als ihr Jahr, und sie rotiert rückwärts.", origin: "Die Atmosphäre (96% CO2) sorgt für einen extremen Treibhauseffekt.", history: "Venera 7 landete 1970 als erste Sonde erfolgreich auf der Venus." },
+                Earth: { fact: "Der einzige bekannte Ort im Universum mit Leben.", origin: "Vor 4,5 Mrd. Jahren entstanden. Einzigartig durch flüssiges Wasser.", history: "Kopernikus bewies im 16. Jahrhundert, dass wir die Sonne umkreisen." },
+                Mars: { fact: "Hier befindet sich Olympus Mons, ein 21 km hoher Vulkan.", origin: "Ein Gesteinsplanet. Eisenoxid-Staub sorgt für die rote Farbe.", history: "Ziel zahlreicher erfolgreicher Rover-Missionen." },
+                Jupiter: { fact: "Er ist so groß, dass 1.300 Erden in ihn hineinpassen würden.", origin: "Ein Gasriese, bestehend aus Wasserstoff und Helium.", history: "Galileos Entdeckung der 4 Monde bewies, dass nicht alles die Erde umkreist." },
+                Saturn: { fact: "Saturn hat eine geringere Dichte als Wasser.", origin: "Seine Ringe bestehen aus Milliarden Eis- und Staubpartikeln.", history: "Die Cassini-Sonde lieferte die detailliertesten Daten (2004-2017)." },
+                Uranus: { fact: "Er rotiert auf der Seite (Achsenneigung von 98 Grad).", origin: "Ein Eisriese, dessen Methangehalt ihm eine hellblaue Farbe verleiht.", history: "Erster mit einem Teleskop entdeckter Planet (Herschel, 1781)." },
+                Neptune: { fact: "Die Winde erreichen Überschallgeschwindigkeiten (2.000 km/h).", origin: "Eisriese ähnlich Uranus, aber mit einem tieferen Blau.", history: "Erster Planet, dessen Existenz mathematisch vorhergesagt wurde (1846)." },
+                Pluto: { fact: "Pluto ist kleiner als der Erdmond.", origin: "Ein Zwergplanet im Kuipergürtel aus Gestein und Eis.", history: "2006 reklassifiziert. 2015 von New Horizons besucht." },
+                Halley: { fact: "Sein Kern ist erdnussförmig und schwärzer als Kohle.", origin: "Ein kurzperiodischer Komet aus uraltem Eis und Staub.", history: "Edmond Halley sagte die Wiederkehr dieses Kometen erfolgreich voraus." }
+            }
+        });
+
+        // Všeobecný prekladový fallback pre ostatné jazyky (Kopíruje angličtinu s príslušnými nadpismi)
+        const commonPlanetTexts = translations.en.planetDetails;
+        Object.assign(translations.fr, { planetUI: { originTitle: "Origine et Composition", historyTitle: "Histoire de l'observation" }, planetDetails: commonPlanetTexts });
+        Object.assign(translations.es, { planetUI: { originTitle: "Origen y Composición", historyTitle: "Historia de observación" }, planetDetails: commonPlanetTexts });
+        Object.assign(translations.zh, { planetUI: { originTitle: "起源与组成", historyTitle: "观测历史" }, planetDetails: commonPlanetTexts });
+        Object.assign(translations.hi, { planetUI: { originTitle: "उत्पत्ति और संरचना", historyTitle: "अवलोकन का इतिहास" }, planetDetails: commonPlanetTexts });
+        Object.assign(translations.ja, { planetUI: { originTitle: "起源と構成", historyTitle: "観測の歴史" }, planetDetails: commonPlanetTexts });
+        Object.assign(translations.ko, { planetUI: { originTitle: "기원 및 구성", historyTitle: "관측 역사" }, planetDetails: commonPlanetTexts });
+
+// --- MULTIJAZYČNÁ ENCYKLOPÉDIA PLANÉT A TELIES (BEZ SKRATIEK) ---
+        Object.assign(translations.sk, {
+            planetUI: { originTitle: "Vznik a zloženie", historyTitle: "Z histórie pozorovania" },
+            planetDetails: {
+                Sun: { fact: "Slnko tvorí až 99,86 % celkovej hmotnosti celej našej slnečnej sústavy. Každú sekundu premení jadrovou fúziou približne 600 miliónov ton vodíka na hélium, pričom sa uvoľní obrovské množstvo energie vo forme svetla a tepla.", origin: "Vzniklo pred 4,6 miliardami rokov z obrovského rotujúceho gravitačného mračna plynu a vesmírneho prachu. Skladá sa prevažne z čistého vodíka (73 %) a hélia (25 %), s malou prímesou ťažších chemických prvkov ako kyslík, uhlík a železo.", history: "Bolo uctievané ako najvyššie božstvo (Ra, Helios, Sol) vo všetkých starovekých civilizáciách. Prvé reálne slnečné škvrny pomocou optického teleskopu spozoroval Galileo Galilei v roku 1610. Dnes ho priamo z koróny skúmajú moderné sondy ako NASA Parker Solar Probe." }
+            }
+        });
+        Object.assign(translations.cs, {
+            planetUI: { originTitle: "Vznik a složení", historyTitle: "Z historie pozorování" },
+            planetDetails: {
+                Sun: { fact: "Slunce tvoří neuvěřitelných 99,86 % celkové hmotnosti celé naší sluneční soustavy. Každou sekundu přemění jadernou fúzí přibližně 600 milionů tun vodíku na helium, čímž generuje životodárné záření.", origin: "Vzniklo před 4,6 miliardami let z rotujícího gravitačního mračna mezihvězdného plynu a prachu. Skládá se převážně z vodíku (73 %) a helia (25 %), s nepatrnou příměsí těžších prvků, jako je uhlík a kyslík.", history: "Uctíváno jako božstvo napříč lidskou historií. První sluneční skvrny pozoroval dalekohledem Galileo Galilei v roce 1610. V současnosti Slunce zkoumá lidstvo pomocí špičkových sond, například Parker Solar Probe." }
+            }
+        });
+        Object.assign(translations.en, {
+            planetUI: { originTitle: "Origin & Composition", historyTitle: "Observation History" },
+            planetDetails: {
+                Sun: { fact: "The Sun accounts for 99.86% of the total mass of the entire solar system. Every second, its core converts 600 million tons of hydrogen into helium through nuclear fusion, releasing immense energy.", origin: "It formed 4.6 billion years ago from the gravitational collapse of a giant interstellar gas nebula. It is composed of hydrogen (73%) and helium (25%), with trace amounts of heavier elements like oxygen and iron.", history: "Worshipped as a supreme god (Ra, Helios) in ancient cultures. Galileo Galilei first observed sunspots via telescope in 1610. Today, advanced spacecraft like NASA's Parker Solar Probe closely study its hot corona." }
+            }
+        });
+        Object.assign(translations.de, {
+            planetUI: { originTitle: "Herkunft & Struktur", historyTitle: "Beobachtungsgeschichte" },
+            planetDetails: {
+                Sun: { fact: "Die Sonne macht 99,86 % der gesamten Masse des Sonnensystems aus. Jede Sekunde verschmilzt sie im Kern 600 Millionen Tonnen Wasserstoff zu Helium und setzt enorme Energie frei.", origin: "Entstanden vor 4,6 Milliarden Jahren durch den Gravitationskollaps einer Urgaswolke. Sie besteht hauptsächlich aus Wasserstoff (73 %) und Helium (25 %) sowie schweren Elementen im Inneren.", history: "In alten Kulturen als Hauptgott (Sol, Helios) verehrt. Galileo Galilei entdeckte 1610 die Sonnenflecken mit dem Fernrohr. Heute erforschen Raumsonden wie die Parker Solar Probe die Sonnenkorona aus nächster Nähe." }
+            }
+        });
+
+        // Automatické prepojenie podrobných dát pre zostávajúce svetové jazyky (Vytvorenie nezávislých kópií!)
+        const globalPlanetWiki = translations.en.planetDetails;
+        Object.assign(translations.fr, { planetUI: { originTitle: "Origine et Composition", historyTitle: "Histoire de l'observation" }, planetDetails: { ...globalPlanetWiki } });
+        Object.assign(translations.es, { planetUI: { originTitle: "Origen y Composición", historyTitle: "Historia de la observación" }, planetDetails: { ...globalPlanetWiki } });
+        Object.assign(translations.zh, { planetUI: { originTitle: "起源与星体组成", historyTitle: "人类天文观测史" }, planetDetails: { ...globalPlanetWiki } });
+        Object.assign(translations.hi, { planetUI: { originTitle: "उत्पत्ति और संरचना", historyTitle: "अवलोकन का इतिहास" }, planetDetails: { ...globalPlanetWiki } });
+        Object.assign(translations.ja, { planetUI: { originTitle: "起源と天体構成", historyTitle: "天体観測の歴史" }, planetDetails: { ...globalPlanetWiki } });
+        Object.assign(translations.ko, { planetUI: { originTitle: "천체의 기원 및 구성", historyTitle: "인류의 관측 역사" }, planetDetails: { ...globalPlanetWiki } });
+
+        // Doplnenie encyklopedických detailov pre zvyšné objekty
+        const addPlanetData = (lang, key, data) => { if(translations[lang] && translations[lang].planetDetails) translations[lang].planetDetails[key] = data; };
+        
+        // --- SLOVENSKÁ DATABÁZA OBJEKTOV ---
+        addPlanetData('sk', 'Moon', { fact: "Mesiac je slapovo uzamknutý so Zemou, čo znamená, že nám ukazuje stále tú istú privrátenú stranu. Stabilizuje sklon zemskej osi, čím zabezpečuje stabilné podnebie.", origin: "Vznikol približne pred 4,5 miliardami rokov po gigantickej zrážke mladej Zeme s protoplanétou Theia. Skladá sa z kamenného plášťa a malého železného jadra, povrch pokrýva jemný prach (regolit).", history: "Sprevádza ľudstvo od praveku. Prvé mapy kráterov urobil Thomas Harriot v roku 1609. V roku 1969 na ňom úspešne pristáli prví ľudia v rámci programu Apollo 11." });
+        addPlanetData('sk', 'Mercury', { fact: "Merkúr zažíva najextrémnejšie teplotné rozdiely v slnečnej sústave – od -180 °C počas noci až po +430 °C cez deň, pretože nemá atmosféru.", origin: "Skalnatá planéta s neobvykle obrovským železným jadrom, ktoré tvorí až 85 % jej polomeru. Predpokladá sa, že jeho kamenný plášť bol v minulosti odtrhnutý masívnou vesmírnou kolíziou.", history: "Pozorovali ho už starí Sumeri okolo roku 3000 pred n.l. Zblízka ho prvýkrát preskúmala sonda Mariner 10 v roku 1974 a neskôr sonda MESSENGER, ktorá objavila vodný ľad v polárnych kráteroch." });
+        addPlanetData('sk', 'Venus', { fact: "Venuša je najteplejšou planétou v našej sústave a rotuje okolo svojej osi opačným smerom ako väčšina planét. Jeden deň na nej trvá dlhšie než celý jej obeh okolo Slnka.", origin: "Veľkosťou je podobná Zemi, ale jej hustá atmosféra z 96 % oxidu uhličitého vytvára brutálny skleníkový efekt. Tlak na povrchu je 90-krát vyšší ako na Zemi.", history: "Známa ako Zornička a Večernica. Prvé reálne panoramatické snímky z jej pekelného povrchu poslala sovietska sonda Venera 9 v roku 1975." });
+        addPlanetData('sk', 'Earth', { fact: "Zem je jedinou planétou v známom vesmíre, na ktorej je dokázaná existencia života a tekutej vody na povrchu.", origin: "Sformovala sa pred 4,54 miliardami rokov. Má silné magnetické pole generované tekutým železným vonkajším jadrom, ktoré nás chráni pred smrtiacim solárnym žiarením.", history: "Až v 16. storočí Mikuláš Koperník dokázal, že Zem obieha okolo Slnka a nie je stredom vesmíru. Prvú fotografiu celej Zeme (Modrá sklenená guľa) urobila posádka Apolla 17 v roku 1972." });
+        addPlanetData('sk', 'Mars', { fact: "Mars má najväčšiu sopku v slnečnej sústave – Olympus Mons, ktorá je vysoká 21,9 km, čo je takmer trojnásobok Mount Everestu.", origin: "Skalnatá planéta s veľmi tenkou atmosférou z CO2. Charakteristickú červenú farbu povrchu spôsobuje vysoká koncentrácia oxidu železitého (obyčajná hrdza).", history: "Pomenovaný po rímskom bohovi vojny kvôli svojej krvavej farbe. Od roku 1997 ho nepretržite skúmajú úspešné robotické rovery ako Spirit, Opportunity, Curiosity a Perseverance." });
+        addPlanetData('sk', 'Jupiter', { fact: "Jupiter je taký obrovský, že by pohltil všetky ostatné planéty slnečnej sústavy dohromady. Jeho Veľká červená škvrna je obrovská búrka besniaca už vyše 350 rokov.", origin: "Plynný obor zložený najmä z vodíka a hélia. Nemá pevný povrch, hlboko vnútri sa predpokladá prítomnosť exotického tekutého kovového vodíka.", history: "V roku 1610 Galileo Galilei namieril teleskop na Jupiter a objavil jeho štyri najväčšie mesiace (Io, Európa, Ganymedes, Kalisto), čím definitívne vyvrátil geocentrický model vesmíru." });
+        addPlanetData('sk', 'Saturn', { fact: "Saturn má najnižšiu hustotu zo všetkých planét – je menšia ako hustota vody. Keby sme ho hodili do gigantického oceánu, plával by na hladine.", origin: "Plynný obor s jadrom z kameňa a ľadu. Jeho úchvatné prstence sú zložené z miliárd čiastočiek čistého vodného ľadu, prachu a skál s veľkosťou od zrniek piesku po domy.", history: "Prstence si prvýkrát všimol Galileo v roku 1610, ale považoval ich za 'uši'. Správnu prstencovú štruktúru opísal až Christiaan Huygens v roku 1655." });
+        addPlanetData('sk', 'Uranus', { fact: "Urán rotuje 'na boku'. Jeho rotačná os je sklonená o 98 stupňov, čo znamená, že Slnku striedavo otáča svoj severný a južný pól. Spôsobila to pravdepodobne kolízia v ranej histórii.", origin: "Ľadový obor s plášťom z vody, amoniaku a metánu. Práve atmosférický metán pohlcuje červené svetlo a dodáva planéte jej nádhernú azúrovú farbu.", history: "Ide o prvú planétu objavenú moderným teleskopom. Náhodne ju objavil astronóm William Herschel v roku 1781, pričom ju pôvodne považoval za kométu." });
+        addPlanetData('sk', 'Neptune', { fact: "Na Neptúne vanú najrýchlejšie vetry v slnečnej sústave, ktoré dosahujú desivú rýchlosť až 2 100 km/h, čo výrazne prekračuje rýchlosť zvuku.", origin: "Ľadový obor veľmi podobný Uránu, ale s o niečo vyššou hmotnosťou a silnejším vnútorným teplom, ktoré poháňa obrovské dynamické atmosférické búrky.", history: "Prvá planéta objavená čisto na základe matematických výpočtov anomálií dráhy Uránu (Alexis Bouvard, Urbain Le Verrier). Opticky ju potvrdil Johann Galle v roku 1846." });
+        addPlanetData('sk', 'Pluto', { fact: "Pluto je menšie než náš zemský Mesiac. Jeho obežná dráha je taká eliptická, že počas určitého obdobia sa dostáva bližšie k Slnku než samotný Neptún.", origin: "Trpasličia planéta ležiaca v Kuiperovom páse. Je zložená z 30 % ľadu a 70 % skál, na povrchu sa nachádzajú obrovské pláne zo zamrznutého dusíka.", history: "Objavené v roku 1930 Clydeom Tombaughom. V roku 2006 ho Medzinárodná astronomická únia preklasifikovala na trpasličiu planétu. V roku 2015 okolo neho preletela sonda New Horizons." });
+        addPlanetData('sk', 'Halley', { fact: "Halleyho kométa je jedinou známou kométou, ktorú môže človek vidieť voľným okom dvakrát za život. Jej tmavé jadro odráža menej svetla ako kus uhlia.", origin: "Pozostatok z obdobia vzniku slnečnej sústavy. Ide o 'špinavú snehovú guľu' zloženú zo zamrznutej vody, oxidu uhoľnatého, metánu, prachu a kremičitanov.", history: "Zaznamenaná už v roku 240 pred n.l. v Číne. Edmond Halley v roku 1705 pochopil periodicitu jej obehu a úspešne predpovedal jej návrat na rok 1758." });
+
+        // --- ČESKÁ DATABÁZA OBJEKTOV ---
+        addPlanetData('cs', 'Moon', { fact: "Měsíc je vázaně rotující těleso, což znamená, že nám ukazuje stále stejnou privrácenou stranu. Stabilizuje sklon zemské osy, čímž zajišťuje stabilní klima.", origin: "Vznikl přibližně před 4,5 miliardami let po kolizi mladé Země s protoplanetou Theia. Skládá se z kamenného pláště a železného jádra.", history: "Doprovází lidstvo od pravěku. První mapy kráterů vytvořil Thomas Harriot v roce 1609. V roce 1969 na něm přistáli první lidé v rámci mise Apollo 11." });
+        addPlanetData('cs', 'Mercury', { fact: "Merkur má nejextrémnější teplotní rozdíly v naší soustavě – od -180 °C v noci až po +430 °C přes den, protože nemá atmosféru.", origin: "Skalnatá planeta s obrovským železným jádrem, které tvoří až 85 % jejího poloměru. Plášť byl pravděpodobně odtržen dávnou vesmírnou kolizí.", history: "Pozorován starými Sumery již kolem roku 3000 př.n.l. Detailně ho prozkoumala sonda Mariner 10 v roce 1974 a později MESSENGER." });
+        addPlanetData('cs', 'Venus', { fact: "Venuše je nejteplejší planetou sluneční soustavy. Její hustá atmosféra rotuje opačným směrem a den na ní trvá déle než její oblet kolem Slunce.", origin: "Velikostí je podobná Zemi, ale atmosféra z 96 % oxidu uhličitého vytváří nekontrolovatelný skleníkový efekt s tlakem 90-krát vyšším než na Zemi.", history: "Známá jako Večernice či Jitřenka. První panoramatické snímky z jejího povrchu odeslala sovětská sonda Venera 9 v roce 1975." });
+        addPlanetData('cs', 'Earth', { fact: "Země je jedinou planetou v celém známém vesmíru, na které je prokazatelně potvrzena existence komplexního života a tekuté vody.", origin: "Zformovala se před 4,54 miliardami let. Její rotující tekuté vnější jádro generuje silné magnetické pole chránící povrch před solárním větrem.", history: "V 16. století Mikuláš Koperník dokázal heliocentrický model. Nejslavnější fotografii celé Země pořídila posádka Apolla 17 v roce 1972." });
+        addPlanetData('cs', 'Mars', { fact: "Mars hostí nejvyšší sopku sluneční soustavy – Olympus Mons, vysokou 21,9 km, což trojnásobně převyšuje pozemský Mount Everest.", origin: "Skalnatá planeta s velmi tenkou atmosférou z CO2. Charakteristickou rezavě červenou barvu způsobuje vysoká koncentrace oxidu železitého.", history: "Pojmenován po římském bohu války. Od roku 1997 je nepřetržitě zkoumán úspěšnými robotickými rovery jako Curiosity a Perseverance." });
+        addPlanetData('cs', 'Jupiter', { fact: "Jupiter je tak obrovský, že by pojal všechny ostatní planety naší soustavy dohromady. Velká rudá skvrna je gigantická bouře trvající přes 350 let.", origin: "Obří plynná planeta složená převážně z vodíku a helia. Nemá pevný povrch, pod plynným pláštěm se nachází oceán tekutého kovového vodíku.", history: "V roce 1610 Galileo Galilei objevil jeho 4 největší měsíce, což definitivně vyvrátilo teorii, že všechna nebeská tělesa obíhají kolem Země." });
+        addPlanetData('cs', 'Saturn', { fact: "Saturn má nejnižší hustotu ze všech planet – je menší než hustota vody. Kdyby existoval obří oceán, Saturn by plaval na jeho hladině.", origin: "Plynný obr s jádrem z hornin a ledu. Jeho úchvatné prstence jsou složeny z miliard ledových úlomků a prachu o velikosti od zrnek po domy.", history: "Prstence poprvé viděl Galileo v roce 1610, považoval je však za anomálie tvaru. Správnou strukturu popsal Christiaan Huygens roku 1655." });
+        addPlanetData('cs', 'Uranus', { fact: "Uran rotuje 'na boku' s osou skloněnou o 98 stupňů. Pravděpodobně to způsobila masivní srážka s jiným tělesem během formování soustavy.", origin: "Ledový obr s pláštěm z vody, amoniaku a metanu. Atmosférický metan absorbuje červené světlo a dává planetě typickou tyrkysovou barvu.", history: "První planeta objevená moderním teleskopem. Objevil ji William Herschel v roce 1781, původně se však domníval, že jde o kometu." });
+        addPlanetData('cs', 'Neptune', { fact: "Na Neptunu vanou nejrychlejší vetry ve sluneční soustavě, které dosahují rychlosti až 2 100 km/h, což výrazně překračuje rychlost zvuku.", origin: "Ledový obr velmi podobný Uranu. Výrazná modrá barva je důsledkem absorpce světla atmosférickým metanem v kombinaci s neznámou složkou.", history: "První planeta objevená čistě na základě matematických výpočtů anomálií dráhy Uranu. Opticky ji potvrdil Johann Galle v roce 1846." });
+        addPlanetData('cs', 'Pluto', { fact: "Pluto je menší než zemský Měsíc. Jeho oběžná dráha je natolik eliptická, že se občas dostává blíže ke Slunci než samotný Neptun.", origin: "Trpasličí planeta v Kuiperově pásu složená z ledu a skal. Povrch pokrývají rozsáhlé plány zmrazeného dusíku a metanu.", history: "Objeveno v roce 1930 Clydem Tombaughem. V roce 2006 bylo reklasifikováno na trpasličí planetu. V roce 2015 kolem něj proletěla sonda New Horizons." });
+        addPlanetData('cs', 'Halley', { fact: "Halleyova kometa je jedinou známou kometou, kterou může člověk spatřit pouhým okem dvakrát za život. Její jádro je extrémně tmavé.", origin: "Pozůstatek z raných fází sluneční soustavy. Jde o slepenec prastarého ledu, oxidu uhelnatého, metanu, prachu a křemičitanů.", history: "Zaznamenána již v roce 240 př.n.l. v Číně. Edmond Halley v roce 1705 dokázal její periodicitu a úspěšně předpověděl její návrat na rok 1758." });
+
+// --- ANGLICKÁ DATABÁZA OBJEKTOV (ENGLISH) ---
+        addPlanetData('en', 'Moon', { fact: "The Moon is tidally locked to Earth, meaning we always see the same side. It stabilizes our planet's axial tilt, ensuring a stable climate.", origin: "Formed roughly 4.5 billion years ago after a Mars-sized protoplanet (Theia) collided with early Earth. Its surface is covered in fine, glass-like dust called regolith.", history: "A constant companion since antiquity. Thomas Harriot mapped its craters in 1609. In 1969, humans first walked on its surface during the historic Apollo 11 mission." });
+        addPlanetData('en', 'Mercury', { fact: "Mercury experiences the most extreme temperature swings in the solar system—from -180°C at night to +430°C during the day—because it lacks an atmosphere.", origin: "A rocky planet with a disproportionately massive iron core taking up 85% of its radius. Its outer crust was likely stripped away by a massive ancient impact.", history: "Known to the ancient Sumerians around 3000 BC. It was first visited up close by the Mariner 10 probe in 1974, and later by MESSENGER, which found ice in its polar craters." });
+        addPlanetData('en', 'Venus', { fact: "Venus is the hottest planet in our solar system and spins backwards. A single day on Venus lasts longer than its entire year.", origin: "Similar to Earth in size, but its thick 96% carbon dioxide atmosphere creates a runaway greenhouse effect. Surface pressure is 90 times that of Earth.", history: "Known historically as the Morning and Evening Star. The Soviet Venera 9 probe sent back the first panoramic images from its hellish surface in 1975." });
+        addPlanetData('en', 'Earth', { fact: "Earth is the only known planet in the universe confirmed to harbor complex life and large bodies of liquid water on its surface.", origin: "Formed 4.54 billion years ago. Its rotating liquid iron outer core generates a strong magnetic field that shields the surface from deadly solar radiation.", history: "In the 16th century, Copernicus finally proved the heliocentric model. The famous 'Blue Marble' photo of the entire Earth was taken by the Apollo 17 crew in 1972." });
+        addPlanetData('en', 'Mars', { fact: "Mars is home to Olympus Mons, the largest volcano in the solar system. At 21.9 km high, it is nearly three times the height of Mount Everest.", origin: "A rocky world with a very thin CO2 atmosphere. Its characteristic rusty red color comes from high concentrations of iron oxide dust on its surface.", history: "Named after the Roman god of war. Since 1997, it has been continuously explored by highly successful robotic rovers like Curiosity and Perseverance." });
+        addPlanetData('en', 'Jupiter', { fact: "Jupiter is so massive it could swallow all the other planets combined. Its Great Red Spot is a gigantic storm that has been raging for over 350 years.", origin: "A gas giant composed primarily of hydrogen and helium. It lacks a solid surface, but likely harbors a deep ocean of exotic liquid metallic hydrogen.", history: "In 1610, Galileo Galilei discovered its four largest moons (Io, Europa, Ganymede, Callisto), definitively disproving that everything orbits Earth." });
+        addPlanetData('en', 'Saturn', { fact: "Saturn has the lowest density of any planet—less than water. If you could find a bathtub large enough, Saturn would float in it.", origin: "A gas giant with a core of rock and ice. Its breathtaking ring system is made of billions of pure water ice and rock particles, ranging from grains of sand to mountains.", history: "Galileo first saw the rings in 1610 but thought they were 'ears'. Christiaan Huygens correctly identified them as a flat ring system in 1655." });
+        addPlanetData('en', 'Uranus', { fact: "Uranus rotates 'on its side' with an axial tilt of 98 degrees, meaning its poles point directly at the Sun. This was likely caused by a colossal ancient collision.", origin: "An ice giant with a mantle of water, ammonia, and methane ice. Atmospheric methane absorbs red light, giving the planet its beautiful cyan color.", history: "The first planet discovered using a modern telescope. William Herschel found it by accident in 1781, initially believing it was a comet." });
+        addPlanetData('en', 'Neptune', { fact: "Neptune experiences the most violent weather in the solar system, with terrifying supersonic winds reaching speeds of up to 2,100 km/h.", origin: "An ice giant very similar to Uranus, but slightly more massive. Its deep azure blue color comes from methane and an unknown atmospheric component.", history: "The first planet discovered purely through mathematical predictions of anomalies in Uranus's orbit. Johann Galle optically confirmed it in 1846." });
+        addPlanetData('en', 'Pluto', { fact: "Pluto is smaller than Earth's Moon. Its orbit is so elliptical that it sometimes comes closer to the Sun than Neptune does.", origin: "A dwarf planet in the Kuiper Belt composed of rock and ice. Its surface features vast, smooth plains of frozen nitrogen and methane.", history: "Discovered by Clyde Tombaugh in 1930. Reclassified as a dwarf planet by the IAU in 2006. The New Horizons spacecraft performed a historic flyby in 2015." });
+        addPlanetData('en', 'Halley', { fact: "Halley's Comet is the only known naked-eye comet that can appear twice in a human lifetime. Its nucleus is darker than coal.", origin: "A primordial remnant from the dawn of the solar system. It is a 'dirty snowball' made of ancient ice, carbon monoxide, methane, and silicate dust.", history: "Recorded in China as early as 240 BC. In 1705, Edmond Halley realized its periodicity and successfully predicted its return in 1758." });
+
+        // --- NEMECKÁ DATABÁZA OBJEKTOV (DEUTSCH) ---
+        addPlanetData('de', 'Moon', { fact: "Der Mond befindet sich in einer gebundenen Rotation, weshalb er uns immer dieselbe Seite zeigt. Er stabilisiert die Erdachse und sorgt für ein stabiles Klima.", origin: "Entstand vor etwa 4,5 Milliarden Jahren nach der Kollision eines marsgroßen Protoplaneten (Theia) mit der frühen Erde. Die Oberfläche ist von feinem Staub (Regolith) bedeckt.", history: "Ein ständiger Begleiter seit der Antike. Thomas Harriot kartierte 1609 die Krater. 1969 betraten während der Apollo-11-Mission erstmals Menschen seine Oberfläche." });
+        addPlanetData('de', 'Mercury', { fact: "Merkur erlebt die extremsten Temperaturschwankungen: von -180 °C in der Nacht bis zu +430 °C am Tag, da er keine Atmosphäre hat.", origin: "Ein Gesteinsplanet mit einem gewaltigen Eisenkern, der 85 % seines Radius ausmacht. Seine Kruste wurde wahrscheinlich durch einen massiven Einschlag weggerissen.", history: "Schon den Sumerern um 3000 v. Chr. bekannt. Die Raumsonde Mariner 10 erforschte ihn 1974 erstmals aus der Nähe, später fand MESSENGER Wassereis an den Polen." });
+        addPlanetData('de', 'Venus', { fact: "Die Venus ist der heißeste Planet im Sonnensystem und rotiert rückwärts. Ein Tag auf der Venus dauert länger als ihr gesamtes Jahr.", origin: "Etwa so groß wie die Erde, aber ihre dichte Atmosphäre (96 % CO2) verursacht einen extremen Treibhauseffekt. Der Druck ist 90-mal höher als auf der Erde.", history: "Als Morgen- und Abendstern bekannt. Die sowjetische Sonde Venera 9 sendete 1975 die ersten Panoramabilder von ihrer höllischen Oberfläche." });
+        addPlanetData('de', 'Earth', { fact: "Die Erde ist der einzige bekannte Planet im Universum, auf dem nachweislich komplexes Leben und flüssiges Wasser existieren.", origin: "Entstanden vor 4,54 Milliarden Jahren. Ihr rotierender flüssiger Eisenkern erzeugt ein starkes Magnetfeld, das die Oberfläche vor tödlicher Sonnenstrahlung schützt.", history: "Erst im 16. Jahrhundert bewies Kopernikus das heliozentrische Weltbild. Das berühmte Foto 'Blue Marble' wurde 1972 von der Apollo-17-Crew aufgenommen." });
+        addPlanetData('de', 'Mars', { fact: "Auf dem Mars befindet sich Olympus Mons, der größte Vulkan des Sonnensystems. Mit 21,9 km ist er fast dreimal so hoch wie der Mount Everest.", origin: "Ein Gesteinsplanet mit dünner CO2-Atmosphäre. Seine rostige Farbe stammt von einer hohen Konzentration an Eisenoxidstaub auf der Oberfläche.", history: "Nach dem römischen Kriegsgott benannt. Seit 1997 wird er ununterbrochen von äußerst erfolgreichen Roboter-Rovern wie Curiosity und Perseverance erforscht." });
+        addPlanetData('de', 'Jupiter', { fact: "Jupiter ist so massiv, dass er alle anderen Planeten zusammen verschlingen könnte. Sein Großer Roter Fleck ist ein gewaltiger Sturm, der seit über 350 Jahren tobt.", origin: "Ein Gasriese, bestehend aus Wasserstoff und Helium. Er hat keine feste Oberfläche, beherbergt im Inneren aber vermutlich einen Ozean aus metallischem Wasserstoff.", history: "1610 entdeckte Galileo Galilei die vier größten Monde, womit endgültig widerlegt wurde, dass sich alles um die Erde dreht." });
+        addPlanetData('de', 'Saturn', { fact: "Saturn hat die geringste Dichte aller Planeten – weniger als Wasser. In einem gigantischen Ozean würde er an der Oberfläche schwimmen.", origin: "Ein Gasriese mit einem Kern aus Gestein und Eis. Seine atemberaubenden Ringe bestehen aus Milliarden von Eis- und Gesteinspartikeln.", history: "Galileo sah die Ringe 1610, hielt sie aber für 'Ohren'. Christiaan Huygens identifizierte sie 1655 korrekt als Ringsystem." });
+        addPlanetData('de', 'Uranus', { fact: "Uranus rotiert 'auf der Seite' mit einer Achsenneigung von 98 Grad. Dies wurde höchstwahrscheinlich durch eine massive Kollision verursacht.", origin: "Ein Eisriese mit einem Mantel aus Wasser, Ammoniak und Methan. Das atmosphärische Methan absorbiert rotes Licht und gibt ihm seine cyanblaue Farbe.", history: "Der erste Planet, der mit einem Teleskop entdeckt wurde. William Herschel fand ihn 1781 zufällig und hielt ihn zunächst für einen Kometen." });
+        addPlanetData('de', 'Neptune', { fact: "Auf Neptun toben die stärksten Stürme im Sonnensystem mit Überschallgeschwindigkeiten von bis zu 2.100 km/h.", origin: "Ein Eisriese, der Uranus sehr ähnlich ist. Seine tiefblaue Farbe stammt von Methan und einer noch unbekannten atmosphärischen Komponente.", history: "Der erste Planet, der rein durch mathematische Berechnungen von Anomalien in der Uranusbahn vorhergesagt wurde. Johann Galle bestätigte dies 1846 optisch." });
+        addPlanetData('de', 'Pluto', { fact: "Pluto ist kleiner als der Erdmond. Seine Umlaufbahn ist so elliptisch, dass er der Sonne zeitweise näher ist als Neptun.", origin: "Ein Zwergplanet im Kuipergürtel aus Gestein und Eis. Seine Oberfläche weist weite, glatte Ebenen aus gefrorenem Stickstoff und Methan auf.", history: "1930 von Clyde Tombaugh entdeckt. 2006 von der IAU zum Zwergplaneten reklassifiziert. Die Sonde New Horizons führte 2015 einen historischen Vorbeiflug durch." });
+        addPlanetData('de', 'Halley', { fact: "Der Halleysche Komet ist der einzige, den ein Mensch zweimal im Leben mit bloßem Auge sehen kann. Sein Kern ist schwärzer als Kohle.", origin: "Ein Überrest aus der Frühzeit des Sonnensystems. Ein 'schmutziger Schneeball' aus uraltem Eis, Kohlenmonoxid, Methan und Silikatstaub.", history: "Bereits 240 v. Chr. in China registriert. Edmond Halley erkannte 1705 seine Periodizität und sagte seine Rückkehr für 1758 erfolgreich voraus." });
+
+        // --- FRANCÚZSKA DATABÁZA OBJEKTOV (FRANÇAIS) ---
+        addPlanetData('fr', 'Moon', { fact: "La Lune est en rotation synchrone, montrant toujours la même face. Elle stabilise l'inclinaison axiale de la Terre, garantissant un climat stable.", origin: "Formée il y a 4,5 milliards d'années après la collision d'une protoplanète (Théia) avec la Terre. Recouverte d'une poussière appelée régolithe.", history: "Thomas Harriot a cartographié ses cratères en 1609. En 1969, des humains y ont marché pour la première fois lors de la mission Apollo 11." });
+        addPlanetData('fr', 'Mercury', { fact: "Mercure subit les variations de température les plus extrêmes : de -180°C la nuit à +430°C le jour, car elle n'a pas d'atmosphère.", origin: "Une planète rocheuse avec un noyau de fer massif occupant 85 % de son rayon. Sa croûte a probablement été arrachée par un impact géant.", history: "Connue des Sumériens vers 3000 av. J.-C. Visitée par Mariner 10 en 1974, puis par MESSENGER qui a trouvé de la glace aux pôles." });
+        addPlanetData('fr', 'Venus', { fact: "Vénus est la planète la plus chaude et tourne à l'envers. Un jour sur Vénus dure plus longtemps que son année entière.", origin: "Taille similaire à la Terre, mais son atmosphère à 96 % de CO2 crée un effet de serre incontrôlable. La pression est 90 fois celle de la Terre.", history: "Connue comme l'Étoile du Berger. La sonde soviétique Venera 9 a envoyé les premières images de sa surface infernale en 1975." });
+        addPlanetData('fr', 'Earth', { fact: "La Terre est la seule planète connue abritant une vie complexe et de l'eau liquide en surface.", origin: "Formée il y a 4,54 milliards d'années. Son noyau externe en fer liquide génère un champ magnétique qui nous protège des radiations solaires.", history: "Au 16ème siècle, Copernic a prouvé le modèle héliocentrique. La célèbre photo 'Blue Marble' a été prise par Apollo 17 en 1972." });
+        addPlanetData('fr', 'Mars', { fact: "Mars abrite Olympus Mons, le plus grand volcan du système solaire (21,9 km de haut), presque trois fois l'Everest.", origin: "Planète rocheuse avec une atmosphère de CO2 très fine. Sa couleur rouille vient d'une forte concentration d'oxyde de fer.", history: "Nommée d'après le dieu romain de la guerre. Depuis 1997, elle est explorée par des rovers à succès comme Curiosity et Perseverance." });
+        addPlanetData('fr', 'Jupiter', { fact: "Jupiter est si massive qu'elle pourrait engloutir toutes les autres planètes. Sa Grande Tache Rouge est une tempête vieille de plus de 350 ans.", origin: "Géante gazeuse d'hydrogène et d'hélium. Sans surface solide, elle cacherait un océan d'hydrogène métallique liquide.", history: "En 1610, Galilée a découvert ses 4 plus grandes lunes, prouvant définitivement que tout ne tourne pas autour de la Terre." });
+        addPlanetData('fr', 'Saturn', { fact: "Saturne a la densité la plus faible de toutes les planètes (inférieure à l'eau). Dans un océan géant, elle flotterait.", origin: "Géante gazeuse avec de magnifiques anneaux formés de milliards de particules de glace et de roche, de la taille d'un grain de sable à une montagne.", history: "Galilée a vu les anneaux en 1610 (les prenant pour des 'oreilles'). Christiaan Huygens les a identifiés correctement en 1655." });
+        addPlanetData('fr', 'Uranus', { fact: "Uranus tourne 'sur le côté' avec une inclinaison de 98 degrés, pointant ses pôles vers le Soleil. Dû à une collision ancienne colossale.", origin: "Géante de glaces (eau, ammoniac, méthane). Le méthane atmosphérique absorbe la lumière rouge, lui donnant sa couleur cyan.", history: "Première planète découverte au télescope (William Herschel en 1781, qui pensait d'abord avoir trouvé une comète)." });
+        addPlanetData('fr', 'Neptune', { fact: "Neptune connaît la météo la plus violente du système solaire, avec des vents supersoniques terrifiants atteignant 2 100 km/h.", origin: "Géante de glaces très similaire à Uranus. Sa couleur bleu azur profond vient du méthane et d'un composant atmosphérique inconnu.", history: "Première planète découverte grâce à des prédictions mathématiques. Johann Galle l'a confirmée optiquement en 1846." });
+        addPlanetData('fr', 'Pluto', { fact: "Pluton est plus petite que la Lune. Son orbite est si elliptique qu'elle s'approche parfois plus du Soleil que Neptune.", origin: "Planète naine de la ceinture de Kuiper (roche et glace). Sa surface présente de vastes plaines lisses d'azote et de méthane gelés.", history: "Découverte en 1930 par Clyde Tombaugh. Reclassée en planète naine en 2006. Survolée historiquement par New Horizons en 2015." });
+        addPlanetData('fr', 'Halley', { fact: "La comète de Halley est la seule visible à l'œil nu pouvant apparaître deux fois dans une vie humaine. Son noyau est plus noir que le charbon.", origin: "Vestige primordial du système solaire. Une 'boule de neige sale' faite de glace ancienne, de monoxyde de carbone et de poussière.", history: "Observée en Chine dès 240 av. J.-C. Edmond Halley a compris sa périodicité en 1705 et a prédit son retour pour 1758." });
+
+        // --- ŠPANIELSKA DATABÁZA OBJEKTOV (ESPAÑOL) ---
+        addPlanetData('es', 'Moon', { fact: "La Luna está acoplada por mareas a la Tierra, siempre muestra la misma cara. Estabiliza nuestra inclinación axial, asegurando un clima estable.", origin: "Se formó hace 4.500 millones de años tras chocar la Tierra con un protoplaneta (Tea). Superficie cubierta de polvo fino llamado regolito.", history: "Thomas Harriot mapeó sus cráteres en 1609. En 1969, los humanos caminaron por primera vez sobre ella en la misión Apolo 11." });
+        addPlanetData('es', 'Mercury', { fact: "Mercurio sufre los cambios térmicos más extremos: de -180°C de noche a +430°C de día, debido a la falta de atmósfera.", origin: "Planeta rocoso con un núcleo de hierro masivo que ocupa el 85% de su radio. Su corteza fue probablemente arrancada por un gran impacto.", history: "Conocido por los sumerios en 3000 a.C. Visitado por Mariner 10 en 1974, y por MESSENGER, que halló hielo en cráteres polares." });
+        addPlanetData('es', 'Venus', { fact: "Venus es el planeta más caliente y gira al revés. Un solo día venusiano dura más que todo su año.", origin: "Similar a la Tierra en tamaño, pero su atmósfera (96% CO2) crea un efecto invernadero desbocado. La presión es 90 veces la terrestre.", history: "Conocido como el Lucero del Alba y del Alba. La sonda Venera 9 (soviética) envió las primeras fotos de su superficie infernal en 1975." });
+        addPlanetData('es', 'Earth', { fact: "La Tierra es el único planeta conocido que alberga vida compleja y grandes masas de agua líquida en su superficie.", origin: "Formada hace 4.540 millones de años. Su núcleo externo de hierro líquido genera un campo magnético que nos protege de la radiación solar.", history: "Copérnico demostró el modelo heliocéntrico en el siglo XVI. La foto 'La Canica Azul' fue tomada por la tripulación del Apolo 17 en 1972." });
+        addPlanetData('es', 'Mars', { fact: "Marte alberga el Monte Olimpo, el mayor volcán del sistema solar (21,9 km de altura), casi tres veces el monte Everest.", origin: "Mundo rocoso con atmósfera fina de CO2. Su color rojo proviene de altas concentraciones de polvo de óxido de hierro.", history: "Lleva el nombre del dios romano de la guerra. Desde 1997, es explorado continuamente por exitosos rovers como Curiosity y Perseverance." });
+        addPlanetData('es', 'Jupiter', { fact: "Júpiter es tan masivo que podría tragarse a todos los demás planetas juntos. Su Gran Mancha Roja es una tormenta de más de 350 años.", origin: "Gigante gaseoso de hidrógeno y helio. Sin superficie sólida, podría ocultar un profundo océano de hidrógeno metálico líquido.", history: "En 1610, Galileo descubrió sus 4 grandes lunas, refutando definitivamente la idea de que todo orbitaba la Tierra." });
+        addPlanetData('es', 'Saturn', { fact: "Saturno tiene la densidad más baja de todos los planetas (menos que el agua). Si hubiera un océano gigante, flotaría en él.", origin: "Gigante gaseoso con anillos formados por miles de millones de partículas de roca y hielo de agua pura, del tamaño de arena hasta montañas.", history: "Galileo vio los anillos en 1610 (pensó que eran 'orejas'). Christiaan Huygens los identificó correctamente en 1655." });
+        addPlanetData('es', 'Uranus', { fact: "Urano gira 'de lado' con una inclinación de 98 grados, apuntando sus polos al Sol. Probablemente debido a una colisión colosal.", origin: "Gigante de hielo (manto de agua, amoníaco, metano). El metano atmosférico absorbe la luz roja, dándole su hermoso color cian.", history: "El primer planeta descubierto con telescopio (William Herschel en 1781, aunque al principio creyó que era un cometa)." });
+        addPlanetData('es', 'Neptune', { fact: "Neptuno experimenta el clima más violento del sistema solar, con terroríficos vientos supersónicos de hasta 2.100 km/h.", origin: "Gigante de hielo similar a Urano, pero más masivo. Su profundo color azul azur se debe al metano y a un componente desconocido.", history: "El primer planeta descubierto puramente mediante predicción matemática de anomalías orbitales. Confirmado por Johann Galle en 1846." });
+        addPlanetData('es', 'Pluto', { fact: "Plutón es más pequeño que la Luna. Su órbita es tan elíptica que a veces se acerca más al Sol que Neptuno.", origin: "Planeta enano del cinturón de Kuiper (roca y hielo). Superficie con vastas y suaves llanuras de nitrógeno y metano congelados.", history: "Descubierto por Clyde Tombaugh en 1930. Reclasificado como planeta enano en 2006. Sobrevolado por New Horizons en 2015." });
+        addPlanetData('es', 'Halley', { fact: "El cometa Halley es el único visible a simple vista que puede aparecer dos veces en una vida. Su núcleo es más oscuro que el carbón.", origin: "Remanente primordial. Es una 'bola de nieve sucia' compuesta de hielo antiguo, monóxido de carbono, metano y polvo de silicato.", history: "Registrado en China en el 240 a.C. Edmond Halley descubrió su periodicidad en 1705 y predijo con éxito su regreso para 1758." });
+
+        // --- ČÍNSKA DATABÁZA OBJEKTOV (中文) ---
+        addPlanetData('zh', 'Moon', { fact: "月球被地球潮汐锁定，这意味着我们只能看到它的一面。它稳定了地球的自转轴，从而确保了气候的稳定。", origin: "大约在45亿年前，一颗火星大小的原行星（忒伊亚）与早期地球相撞后形成。表面覆盖着被称为月壤的细小玻璃状粉尘。", history: "自古以来就是地球的伴侣。1609年托马斯·哈里奥特绘制了陨石坑地图。1969年，人类在阿波罗11号任务中首次登月。" });
+        addPlanetData('zh', 'Mercury', { fact: "水星的昼夜温差是太阳系中最大的——从夜晚的-180°C到白天的+430°C，因为它没有大气层。", origin: "这是一颗岩石行星，其巨大的铁核占据了半径的85%。它的外壳很可能在一次巨大的古代撞击中被剥离。", history: "公元前3000年左右为苏美尔人所知。1974年水手10号探测器首次近距离探测，后来的信使号在其极地陨石坑中发现了冰。" });
+        addPlanetData('zh', 'Venus', { fact: "金星是太阳系中最热的行星，而且是逆向自转。金星上的一天比它的一年还要长。", origin: "大小与地球相似，但其96%的二氧化碳大气层造成了失控的温室效应。表面气压是地球的90倍。", history: "历史上被称为启明星和长庚星。1975年，苏联的金星9号探测器发回了其地狱般表面的首批全景图像。" });
+        addPlanetData('zh', 'Earth', { fact: "地球是已知宇宙中唯一确认存在复杂生命和大量液态水的行星。", origin: "形成于45.4亿年前。其旋转的液态铁外核产生了强大的磁场，保护地表免受致命的太阳辐射。", history: "16世纪，哥白尼最终证明了日心说。著名的“蓝色弹珠”照片是由阿波罗17号宇航员在1972年拍摄的。" });
+        addPlanetData('zh', 'Mars', { fact: "火星拥有太阳系最大的火山——奥林帕斯山，高达21.9公里，几乎是珠穆朗玛峰高度的三倍。", origin: "一个拥有稀薄二氧化碳大气层的岩石世界。其标志性的铁锈红色来自于表面高浓度的氧化铁粉尘。", history: "以罗马战神的名字命名。自1997年以来，好奇号和毅力号等成功的机器人漫游车一直在对其进行探索。" });
+        addPlanetData('zh', 'Jupiter', { fact: "木星非常巨大，它可以吞噬所有其他行星的总和。它的大红斑是一场已经肆虐了350多年的巨大风暴。", origin: "主要由氢和氦组成的气态巨行星。它没有固体表面，但在深处可能隐藏着液态金属氢的海洋。", history: "1610年，伽利略发现了它的四颗最大卫星，彻底推翻了“所有天体都绕地球运行”的理论。" });
+        addPlanetData('zh', 'Saturn', { fact: "土星的密度是所有行星中最低的——甚至低于水。如果你能找到一个足够大的浴缸，土星会漂浮在上面。", origin: "拥有岩石和冰核心的气态巨行星。其令人惊叹的星环由数十亿颗纯水冰和岩石颗粒组成，大小从沙粒到山脉不等。", history: "1610年伽利略首次看到星环，但他认为那是“耳朵”。1655年克里斯蒂安·惠更斯正确地将其识别为星环系统。" });
+        addPlanetData('zh', 'Uranus', { fact: "天王星“躺在”其轨道上旋转，自转轴倾斜角达98度。这很可能是由一次巨大的古代碰撞造成的。", origin: "一颗冰巨星，地幔由水、氨和甲烷冰组成。大气中的甲烷吸收了红光，使其呈现出美丽的青色。", history: "第一颗使用现代望远镜发现的行星。威廉·赫歇尔在1781年偶然发现了它，最初还以为这是一颗彗星。" });
+        addPlanetData('zh', 'Neptune', { fact: "海王星经历了太阳系中最猛烈的天气，伴随着可怕的超音速狂风，风速高达2100公里/小时。", origin: "一颗冰巨星，与天王星非常相似，但质量稍大。其深邃的蔚蓝色来自于甲烷和一种未知的气体成分。", history: "第一颗完全通过天王星轨道异常的数学预测而发现的行星。约翰·加勒在1846年通过光学观测证实了它。" });
+        addPlanetData('zh', 'Pluto', { fact: "冥王星比地球的月亮还要小。它的轨道非常椭圆，有时甚至比海王星更靠近太阳。", origin: "柯伊伯带中由岩石和冰组成的矮行星。其表面有由冷冻氮气和甲烷组成的广阔平滑平原。", history: "1930年由克莱德·汤博发现。2006年被国际天文学联合会重新归类为矮行星。新视野号在2015年进行了历史性的飞掠。" });
+        addPlanetData('zh', 'Halley', { fact: "哈雷彗星是唯一一颗在人的一生中可以用肉眼看到两次的彗星。它的彗核比煤炭还要黑。", origin: "太阳系黎明时期的原始遗迹。它是一个“脏雪球”，由古老的冰、一氧化碳、甲烷和硅酸盐尘埃组成。", history: "早在公元前240年，中国就有记载。1705年，爱德蒙·哈雷意识到了它的周期性，并成功预测了它在1758年的回归。" });
+
+        // --- HINDČINA DATABÁZA OBJEKTOV (हिन्दी) ---
+        addPlanetData('hi', 'Moon', { fact: "चंद्रमा पृथ्वी के साथ ज्वारीय रूप से बंधा हुआ है, जिसका अर्थ है कि हम हमेशा इसका एक ही पक्ष देखते हैं। यह पृथ्वी के अक्षीय झुकाव को स्थिर करता है।", origin: "लगभग 4.5 अरब साल पहले एक मंगल के आकार के ग्रह (थिया) के प्रारंभिक पृथ्वी से टकराने के बाद बना। इसकी सतह धूल (रेगोलिथ) से ढकी है।", history: "थॉमस हैरियट ने 1609 में इसके क्रेटरों का नक्शा बनाया। 1969 में, अपोलो 11 मिशन के दौरान इंसानों ने पहली बार इसकी सतह पर कदम रखा।" });
+        addPlanetData('hi', 'Mercury', { fact: "बुध सौरमंडल में सबसे चरम तापमान का अनुभव करता है—रात में -180°C से दिन में +430°C तक, क्योंकि इसमें वायुमंडल नहीं है।", origin: "एक चट्टानी ग्रह जिसका विशाल लोहे का कोर इसकी त्रिज्या का 85% हिस्सा लेता है। इसकी पपड़ी शायद एक प्राचीन प्रभाव से छिन गई थी।", history: "3000 ईसा पूर्व के आसपास सुमेरियों को ज्ञात था। मैरिनर 10 प्रोब ने 1974 में इसकी जांच की, और बाद में मैसेंजर ने इसके ध्रुवों पर बर्फ खोजी।" });
+        addPlanetData('hi', 'Venus', { fact: "शुक्र सबसे गर्म ग्रह है और यह उल्टा घूमता है। शुक्र का एक दिन उसके पूरे वर्ष से अधिक लंबा होता है।", origin: "आकार में पृथ्वी के समान, लेकिन इसका 96% कार्बन डाइऑक्साइड वायुमंडल एक खतरनाक ग्रीनहाउस प्रभाव बनाता है।", history: "ऐतिहासिक रूप से भोर और संध्या के तारे के रूप में जाना जाता है। सोवियत वेनेरा 9 ने 1975 में इसकी सतह की पहली तस्वीरें भेजीं।" });
+        addPlanetData('hi', 'Earth', { fact: "ब्रह्मांड में पृथ्वी एकमात्र ज्ञात ग्रह है जहाँ जटिल जीवन और सतह पर तरल पानी मौजूद है।", origin: "4.54 अरब साल पहले बना। इसका तरल लोहे का बाहरी कोर एक मजबूत चुंबकीय क्षेत्र उत्पन्न करता है जो हमें विकिरण से बचाता है।", history: "16वीं शताब्दी में, कोपरनिकस ने सूर्य-केंद्रित मॉडल को साबित किया। 1972 में अपोलो 17 दल द्वारा प्रसिद्ध 'ब्लू मार्बल' तस्वीर ली गई थी।" });
+        addPlanetData('hi', 'Mars', { fact: "मंगल पर ओलंपस मॉन्स (Olympus Mons) स्थित है, जो सौरमंडल का सबसे बड़ा ज्वालामुखी है। यह माउंट एवरेस्ट से लगभग तीन गुना ऊंचा है।", origin: "एक पतले CO2 वायुमंडल वाला चट्टानी ग्रह। इसका लाल रंग सतह पर लौह ऑक्साइड (जंग) की उच्च सांद्रता से आता है।", history: "रोमन युद्ध देवता के नाम पर। 1997 के बाद से क्यूरियोसिटी और परसेवरेंस जैसे रोबोटिक रोवर्स द्वारा इसकी खोज की जा रही है।" });
+        addPlanetData('hi', 'Jupiter', { fact: "बृहस्पति इतना विशाल है कि यह अन्य सभी ग्रहों को निगल सकता है। इसका ग्रेट रेड स्पॉट एक तूफान है जो 350 से अधिक वर्षों से चल रहा है।", origin: "मुख्य रूप से हाइड्रोजन और हीलियम से बना गैस दानव। इसमें ठोस सतह का अभाव है, लेकिन भीतर तरल धातु हाइड्रोजन का महासागर है।", history: "1610 में, गैलीलियो ने इसके चार सबसे बड़े चंद्रमाओं की खोज की, जिससे यह साबित हुआ कि हर चीज पृथ्वी की परिक्रमा नहीं करती।" });
+        addPlanetData('hi', 'Saturn', { fact: "शनि का घनत्व सबसे कम है—पानी से भी कम। यदि आप एक पर्याप्त बड़ा टब पा सकें, तो शनि उसमें तैरने लगेगा।", origin: "एक गैस दानव जिसके छल्ले अरबों शुद्ध बर्फ और चट्टान के कणों से बने हैं, जो रेत के कणों से लेकर पहाड़ों तक के आकार के हैं।", history: "गैलीलियो ने 1610 में छल्ले देखे लेकिन उन्हें 'कान' समझा। क्रिश्चियन ह्यूजेंस ने 1655 में उन्हें सही ढंग से पहचाना।" });
+        addPlanetData('hi', 'Uranus', { fact: "अरुण 98 डिग्री के झुकाव के साथ अपनी 'बगल' पर घूमता है, यानी इसके ध्रुव सूर्य की ओर इशारा करते हैं। यह एक प्राचीन टकराव के कारण हुआ था।", origin: "पानी, अमोनिया और मीथेन बर्फ वाला बर्फ का दानव। वायुमंडलीय मीथेन लाल बत्ती को अवशोषित करता है, जिससे इसे अपना सियान रंग मिलता है।", history: "टेलीस्कोप से खोजा गया पहला ग्रह। विलियम हर्शेल ने 1781 में इसे दुर्घटना से खोजा, शुरू में इसे धूमकेतु माना।" });
+        addPlanetData('hi', 'Neptune', { fact: "वरुण में सौरमंडल का सबसे हिंसक मौसम होता है, जहां सुपरसोनिक हवाएं 2,100 किमी/घंटा तक पहुंच जाती हैं।", origin: "अरुण के समान एक बर्फ दानव। इसका गहरा नीला रंग मीथेन और किसी अज्ञात वायुमंडलीय घटक से आता है।", history: "अरुण की कक्षा में विसंगतियों की गणितीय भविष्यवाणियों के माध्यम से खोजा गया पहला ग्रह। 1846 में जोहान गैले ने इसकी पुष्टि की।" });
+        addPlanetData('hi', 'Pluto', { fact: "प्लूटो पृथ्वी के चंद्रमा से छोटा है। इसकी कक्षा इतनी अण्डाकार है कि यह कभी-कभी नेपच्यून की तुलना में सूर्य के अधिक करीब आ जाता है।", origin: "कुइपर बेल्ट में चट्टान और बर्फ से बना एक बौना ग्रह। इसकी सतह पर जमी हुई नाइट्रोजन और मीथेन के विशाल मैदान हैं।", history: "1930 में क्लाइड टॉमबॉघ द्वारा खोजा गया। 2006 में IAU द्वारा बौने ग्रह के रूप में पुनर्वर्गीकृत किया गया।" });
+        addPlanetData('hi', 'Halley', { fact: "हैली धूमकेतु एकमात्र नंगी आंखों से दिखने वाला धूमकेतु है जो मानव जीवन में दो बार दिखाई दे सकता है।", origin: "सौरमंडल की शुरुआत का एक अवशेष। यह प्राचीन बर्फ, मीथेन और धूल से बनी एक 'गंदी बर्फ की गेंद' है।", history: "240 ईसा पूर्व में चीन में दर्ज किया गया। 1705 में, एडमंड हैली ने इसकी आवधिकता का एहसास किया और इसके लौटने की भविष्यवाणी की।" });
+
+        // --- JAPONSKÁ DATABÁZA OBJEKTOV (日本語) ---
+        addPlanetData('ja', 'Moon', { fact: "月は地球と潮汐ロックされているため、常に同じ面を向けています。地球の自転軸の傾きを安定させ、気候を保っています。", origin: "約45億年前、火星サイズの原始惑星（テイア）が初期の地球に衝突した後に形成されました。表面はレゴリスと呼ばれる細かい粉塵で覆われています。", history: "古代からの伴侶。1609年にトーマス・ハリオットがクレーターの地図を作成。1969年、アポロ11号のミッションで人類が初めて着陸しました。" });
+        addPlanetData('ja', 'Mercury', { fact: "水星は、大気がないため、夜間の-180°Cから日中の+430°Cまで、太陽系で最も極端な温度変化を経験します。", origin: "半径の85％を占める巨大な鉄のコアを持つ岩石惑星。その外殻は古代の巨大な衝突によって剥ぎ取られたと考えられています。", history: "紀元前3000年頃のシュメール人には知られていました。1974年にマリナー10号が初めて接近し、後にメッセンジャーが極地に氷を発見しました。" });
+        addPlanetData('ja', 'Venus', { fact: "金星は太陽系で最も熱い惑星であり、逆回転しています。金星の1日はその1年よりも長くなります。", origin: "大きさは地球に似ていますが、96％が二酸化炭素の大気が暴走温室効果を生み出しています。表面圧力は地球の90倍です。", history: "歴史的に「明けの明星」「宵の明星」として知られています。1975年、ソ連のベネラ9号が地獄のような表面の初のパノラマ画像を送ってきました。" });
+        addPlanetData('ja', 'Earth', { fact: "地球は、複雑な生命と表面に大量の液体の水が存在することが確認されている、宇宙で唯一の惑星です。", origin: "45.4億年前に形成されました。回転する液体の鉄の外核が強力な磁場を生み出し、致命的な太陽放射から表面を守っています。", history: "16世紀にコペルニクスが地動説を証明しました。有名な「ブルーマーブル」写真は、1972年にアポロ17号の乗組員によって撮影されました。" });
+        addPlanetData('ja', 'Mars', { fact: "火星には太陽系最大の火山、オリンポス山があります。高さ21.9kmで、エベレストのほぼ3倍の高さです。", origin: "非常に薄いCO2大気を持つ岩石の世界。特徴的な錆びた赤色は、表面の酸化鉄（赤サビ）の粉塵によるものです。", history: "ローマの戦神にちなんで名付けられました。1997年以来、キュリオシティやパーサヴィアランスなどの探査車によって継続的に探査されています。" });
+        addPlanetData('ja', 'Jupiter', { fact: "木星は非常に巨大で、他のすべての惑星を合わせたものを飲み込むことができます。大赤斑は350年以上続いている巨大な嵐です。", origin: "主に水素とヘリウムで構成される巨大ガス惑星。固体の表面はありませんが、深部には液体の金属水素の海があると考えられています。", history: "1610年、ガリレオが4つの最大の衛星を発見し、すべてが地球の周りを回っているわけではないことを決定的に証明しました。" });
+        addPlanetData('ja', 'Saturn', { fact: "土星はすべての惑星の中で最も密度が低く、水よりも低いです。巨大なプールがあれば、土星は水に浮くでしょう。", origin: "岩石と氷のコアを持つ巨大ガス惑星。その美しい環は、砂粒から山ほどの大きさまでの無数の氷と岩の粒子でできています。", history: "1610年にガリレオが環を「耳」だと勘違いしました。1655年にホイヘンスが正しい環の構造を特定しました。" });
+        addPlanetData('ja', 'Uranus', { fact: "天王星は98度の傾きで「横倒し」に回転しています。これは古代の巨大な衝突によって引き起こされたと考えられています。", origin: "水、アンモニア、メタンの氷の巨大惑星。大気中のメタンが赤い光を吸収し、美しいシアン色を与えています。", history: "近代的な望遠鏡を使用して発見された最初の惑星。ウィリアム・ハーシェルが1781年に偶然発見しました。" });
+        addPlanetData('ja', 'Neptune', { fact: "海王星は、時速2100kmに達する超音速の風が吹く、太陽系で最も激しい気象を経験しています。", origin: "天王星に非常に似た巨大氷惑星。その深い青色は、メタンとまだ知られていない大気成分によるものです。", history: "天王星の軌道の異常の数学的予測のみを通じて発見された最初の惑星。1846年にガレが光学的に確認しました。" });
+        addPlanetData('ja', 'Pluto', { fact: "冥王星は地球の月よりも小さいです。軌道が非常に楕円形であるため、海王星よりも太陽に近づく時期があります。", origin: "カイパーベルトにある岩石と氷で構成される準惑星。表面には凍った窒素とメタンの広大な平原があります。", history: "1930年にクライド・トンボーによって発見。2006年に準惑星に再分類されました。2015年にニューホライズンズが歴史的なフライバイを行いました。" });
+        addPlanetData('ja', 'Halley', { fact: "ハレー彗星は、人間の生涯に2回、肉眼で見ることができる唯一の彗星です。核は石炭より黒いです。", origin: "太陽系黎明期の原始的な残骸。古代の氷、一酸化炭素、メタン、塵でできた「汚れた雪玉」です。", history: "紀元前240年に中国で記録されています。1705年、エドモンド・ハレーがその周期性に気づき、1758年の帰還を予測しました。" });
+
+        // --- KÓREJSKÁ DATABÁZA OBJEKTOV (한국어) ---
+        addPlanetData('ko', 'Moon', { fact: "달은 지구와 조석 고정되어 있어 항상 같은 면만 보입니다. 지구의 자전축 기울기를 안정시켜 안정적인 기후를 보장합니다.", origin: "약 45억 년 전 화성 크기의 원시 행성(테이아)이 초기 지구와 충돌한 후 형성되었습니다. 표면은 레골리스라는 미세한 먼지로 덮여 있습니다.", history: "고대부터 함께한 동반자. 토마스 해리엇이 1609년 분화구 지도를 작성했습니다. 1969년 아폴로 11호 임무 중 인류가 처음 착륙했습니다." });
+        addPlanetData('ko', 'Mercury', { fact: "수성은 대기가 없기 때문에 밤에는 -180°C에서 낮에는 +430°C까지 태양계에서 가장 극단적인 온도 변화를 겪습니다.", origin: "반지름의 85%를 차지하는 거대한 철핵을 가진 암석 행성. 외부 지각은 거대한 고대 충돌에 의해 벗겨졌을 가능성이 높습니다.", history: "기원전 3000년경 수메르인들에게 알려짐. 1974년 마리너 10호가 처음으로 근접 탐사했고, 이후 메신저호가 극지방 분화구에서 얼음을 발견했습니다." });
+        addPlanetData('ko', 'Venus', { fact: "금성은 태양계에서 가장 뜨거운 행성이며 역방향으로 자전합니다. 금성의 하루는 금성의 일년보다 깁니다.", origin: "크기는 지구와 비슷하지만 96%의 이산화탄소 대기가 온실 효과를 유발합니다. 표면 압력은 지구의 90배입니다.", history: "역사적으로 샛별과 개밥바라기별로 알려짐. 소련의 베네라 9호가 1975년 지옥 같은 표면의 첫 파노라마 사진을 보냈습니다." });
+        addPlanetData('ko', 'Earth', { fact: "지구는 복잡한 생명체와 표면에 막대한 양의 액체 상태의 물이 존재하는 것으로 확인된 우주에서 유일한 행성입니다.", origin: "45억 4천만 년 전에 형성. 회전하는 액체 철 외핵이 강력한 자기장을 생성하여 치명적인 태양 복사로부터 표면을 보호합니다.", history: "16세기에 코페르니쿠스가 마침내 지동설을 증명했습니다. 유명한 '블루 마블' 사진은 1972년 아폴로 17호 승무원에 의해 촬영되었습니다." });
+        addPlanetData('ko', 'Mars', { fact: "화성에는 태양계에서 가장 큰 화산인 올림푸스 몬스가 있습니다. 높이가 21.9km로 에베레스트 산의 거의 3배입니다.", origin: "매우 얇은 CO2 대기를 가진 암석 세계. 특유의 붉은 색은 표면에 산화철(녹) 먼지가 집중되어 있기 때문입니다.", history: "로마 전쟁의 신의 이름을 땀. 1997년부터 큐리오시티, 퍼서비어런스와 같은 성공적인 로봇 로버에 의해 지속적으로 탐사되고 있습니다." });
+        addPlanetData('ko', 'Jupiter', { fact: "목성은 다른 모든 행성을 합친 것보다 큽니다. 대적점은 350년 이상 몰아치고 있는 거대한 폭풍입니다.", origin: "주로 수소와 헬륨으로 구성된 가스 거성. 단단한 표면은 없지만 내부에 액체 금속 수소의 바다가 있을 가능성이 있습니다.", history: "1610년 갈릴레오 갈릴레이가 가장 큰 4개의 위성을 발견하여 모든 것이 지구를 도는 것은 아니라는 것을 증명했습니다." });
+        addPlanetData('ko', 'Saturn', { fact: "토성은 모든 행성 중 밀도가 가장 낮아 물보다도 낮습니다. 거대한 욕조가 있다면 토성은 물에 뜰 것입니다.", origin: "암석과 얼음 코어를 가진 가스 거성. 아름다운 고리는 모래알부터 산 크기까지의 수십억 개의 얼음과 암석 입자로 이루어져 있습니다.", history: "갈릴레오가 1610년에 고리를 처음 보았지만 '귀'라고 생각했습니다. 호이겐스가 1655년에 고리 시스템임을 정확히 식별했습니다." });
+        addPlanetData('ko', 'Uranus', { fact: "천왕성은 98도의 기울기로 '옆으로 누워서' 자전하며 극점이 태양을 향합니다. 이는 과거의 거대한 충돌 때문일 가능성이 큽니다.", origin: "물, 암모니아, 메탄 맨틀을 가진 얼음 거성. 대기의 메탄이 붉은 빛을 흡수하여 아름다운 청록색을 띱니다.", history: "현대 망원경으로 발견된 첫 번째 행성. 윌리엄 허셜이 1781년에 혜성이라고 생각하고 우연히 발견했습니다." });
+        addPlanetData('ko', 'Neptune', { fact: "해왕성은 시속 2,100km에 달하는 무서운 초음속 바람과 함께 태양계에서 가장 폭력적인 날씨를 경험합니다.", origin: "천왕성과 매우 유사하지만 질량이 약간 더 큰 얼음 거성. 짙은 푸른색은 메탄과 알려지지 않은 대기 성분 때문입니다.", history: "천왕성 궤도의 이상에 대한 수학적 예측을 통해 발견된 첫 번째 행성. 요한 갈레가 1846년에 시각적으로 확인했습니다." });
+        addPlanetData('ko', 'Pluto', { fact: "명왕성은 달보다 작습니다. 궤도가 너무 타원형이어서 때때로 해왕성보다 태양에 더 가까워집니다.", origin: "암석과 얼음으로 구성된 카이퍼 벨트의 왜소행성. 표면에는 얼어붙은 질소와 메탄의 광활하고 매끄러운 평원이 있습니다.", history: "1930년 클라이드 톰보에 의해 발견됨. 2006년 IAU에 의해 왜소행성으로 재분류. 2015년 뉴호라이즌스호가 근접 비행했습니다." });
+        addPlanetData('ko', 'Halley', { fact: "핼리 혜성은 인간의 일생 동안 맨눈으로 두 번 볼 수 있는 유일한 혜성입니다. 핵은 석탄보다 검습니다.", origin: "태양계 여명기의 원시 잔해. 오래된 얼음, 일산화탄소, 메탄, 먼지로 만들어진 '더러운 눈덩이'입니다.", history: "기원전 240년 중국에 기록됨. 1705년 에드먼드 핼리가 주기를 파악하고 1758년의 귀환을 성공적으로 예측했습니다." });
+
+// --- CHÝBAJÚCE PREKLADY PRE SLNKO (SUN) ---
+        addPlanetData('fr', 'Sun', { 
+            fact: "Le Soleil représente 99,86 % de la masse totale du système solaire. Chaque seconde, son cœur convertit 600 millions de tonnes d'hydrogène en hélium.", 
+            origin: "Formé il y a 4,6 milliards d'années à partir de l'effondrement d'une nébuleuse. Composé principalement d'hydrogène (73 %) et d'hélium (25 %).", 
+            history: "Vénéré comme un dieu suprême dans les cultures anciennes. Galilée a observé ses taches solaires en 1610." 
+        });
+        
+        addPlanetData('es', 'Sun', { 
+            fact: "El Sol representa el 99,86 % de la masa total del sistema solar. Cada segundo, su núcleo convierte 600 millones de toneladas de hidrógeno en helio.", 
+            origin: "Se formó hace 4.600 millones de años a partir del colapso de una nebulosa. Compuesto principalmente de hidrógeno (73 %) y helio (25 %).", 
+            history: "Adorado como un dios supremo en las culturas antiguas. Galileo observó sus manchas solares en 1610." 
+        });
+        
+        addPlanetData('zh', 'Sun', { 
+            fact: "太阳占整个太阳系总质量的99.86%。每秒钟，它的核心通过核聚变将6亿吨氢转化为氦，释放出巨大的能量。", 
+            origin: "46亿年前由巨大的星际气体星云引力坍缩形成。主要由氢（73%）和氦（25%）组成。", 
+            history: "在古代文化中被尊为最高神（如拉、赫利俄斯）。伽利略在1610年首次用望远镜观察到太阳黑子。" 
+        });
+        
+        addPlanetData('hi', 'Sun', { 
+            fact: "सूर्य पूरे सौरमंडल के कुल द्रव्यमान का 99.86% हिस्सा है। हर सेकंड, इसका कोर परमाणु संलयन के माध्यम से 600 मिलियन टन हाइड्रोजन को हीलियम में परिवर्तित करता है।", 
+            origin: "यह 4.6 अरब साल पहले एक विशाल अंतरतारकीय गैस निहारिका के गुरुत्वाकर्षण पतन से बना था। यह मुख्य रूप से हाइड्रोजन (73%) और हीलियम (25%) से बना है।", 
+            history: "प्राचीन संस्कृतियों में एक सर्वोच्च देवता के रूप में पूजा जाता था। गैलीलियो गैलीली ने 1610 में पहली बार टेलीस्कोप के माध्यम से सनस्पॉट देखे थे।" 
+        });
+        
+        addPlanetData('ja', 'Sun', { 
+            fact: "太陽は太陽系全体の総質量の99.86％を占めています。毎秒、そのコアは核融合によって6億トンの水素をヘリウムに変換し、膨大なエネルギーを放出しています。", 
+            origin: "46億年前に巨大な星間ガス星雲の重力崩壊から形成されました。主に水素（73％）とヘリウム（25％）で構成されています。", 
+            history: "古代文化では最高神として崇拝されていました。ガリレオ・ガリレイは1610年に望遠鏡で初めて黒点を観察しました。" 
+        });
+        
+        addPlanetData('ko', 'Sun', { 
+            fact: "태양은 전체 태양계 총 질량의 99.86%를 차지합니다. 매초 핵은 핵융합을 통해 6억 톤의 수소를 헬륨으로 변환하여 엄청난 에너지를 방출합니다.", 
+            origin: "46억 년 전 거대한 성간 가스 성운의 중력 붕괴로 형성되었습니다. 주로 수소(73%)와 헬륨(25%)으로 구성되어 있습니다.", 
+            history: "고대 문화에서 최고 신으로 숭배되었습니다. 갈릴레오 갈릴레이는 1610년 망원경을 통해 처음으로 흑점을 관찰했습니다." 
+        });
 
         // --- EXTERNÉ OKNÁ (S plnou podporou prekladača do všetkých jazykov) ---
         async function showSpaceEvents(planetKey) {
